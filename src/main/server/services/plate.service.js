@@ -10,12 +10,12 @@ const inputCar = (req, res) => {
 
     const { fullImage, plateImage, number } = parsePlateData(req.body);
 
-    getIO().emit("inputCar", { number, plateImage, fullImage });
+    getIO().emit("inputCar", { number, plateImage, fullImage, cameraIp: req.headers.host });
 
     res.status(200).send("OK");
   } catch (error) {
     console.error(`❌ Error processing ${eventName}:`, error);
-    next(error);
+    res.status(400).send(error);
   }
 };
 
@@ -33,7 +33,7 @@ const outputCar = (req, res) => {
     res.status(200).send("OK");
   } catch (error) {
     console.error(`❌ Error processing ${eventName}:`, error);
-    next(error);
+    res.status(400).send(error);
   }
 };
 

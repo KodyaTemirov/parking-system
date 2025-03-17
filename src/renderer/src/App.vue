@@ -55,7 +55,8 @@
   });
 
   const addSessionHandler = async () => {
-    const { number, plateImage, fullImage, eventName, paymentMethod, tariffType } = newCar.value;
+    const { number, plateImage, fullImage, eventName, paymentMethod, tariffType, cameraIp } =
+      newCar.value;
 
     console.log("newCar.value", newCar.value);
 
@@ -66,6 +67,7 @@
       eventName: eventName || "input",
       paymentMethod,
       tariffType: tariffType || 1,
+      cameraIp,
     });
 
     // window.api.send("new-session", {
@@ -149,6 +151,7 @@
       <Plans v-model="newCar.tariffType" />
       <div class="sub-title">Выберите метод оплаты</div>
       <PaymentSelector v-model="newCar.paymentMethod" />
+      <div class="sub-title">IP камеры: {{ newCar.cameraIp }}</div>
 
       <Button @click="addSessionHandler" class="my-4 w-full">Открыть ворота</Button>
     </Drawer>

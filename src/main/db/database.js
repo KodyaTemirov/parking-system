@@ -58,7 +58,8 @@ db.prepare(
     cost REAL,
     paymentMethod INTEGER,
     paymentStatus INTEGER,
-    isSync INTEGER DEFAULT 0
+    isSync INTEGER DEFAULT 0,
+    cameraIp TEXT
   );
 `
 ).run();

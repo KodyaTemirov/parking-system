@@ -2,11 +2,40 @@ import db from "@/db/database.js";
 import { getIO } from "../../utils/socket.js";
 
 const registerSession = async (req, res) => {
+  const { number, plateImage, fullImage, eventName, tariffType, paymentMethod, cameraIp } =
+    req.body;
+
+  const stmt = db.prepare(`
+    INSERT INTO sessions
+      (plateNumber, plateImage, fullImage, startTime, endTime, event, tariffType, duration, cost, paymentMethod,cameraIp)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+
+  const result = stmt.run(
+    number,
+    plateImage || null,
+    fullImage || null,
+    new Date().toISOString(),
+    null,
+    eventName,
+    tariffType,
+    null,
+    null,
+    paymentMethod,
+    cameraIp
+  );
+
+  const insertedData = db
+    .prepare("SELECT * FROM sessions WHERE id = ?")
+    .get(result.lastInsertRowid);
+
+  await getIO().emit("newSession", insertedData);
+
+  res.status(201).send(insertedData);
+};
+
+const outputSession = async (req, res) => {
   const { number, plateImage, fullImage, eventName, tariffType, paymentMethod } = req.body;
-
-  console.log(number, eventName, tariffType, paymentMethod, "INFOS");
-
-  console.log(req.body);
 
   const stmt = db.prepare(`
     INSERT INTO sessions
@@ -18,7 +47,7 @@ const registerSession = async (req, res) => {
     number,
     plateImage || null,
     fullImage || null,
-    new Date().toISOString(), // Текущее время для startTime
+    new Date().toISOString(),
     null,
     eventName,
     tariffType,
@@ -42,4 +71,4 @@ const getSessions = (req, res) => {
   res.status(200).send(data);
 };
 
-export { registerSession, getSessions };
+export { registerSession, getSessions, outputSession };
