@@ -1,20 +1,28 @@
-import { contextBridge } from 'electron'
-import { electronAPI } from '@electron-toolkit/preload'
+import { contextBridge, ipcRenderer } from "electron";
+import { electronAPI } from "@electron-toolkit/preload";
 
-// Custom APIs for renderer
-const api = {}
+// Кастомный API
+const api = {
+  onMessage: (channel, callback) => {
+    ipcRenderer.removeAllListeners(channel); // Убираем старые слушатели
+    ipcRenderer.on(channel, (_, data) => callback(data));
+  },
 
-// Use `contextBridge` APIs to expose Electron APIs to
-// renderer only if context isolation is enabled, otherwise
-// just add to the DOM global.
+  send: (channel, data) => {
+    console.log(`Sending data to ${channel}:`, data);
+    ipcRenderer.send(channel, data);
+  },
+};
+
+// Экспозим API в рендерер через contextBridge
 if (process.contextIsolated) {
   try {
-    contextBridge.exposeInMainWorld('electron', electronAPI)
-    contextBridge.exposeInMainWorld('api', api)
+    contextBridge.exposeInMainWorld("electron", electronAPI);
+    contextBridge.exposeInMainWorld("api", api);
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
 } else {
-  window.electron = electronAPI
-  window.api = api
+  window.electron = electronAPI;
+  window.api = api;
 }

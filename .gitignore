@@ -3,3 +3,5 @@ dist
 out
 .DS_Store
 *.log*
+xml_log copy.json
+xml_log.json
