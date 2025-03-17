@@ -16,6 +16,7 @@
   const initialCar = {
     paymentMethod: 1,
     tariffType: 1,
+    eventName: "inputCar",
   };
   const newCar = ref({
     ...initialCar,
