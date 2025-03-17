@@ -11,6 +11,37 @@ const dbPath = isDev
 // Подключаем базу
 const db = new Database(dbPath, { verbose: console.log });
 
+db.prepare(
+  `
+  CREATE TABLE IF NOT EXISTS camras (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    login TEXT,
+    ip TEXT,
+    password TEXT,
+    operatorId INTEGER
+  );
+  `
+).run();
+
+db.prepare(
+  `
+  CREATE TABLE IF NOT EXISTS operators (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT
+  );
+  `
+).run();
+
+db.prepare(
+  `
+  CREATE TABLE IF NOT EXISTS configs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    mode TEXT
+  );
+  `
+).run();
+
 // Создаем таблицу, если её нет
 db.prepare(
   `
@@ -28,7 +59,7 @@ db.prepare(
     paymentMethod INTEGER,
     paymentStatus INTEGER,
     isSync INTEGER DEFAULT 0
-  )
+  );
 `
 ).run();
 

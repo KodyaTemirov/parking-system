@@ -1,5 +1,6 @@
 import { ipcMain } from "electron";
 import axios from "axios";
+
 import db from "@/db/database.js";
 const config = {
   headers: {
