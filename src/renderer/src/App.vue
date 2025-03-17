@@ -13,14 +13,8 @@
 
   const sessionStore = useSessionsStore();
   const currentTariff = ref();
-  const initialCar = {
-    paymentMethod: 1,
-    tariffType: 1,
-    eventName: "inputCar",
-  };
-  const newCar = ref({
-    ...initialCar,
-  });
+  const initialCar = { paymentMethod: 1, tariffType: 1, eventName: "output" };
+  const newCar = ref({ ...initialCar });
 
   //Событие Вход
   window.api.onMessage("inputCar", (data) => {
@@ -41,20 +35,19 @@
 
   const addSessionHandler = () => {
     const { number, plateImage, fullImage, eventName, paymentMethod, tariffType } = newCar.value;
+
     window.api.send("new-session", {
       number,
       plateImage,
       fullImage,
-      eventName,
+      eventName: eventName || "input",
       paymentMethod,
       tariffType: tariffType || 1,
     });
 
     window.api.onMessage("new-session", (data) => {
       sessionStore.addSession(data);
-      newCar.value = {
-        ...initialCar,
-      };
+      newCar.value = { ...initialCar };
     });
 
     isOpen.value = false;
@@ -63,9 +56,7 @@
   const isOpen = ref(false);
   const openDrawer = () => {
     isOpen.value = true;
-    newCar.value = {
-      ...initialCar,
-    };
+    newCar.value = { ...initialCar };
   };
 
   const selectPaymentMethod = (id) => {

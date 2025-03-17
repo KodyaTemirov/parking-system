@@ -1,9 +1,10 @@
-import express from "express";
+import { Router } from "express";
 import { parsePlateData } from "@/utils/parsePlateData.js";
 import db from "@/db/database.js";
+import { Builder } from "xml2js";
 import fs from "fs";
 
-const router = express.Router();
+const router = Router();
 
 const handleCarData = (mainWindow, eventName) => async (req, res, next) => {
   try {
@@ -12,14 +13,9 @@ const handleCarData = (mainWindow, eventName) => async (req, res, next) => {
       throw new Error("No body in request");
     }
 
-    // fs.writeFileSync("lastRequestBody.xml", req.body);
     const { fullImage, plateImage, number } = parsePlateData(req.body);
 
-    mainWindow.webContents.send(eventName, {
-      number,
-      plateImage,
-      fullImage,
-    });
+    mainWindow.webContents.send(eventName, { number, plateImage, fullImage });
 
     res.status(200).send("OK");
   } catch (error) {

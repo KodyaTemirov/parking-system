@@ -25,8 +25,9 @@ db.prepare(
     tariffType INTEGER,
     duration INTEGER,
     cost REAL,
-    paymentMethod INTEGER
-    paymentStatus INTEGER
+    paymentMethod INTEGER,
+    paymentStatus INTEGER,
+    isSync INTEGER DEFAULT 0
   )
 `
 ).run();

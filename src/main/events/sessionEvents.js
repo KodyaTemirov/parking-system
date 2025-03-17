@@ -35,7 +35,7 @@ export function registerSessionEvents() {
     "new-session",
     (event, { number, plateImage, fullImage, eventName, tariffType, paymentMethod }) => {
       const stmt = db.prepare(`
-  INSERT INTO sessions 
+  INSERT INTO sessions
     (plateNumber, plateImage, fullImage, startTime, endTime, event, tariffType, duration, cost, paymentMethod)
   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `);
