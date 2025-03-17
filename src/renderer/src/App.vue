@@ -7,9 +7,6 @@
   import Plans from "./components/Plans.vue";
   import PaymentSelector from "./components/PaymentSelector.vue";
   import socket from "./helpers/socket.js";
-
-  import { Icon } from "@iconify/vue";
-
   import { useSessionsStore } from "@/store/SessionsStore";
   import axios from "axios";
 

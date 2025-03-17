@@ -1,6 +1,12 @@
-import { BrowserWindow, shell } from "electron";
+import { BrowserWindow, shell, Menu } from "electron";
 import { join } from "path";
 import { is } from "@electron-toolkit/utils";
+
+function getAppURL() {
+  return is.dev && process.env["ELECTRON_RENDERER_URL"]
+    ? process.env["ELECTRON_RENDERER_URL"]
+    : join(__dirname, "../renderer/index.html");
+}
 
 export function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -9,7 +15,6 @@ export function createWindow() {
     show: false,
     title: "Parkly",
 
-    autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: false,
       preload: join(__dirname, "../preload/index.mjs"),
@@ -30,11 +35,7 @@ export function createWindow() {
     return { action: "deny" };
   });
 
-  if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
-    mainWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]);
-  } else {
-    mainWindow.loadFile(join(__dirname, "../renderer/index.html"));
-  }
+  mainWindow.loadURL(getAppURL());
 
   return mainWindow;
 }
