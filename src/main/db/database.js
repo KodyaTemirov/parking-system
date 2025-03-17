@@ -13,7 +13,7 @@ const db = new Database(dbPath, { verbose: console.log });
 
 db.prepare(
   `
-  CREATE TABLE IF NOT EXISTS camras (
+  CREATE TABLE IF NOT EXISTS cameras (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
     login TEXT,

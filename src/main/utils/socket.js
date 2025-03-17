@@ -39,8 +39,8 @@ function getIO() {
   return io;
 }
 
-async function getClientSocket(id) {
-  return await UserModel.findOne({ where: { id }, attributes: ["socketId"] });
-}
+// async function getClientSocket(id) {
+//   return await UserModel.findOne({ where: { id }, attributes: ["socketId"] });
+// }
 
-export { initializeSocket, getIO, getClientSocket };
+export { initializeSocket, getIO };
