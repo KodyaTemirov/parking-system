@@ -19,7 +19,16 @@
   const newCar = ref({ ...initialCar });
 
   //Событие Вход
-  window.api.onMessage("inputCar", (data) => {
+  // window.api.onMessage("inputCar", (data) => {
+  //   try {
+  //     newCar.value = data;
+  //     isOpen.value = true;
+  //   } catch (error) {
+  //     console.log("error при добавлении", error);
+  //   }
+  // });
+
+  socket.on("inputCar", async (data) => {
     try {
       newCar.value = data;
       isOpen.value = true;
@@ -28,11 +37,21 @@
     }
   });
 
-  // Событие Выход
-  window.api.onMessage("outputCar", (data) => {
-    newCar.value = { ...newCar.value, ...data };
-    isOpen.value = true;
-    console.log("outputCar", data);
+  // // Событие Выход
+  // window.api.onMessage("outputCar", (data) => {
+  //   newCar.value = { ...newCar.value, ...data };
+  //   isOpen.value = true;
+  //   console.log("outputCar", data);
+  // });
+
+  socket.on("outputCar", async (data) => {
+    try {
+      newCar.value = { ...newCar.value, ...data };
+      isOpen.value = true;
+      console.log("outputCar", data);
+    } catch (error) {
+      console.log("error при добавлении", error);
+    }
   });
 
   const addSessionHandler = async () => {
@@ -40,7 +59,7 @@
 
     console.log("newCar.value", newCar.value);
 
-    const { data } = await axios.post("http://10.20.11.143:9061/api/register-session", {
+    await axios.post("http://10.20.11.143:9061/api/register-session", {
       number,
       plateImage,
       fullImage,
