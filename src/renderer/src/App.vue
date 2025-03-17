@@ -6,10 +6,12 @@
   import CarPlate from "./components/CarPlate.vue";
   import Plans from "./components/Plans.vue";
   import PaymentSelector from "./components/PaymentSelector.vue";
+  import socket from "./helpers/socket.js";
 
   import { Icon } from "@iconify/vue";
 
   import { useSessionsStore } from "@/store/SessionsStore";
+  import axios from "axios";
 
   const sessionStore = useSessionsStore();
   const currentTariff = ref();
@@ -33,10 +35,12 @@
     console.log("outputCar", data);
   });
 
-  const addSessionHandler = () => {
+  const addSessionHandler = async () => {
     const { number, plateImage, fullImage, eventName, paymentMethod, tariffType } = newCar.value;
 
-    window.api.send("new-session", {
+    console.log("newCar.value", newCar.value);
+
+    const { data } = await axios.post("http://10.20.11.143:9061/api/register-session", {
       number,
       plateImage,
       fullImage,
@@ -45,10 +49,19 @@
       tariffType: tariffType || 1,
     });
 
-    window.api.onMessage("new-session", (data) => {
-      sessionStore.addSession(data);
-      newCar.value = { ...initialCar };
-    });
+    // window.api.send("new-session", {
+    //   number,
+    //   plateImage,
+    //   fullImage,
+    //   eventName: eventName || "input",
+    //   paymentMethod,
+    //   tariffType: tariffType || 1,
+    // });
+
+    // window.api.onMessage("new-session", (data) => {
+    //   sessionStore.addSession(data);
+    //   newCar.value = { ...initialCar };
+    // });
 
     isOpen.value = false;
   };
@@ -63,13 +76,32 @@
     newCar.value = { ...newCar.value, paymentMethod: id };
   };
 
-  const getAllSession = () => {
-    window.api.send("getSessions");
-    window.api.onMessage("getSessions", (sessions) => {
-      sessionStore.setSessions(sessions);
-    });
+  const getAllSession = async () => {
+    try {
+      const { data } = await axios.get("http://10.20.11.143:9061/api/session", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      sessionStore.setSessions(data);
+    } catch (error) {
+      console.log(error, "ERRROR");
+    }
   };
+
+  socket.on("newSession", async (info) => {
+    try {
+      sessionStore.addSession(info);
+      newCar.value = { ...initialCar };
+    } catch (error) {
+      console.error(error);
+    }
+  });
+
   onMounted(() => {
+    socket.connect();
+
     getAllSession();
   });
 

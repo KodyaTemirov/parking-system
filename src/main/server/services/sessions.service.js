@@ -1,7 +1,10 @@
 import db from "@/db/database.js";
+import { getIO } from "../../utils/socket.js";
 
-const registerSession = (req, res) => {
+const registerSession = async (req, res) => {
   const { number, plateImage, fullImage, eventName, tariffType, paymentMethod } = req.body;
+
+  console.log(number, eventName, tariffType, paymentMethod, "INFOS");
 
   console.log(req.body);
 
@@ -27,7 +30,8 @@ const registerSession = (req, res) => {
   const insertedData = db
     .prepare("SELECT * FROM sessions WHERE id = ?")
     .get(result.lastInsertRowid);
-  console.log(insertedData);
+
+  await getIO().emit("newSession", insertedData);
 
   res.status(201).send(insertedData);
 };
