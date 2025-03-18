@@ -9,7 +9,7 @@ const inputCar = async (req, res) => {
       throw new Error("No body in request");
     }
 
-    const operator = await GETCAMERAOPERATOR(req.headers.host);
+    // const operator = await GETCAMERAOPERATOR(req.headers.host);
 
     const { fullImage, plateImage, number } = parsePlateData(req.body);
 
@@ -18,7 +18,7 @@ const inputCar = async (req, res) => {
       plateImage,
       fullImage,
       cameraIp: req.headers.host,
-      operator,
+      // operator,
     });
 
     res.status(200).send("OK");
