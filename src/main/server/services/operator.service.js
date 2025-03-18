@@ -18,7 +18,7 @@ const POSTOPERATORS = async (req, res) => {
     const stmt = db.prepare(`
     INSERT INTO operators
       (name)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    VALUES (?)
   `);
 
     const result = stmt.run(name);
