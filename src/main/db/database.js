@@ -34,15 +34,6 @@ db.prepare(
   `
 ).run();
 
-db.prepare(
-  `
-  CREATE TABLE IF NOT EXISTS configs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    mode TEXT
-  );
-  `
-).run();
-
 // Создаем таблицу, если её нет
 db.prepare(
   `
