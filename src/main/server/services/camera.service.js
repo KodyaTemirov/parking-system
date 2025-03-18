@@ -11,6 +11,18 @@ const GETCAMERAS = async (req, res) => {
   }
 };
 
+const GETCAMERAOPERATOR = async (req, res) => {
+  try {
+    const { ip } = req.body;
+
+    const data = db.prepare("SELECT * FROM cameras WHERE ip = ? ORDER BY id ASC").get(ip);
+
+    res.status(200).send(data);
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
+};
+
 const POSTCAMERAS = async (req, res) => {
   try {
     const { name, login, ip, password, operatorId, status, type } = req.body;
@@ -95,4 +107,4 @@ WHERE id = ?;`
   }
 };
 
-export { GETCAMERAS, POSTCAMERAS, PUTCAMERAS, DELETECAMERAS };
+export { GETCAMERAS, POSTCAMERAS, PUTCAMERAS, DELETECAMERAS, GETCAMERAOPERATOR };
