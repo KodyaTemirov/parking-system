@@ -15,6 +15,9 @@
   const initialCar = { paymentMethod: 1, tariffType: 1, eventName: "output" };
   const newCar = ref({ ...initialCar });
 
+  const isLocal =
+    window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const backendURL = isLocal ? "http://127.0.0.1:9061" : "http://10.20.11.143:9061";
   //Событие Вход
   // window.api.onMessage("inputCar", (data) => {
   //   try {
@@ -57,7 +60,7 @@
 
     console.log("newCar.value", newCar.value);
 
-    await axios.post("http://10.20.11.143:9061/api/register-session", {
+    await axios.post(`${backendURL}/api/register-session`, {
       number,
       plateImage,
       fullImage,
@@ -96,7 +99,7 @@
 
   const getAllSession = async () => {
     try {
-      const { data } = await axios.get("http://10.20.11.143:9061/api/session", {
+      const { data } = await axios.get(`${backendURL}/api/session`, {
         headers: {
           "Content-Type": "application/json",
         },
