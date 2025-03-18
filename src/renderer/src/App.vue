@@ -34,7 +34,7 @@
       console.log(data);
 
       newCar.value = data;
-      // isOpen.value = true;
+      isOpen.value = true;
     } catch (error) {
       console.log("error при добавлении", error);
     }
