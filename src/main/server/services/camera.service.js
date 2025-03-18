@@ -43,7 +43,8 @@ const POSTCAMERAS = async (req, res) => {
       },
     });
 
-    if (data.status != 200) return res.status(400).send({ message: "Camera not found" });
+    if (data.status != 200)
+      return res.status(400).send({ message: "Password or login is incorrect" });
 
     const stmt = db.prepare(`
     INSERT INTO cameras
