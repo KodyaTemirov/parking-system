@@ -6,6 +6,8 @@
   import CarPlate from "./components/CarPlate.vue";
   import Plans from "./components/Plans.vue";
   import PaymentSelector from "./components/PaymentSelector.vue";
+  import AddCamera from "./components/AddCamera.vue";
+
   import socket from "./helpers/socket.js";
   import { useSessionsStore } from "@/store/SessionsStore";
   import axios from "axios";
@@ -16,33 +18,27 @@
   const newCar = ref({ ...initialCar });
 
   const backendURL = "http://10.20.10.157:9061";
-  //Событие Вход
-  // window.api.onMessage("inputCar", (data) => {
-  //   try {
-  //     newCar.value = data;
-  //     isOpen.value = true;
-  //   } catch (error) {
-  //     console.log("error при добавлении", error);
-  //   }
-  // });
+  const isOpen = ref(false);
+
+  const addCam = ref({
+    open: false,
+    id: null,
+  });
+
+  const openModalHandler = (id) => {
+    addCam.value = { open: true, id };
+  };
 
   socket.on("inputCar", async (data) => {
     try {
       console.log(data);
 
       newCar.value = data;
-      isOpen.value = true;
+      // isOpen.value = true;
     } catch (error) {
       console.log("error при добавлении", error);
     }
   });
-
-  // // Событие Выход
-  // window.api.onMessage("outputCar", (data) => {
-  //   newCar.value = { ...newCar.value, ...data };
-  //   isOpen.value = true;
-  //   console.log("outputCar", data);
-  // });
 
   socket.on("outputCar", async (data) => {
     try {
@@ -70,24 +66,9 @@
       cameraIp,
     });
 
-    // window.api.send("new-session", {
-    //   number,
-    //   plateImage,
-    //   fullImage,
-    //   eventName: eventName || "input",
-    //   paymentMethod,
-    //   tariffType: tariffType || 1,
-    // });
-
-    // window.api.onMessage("new-session", (data) => {
-    //   sessionStore.addSession(data);
-    //   newCar.value = { ...initialCar };
-    // });
-
     isOpen.value = false;
   };
 
-  const isOpen = ref(false);
   const openDrawer = () => {
     isOpen.value = true;
     newCar.value = { ...initialCar };
@@ -99,11 +80,7 @@
 
   const getAllSession = async () => {
     try {
-      const { data } = await axios.get(`${backendURL}/api/session`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const { data } = await axios.get(`${backendURL}/api/session`);
 
       sessionStore.setSessions(data);
     } catch (error) {
@@ -122,8 +99,9 @@
 
   onMounted(() => {
     socket.connect();
-
     getAllSession();
+
+    window.api.onMessage("add-camera", openModalHandler);
   });
 
   watch(
@@ -157,6 +135,7 @@
     </Drawer>
     <Sessions />
   </div>
+  <AddCamera v-model:open="addCam.open" :id="addCam.id" />
 </template>
 <style scoped>
   @reference "@/assets/main.css";
