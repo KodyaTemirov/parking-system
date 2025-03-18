@@ -20,7 +20,6 @@ const POSTCAMERAS = async (req, res) => {
         Authorization: "Basic " + btoa(`${login}:${password}`),
       },
     });
-    console.log(data);
 
     if (data.status != 200) return res.status(400).send({ message: "Camera not found" });
 
@@ -52,7 +51,6 @@ const PUTCAMERAS = async (req, res) => {
         Authorization: "Basic " + btoa(`${login}:${password}`),
       },
     });
-    console.log(info);
 
     if (info.status != 200) return res.status(400).send({ message: "Camera not found" });
 
