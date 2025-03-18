@@ -28,6 +28,8 @@
 
   socket.on("inputCar", async (data) => {
     try {
+      console.log(data);
+
       newCar.value = data;
       isOpen.value = true;
     } catch (error) {
