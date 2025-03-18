@@ -1,14 +1,19 @@
 import { Router } from "express";
-import { DELETECAMERAS, GETCAMERAS, POSTCAMERAS, PUTCAMERAS } from "../services/camera.service.js";
+import {
+  DELETEOPERATORS,
+  GETOPERATORS,
+  POSTOPERATORS,
+  PUTOPERATORS,
+} from "../services/operator.service.js";
 
 const router = Router();
 
-router.get("/operator", GETCAMERAS);
+router.get("/operator", GETOPERATORS);
 
-router.post("/operator", POSTCAMERAS);
+router.post("/operator", POSTOPERATORS);
 
-router.put("/operator/:id", PUTCAMERAS);
+router.put("/operator/:id", PUTOPERATORS);
 
-router.delete("/operator/:id", DELETECAMERAS);
+router.delete("/operator/:id", DELETEOPERATORS);
 
 export default router;
