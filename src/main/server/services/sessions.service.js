@@ -33,12 +33,12 @@ const registerSession = async (req, res) => {
 
   await getIO().emit("newSession", insertedData);
 
-  const camera = await getCameraOperator(req.headers.host);
-
-  openFetch(true, req.headers.host, camera.login, camera.password);
+  const camera = await getCameraOperator(cameraIp);
+  console.log(camera);
+  openFetch(true, cameraIp, camera.login, camera.password);
 
   setTimeout(() => {
-    openFetch(false, req.headers.host, camera.login, camera.password);
+    openFetch(false, cameraIp, camera.login, camera.password);
   }, 100);
 
   res.status(201).send(insertedData);
