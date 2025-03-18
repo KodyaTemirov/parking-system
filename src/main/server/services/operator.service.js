@@ -13,21 +13,29 @@ const GETOPERATORS = async (req, res) => {
 
 const POSTOPERATORS = async (req, res) => {
   try {
-    const { name } = req.body;
-
     const stmt = db.prepare(`
     INSERT INTO operators
-      (name)
-    VALUES (?)
+      ()
+    VALUES ()
   `);
 
-    const result = stmt.run(name);
+    const result = stmt.run();
 
     const insertedData = db
       .prepare("SELECT * FROM operators WHERE id = ?")
       .get(result.lastInsertRowid);
 
-    res.status(200).send(insertedData);
+    const data = db
+      .prepare(
+        `UPDATE operators
+         SET name = ?
+         WHERE id = ?;`
+      )
+      .run(`OPERATOR-${insertedData.id}`, insertedData.id);
+
+    const updatedInfo = db.prepare("SELECT * FROM operators WHERE id = ?").get(insertedData.id);
+
+    res.status(200).send(updatedInfo);
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
