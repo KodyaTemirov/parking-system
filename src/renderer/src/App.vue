@@ -15,9 +15,7 @@
   const initialCar = { paymentMethod: 1, tariffType: 1, eventName: "output" };
   const newCar = ref({ ...initialCar });
 
-  const isLocal =
-    window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-  const backendURL = isLocal ? "http://127.0.0.1:9061" : "http://10.20.11.143:9061";
+  const backendURL = "http://10.20.10.157:9061";
   //Событие Вход
   // window.api.onMessage("inputCar", (data) => {
   //   try {
