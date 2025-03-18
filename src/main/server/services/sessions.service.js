@@ -1,6 +1,7 @@
 import db from "@/db/database.js";
 import { getIO } from "../../utils/socket.js";
 import { openFetch } from "./plate.service.js";
+import { getCameraOperator } from "./camera.service.js";
 
 const registerSession = async (req, res) => {
   const { number, plateImage, fullImage, eventName, tariffType, paymentMethod, cameraIp } =
