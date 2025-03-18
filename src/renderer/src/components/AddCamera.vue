@@ -15,10 +15,12 @@
 
   const isDialogOpen = ref(true);
   const backendURL = "http://10.20.10.157:9061";
+  const isLoading = ref(false);
+  const errorMessage = ref("");
 
   const cameraInfo = ref({
     name: "",
-    ip: "",
+    ip: "10.20.10.131",
     login: "",
     password: "",
     operatorId: "",
@@ -32,43 +34,53 @@
     },
   });
 
-  const operators = ref([]); // Храним список операторов
+  const operators = ref([]);
 
-  const addCamera = () => {
+  const addCamera = async () => {
     if (cameraInfo.value.ip.trim() && cameraInfo.value.name.trim() && cameraInfo.value.operatorId) {
-      window.api.send("add-camera", { ...cameraInfo.value });
-
-      isDialogOpen.value = false;
-      cameraInfo.value = {
-        name: "",
-        login: "",
-        ip: "",
-        password: "",
-        operatorId: "",
-        type: "",
-      };
+      try {
+        isLoading.value = true;
+        errorMessage.value = "";
+        await axios.post(`${backendURL}/api/camera`, cameraInfo.value);
+        isDialogOpen.value = false;
+        cameraInfo.value = {
+          name: "",
+          login: "",
+          ip: "",
+          password: "",
+          operatorId: "",
+          type: "",
+        };
+        isDialogOpen.value = false;
+      } catch (error) {
+        console.error("Ошибка при добавлении камеры:", error);
+        errorMessage.value = error.response?.data?.message || "Не удалось добавить камеру.";
+      } finally {
+        isLoading.value = false;
+      }
     }
   };
 
   const getAllOperators = async () => {
     try {
       const { data } = await axios.get(`${backendURL}/api/operator`);
-      operators.value = data; // Записываем операторов в состояние
+      operators.value = data;
     } catch (error) {
       console.error("Ошибка при получении операторов:", error);
     }
   };
 
-  onMounted(() => {
-    getAllOperators();
-  });
-
   watch(
     () => props.id,
     (newValue) => {
+      getAllOperators();
       cameraInfo.value.operatorId = newValue;
     }
   );
+
+  onMounted(() => {
+    getAllOperators();
+  });
 </script>
 
 <template>
@@ -109,9 +121,14 @@
           </select>
         </div>
 
+        <p v-if="errorMessage" class="mt-2 text-red-500">{{ errorMessage }}</p>
+
         <div class="mt-4 flex justify-end space-x-2">
           <DialogClose as="button" class="rounded bg-gray-200 px-4 py-2">Отмена</DialogClose>
-          <Button @click="addCamera">Добавить</Button>
+          <Button @click="addCamera" :disabled="isLoading">
+            <span v-if="isLoading" class="animate-spin">🔄</span>
+            <span v-else>Добавить</span>
+          </Button>
         </div>
 
         <DialogClose class="absolute top-2 right-2">

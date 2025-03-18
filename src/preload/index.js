@@ -1,10 +1,8 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { electronAPI } from "@electron-toolkit/preload";
-
-// Кастомный API
 const api = {
   onMessage: (channel, callback) => {
-    ipcRenderer.removeAllListeners(channel); // Убираем старые слушатели
+    ipcRenderer.removeAllListeners(channel);
     ipcRenderer.on(channel, (_, data) => callback(data));
   },
 
@@ -12,17 +10,22 @@ const api = {
     console.log(`Sending data to ${channel}:`, data);
     ipcRenderer.send(channel, data);
   },
+
+  getSelectedOperator: () => ipcRenderer.invoke("get-selected-operator"),
+
+  onSelectedOperator: (callback) => {
+    ipcRenderer.removeAllListeners("selected-operator");
+    ipcRenderer.on("selected-operator", (_, operator) => callback(operator));
+  },
 };
 
-// Экспозим API в рендерер через contextBridge
+// Экспорт API через `contextBridge`
 if (process.contextIsolated) {
   try {
-    contextBridge.exposeInMainWorld("electron", electronAPI);
     contextBridge.exposeInMainWorld("api", api);
   } catch (error) {
-    console.error(error);
+    console.error("Ошибка при экспорте API:", error);
   }
 } else {
-  window.electron = electronAPI;
   window.api = api;
 }

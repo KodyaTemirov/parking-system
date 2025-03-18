@@ -17,6 +17,8 @@
   const initialCar = { paymentMethod: 1, tariffType: 1, eventName: "output" };
   const newCar = ref({ ...initialCar });
 
+  const selectedOperator = ref(null);
+
   const backendURL = "http://10.20.10.157:9061";
   const isOpen = ref(false);
 
@@ -31,8 +33,6 @@
 
   socket.on("inputCar", async (data) => {
     try {
-      console.log(data);
-
       newCar.value = data;
       isOpen.value = true;
     } catch (error) {
@@ -97,11 +97,25 @@
     }
   });
 
+  watch(
+    () => selectedOperator.value,
+    (newValue) => {
+      console.log("selectedOperator new", newValue);
+    }
+  );
+
   onMounted(() => {
     socket.connect();
     getAllSession();
 
     window.api.onMessage("add-camera", openModalHandler);
+
+    window.api.onMessage("selected-operator", (operator) => {
+      console.log("operator", operator);
+      selectedOperator.value = operator;
+    });
+
+    window.api.send("request-selected-operator");
   });
 
   watch(

@@ -10,6 +10,13 @@ const API_CAMERAS_BASE_URL = "http://10.20.10.157:9061/api/camera/operators";
 const getCheckboxState = () => store.get("checkboxState", false);
 const updateCheckboxState = (state) => store.set("checkboxState", state);
 
+const getSelectedOperator = () => store.get("selectedOperator", null);
+const updateSelectedOperator = (mainWindow, operatorId) => {
+  mainWindow.webContents.send("selected-operator", operatorId);
+
+  store.set("selectedOperator", operatorId);
+};
+
 export const handleCheckboxToggle = async (newState, mainWindow) => {
   updateCheckboxState(newState);
 
@@ -48,11 +55,20 @@ const fetchCameras = async (operatorId) => {
 
 const addOperator = async (mainWindow) => {
   try {
-    const newOperator = { name: "Новый оператор" }; // Здесь можно сделать ввод через окно
+    const newOperator = { name: "Новый оператор" };
     await axios.post(API_BASE_URL, newOperator);
     updateMenu(mainWindow);
   } catch (error) {
     console.error("Ошибка при добавлении оператора:", error);
+  }
+};
+
+const deleteOperator = async (operatorId, mainWindow) => {
+  try {
+    await axios.delete(`${API_BASE_URL}/${operatorId}`);
+    updateMenu(mainWindow);
+  } catch (error) {
+    console.error(`Ошибка при удалении оператора ${operatorId}:`, error);
   }
 };
 
@@ -83,6 +99,8 @@ const createMainMenuTemplate = (mainWindow) => {
 
 const createOperatorsMenuTemplate = async (mainWindow) => {
   const operators = await fetchOperators();
+  const selectedOperator = getSelectedOperator();
+
   return {
     label: "Операторы",
     submenu: [
@@ -110,11 +128,25 @@ const createOperatorsMenuTemplate = async (mainWindow) => {
                   }))
                 : [{ label: "Нет доступных камер", enabled: false }]),
               { type: "separator" },
+
               {
                 label: "Добавить камеру",
                 click: () => {
                   mainWindow.webContents.send("add-camera", operator.id);
                 },
+              },
+              {
+                label: "Выбрать оператора",
+                type: "radio",
+                checked: operator.id === selectedOperator,
+                click: () => {
+                  updateSelectedOperator(mainWindow, operator.id);
+                  updateMenu(mainWindow);
+                },
+              },
+              {
+                label: "Удалить оператора",
+                click: () => deleteOperator(operator.id, mainWindow),
               },
             ],
           };
@@ -134,4 +166,10 @@ export const updateMenu = async (mainWindow) => {
 
 ipcMain.on("request-add-camera", (event, operatorId) => {
   console.log("Добавление камеры для оператора:", operatorId);
+});
+
+ipcMain.handle("get-selected-operator", () => getSelectedOperator());
+
+ipcMain.on("request-selected-operator", (event) => {
+  event.sender.send("selected-operator", getSelectedOperator());
 });
