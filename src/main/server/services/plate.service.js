@@ -46,7 +46,7 @@ const outputCar = async (req, res) => {
 
     const price = calculatePrice(session.startTime, new Date().toISOString(), session.tariffType);
 
-    getIO().emit("outputCar", { number, plateImage, fullImage });
+    getIO().emit("outputCar", { number, plateImage, fullImage, price, session });
 
     res.status(200).send("OK");
   } catch (error) {
@@ -62,9 +62,15 @@ const calculatePrice = (startTime, endTime, tariffType) => {
   if (end < start) return "0м 0с";
 
   const durationMs = end - start;
+  const hours = Math.floor((durationMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
   const days = Math.floor(durationMs / (1000 * 60 * 60 * 24));
 
-  return `${days > 0 ? `${days}д ` : ""}${hours > 0 ? `${hours}ч ` : ""}${minutes > 0 ? `${minutes}м` : "Только что"}`;
+  const daysPrice = days * tarifCost;
+
+  const totalPrice = hours > 0 ? daysPrice + tarifCost : daysPrice;
+
+  return totalPrice || tarifCost;
 };
 
 export { inputCar, outputCar };
