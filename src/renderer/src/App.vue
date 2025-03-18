@@ -32,29 +32,20 @@
   };
 
   socket.on("inputCar", async (data) => {
-    try {
-      newCar.value = data;
-      isOpen.value = true;
-    } catch (error) {
-      console.log("error при добавлении", error);
-    }
+    if (selectedOperator.value !== data.operatorId) return;
+    newCar.value = data;
+    isOpen.value = true;
   });
 
   socket.on("outputCar", async (data) => {
-    try {
-      newCar.value = { ...newCar.value, ...data };
-      isOpen.value = true;
-      console.log("outputCar", data);
-    } catch (error) {
-      console.log("error при добавлении", error);
-    }
+    if (selectedOperator.value !== data.operatorId) return;
+    newCar.value = data;
+    isOpen.value = true;
   });
 
   const addSessionHandler = async () => {
     const { number, plateImage, fullImage, eventName, paymentMethod, tariffType, cameraIp } =
       newCar.value;
-
-    console.log("newCar.value", newCar.value);
 
     await axios.post(`${backendURL}/api/register-session`, {
       number,
@@ -111,7 +102,6 @@
     window.api.onMessage("add-camera", openModalHandler);
 
     window.api.onMessage("selected-operator", (operator) => {
-      console.log("operator", operator);
       selectedOperator.value = operator;
     });
 
