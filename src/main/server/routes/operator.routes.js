@@ -1,19 +1,19 @@
 import { Router } from "express";
 import {
-  DELETEOPERATORS,
-  GETOPERATORS,
-  POSTOPERATORS,
-  PUTOPERATORS,
+  deleteOperators,
+  getOperators,
+  postOperators,
+  putOperators,
 } from "../services/operator.service.js";
 
 const router = Router();
 
-router.get("/operator", GETOPERATORS);
+router.get("/operator", getOperators);
 
-router.post("/operator", POSTOPERATORS);
+router.post("/operator", postOperators);
 
-router.put("/operator/:id", PUTOPERATORS);
+router.put("/operator/:id", putOperators);
 
-router.delete("/operator/:id", DELETEOPERATORS);
+router.delete("/operator/:id", deleteOperators);
 
 export default router;

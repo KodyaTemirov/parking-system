@@ -1,7 +1,7 @@
 import db from "@/db/database.js";
 import { getIO } from "../../utils/socket.js";
 
-const GETCAMERAS = async (req, res) => {
+const getCameras = async (req, res) => {
   try {
     const data = db.prepare("SELECT * FROM cameras ORDER BY id ASC").all();
 
@@ -11,7 +11,7 @@ const GETCAMERAS = async (req, res) => {
   }
 };
 
-const GETOPERATORCAMERAS = async (req, res) => {
+const getOperatorCameras = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -23,7 +23,7 @@ const GETOPERATORCAMERAS = async (req, res) => {
   }
 };
 
-const GETCAMERAOPERATOR = async (ip) => {
+const getCameraOperator = async (ip) => {
   try {
     const data = db.prepare("SELECT * FROM cameras WHERE ip = ? ORDER BY id ASC").get(ip);
 
@@ -33,7 +33,7 @@ const GETCAMERAOPERATOR = async (ip) => {
   }
 };
 
-const POSTCAMERAS = async (req, res) => {
+const postCameras = async (req, res) => {
   try {
     const { name, login, ip, password, operatorId, status, type } = req.body;
 
@@ -64,7 +64,7 @@ const POSTCAMERAS = async (req, res) => {
   }
 };
 
-const PUTCAMERAS = async (req, res) => {
+const putCameras = async (req, res) => {
   try {
     const { name, login, ip, password, operatorId, status, type } = req.body;
     const { id } = req.params;
@@ -98,7 +98,7 @@ const PUTCAMERAS = async (req, res) => {
   }
 };
 
-const DELETECAMERAS = async (req, res) => {
+const deleteCameras = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -118,10 +118,10 @@ WHERE id = ?;`
 };
 
 export {
-  GETCAMERAS,
-  POSTCAMERAS,
-  PUTCAMERAS,
-  DELETECAMERAS,
-  GETCAMERAOPERATOR,
-  GETOPERATORCAMERAS,
+  getCameras,
+  postCameras,
+  putCameras,
+  deleteCameras,
+  getCameraOperator,
+  getOperatorCameras,
 };

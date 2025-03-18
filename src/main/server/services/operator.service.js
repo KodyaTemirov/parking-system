@@ -1,7 +1,7 @@
 import db from "@/db/database.js";
 import { getIO } from "../../utils/socket.js";
 
-const GETOPERATORS = async (req, res) => {
+const getOperators = async (req, res) => {
   try {
     const data = db.prepare("SELECT * FROM operators ORDER BY id ASC").all();
 
@@ -11,7 +11,7 @@ const GETOPERATORS = async (req, res) => {
   }
 };
 
-const POSTOPERATORS = async (req, res) => {
+const postOperators = async (req, res) => {
   try {
     const stmt = db.prepare(`
    INSERT INTO operators DEFAULT VALUES
@@ -39,7 +39,7 @@ const POSTOPERATORS = async (req, res) => {
   }
 };
 
-const PUTOPERATORS = async (req, res) => {
+const putOperators = async (req, res) => {
   try {
     const { name } = req.body;
     const { id } = req.params;
@@ -60,7 +60,7 @@ const PUTOPERATORS = async (req, res) => {
   }
 };
 
-const DELETEOPERATORS = async (req, res) => {
+const deleteOperators = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -81,4 +81,4 @@ WHERE id = ?;`
   }
 };
 
-export { GETOPERATORS, POSTOPERATORS, PUTOPERATORS, DELETEOPERATORS };
+export { getOperators, postOperators, putOperators, deleteOperators };
