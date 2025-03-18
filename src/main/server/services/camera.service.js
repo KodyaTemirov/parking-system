@@ -15,6 +15,10 @@ const POSTCAMERAS = async (req, res) => {
   try {
     const { name, login, ip, password, operatorId, status, type } = req.body;
 
+    const data = await fetch(`http://${ip}/GetDeviceInfo`);
+
+    if (data.status != 200) return res.status(400).send({ message: "Camera not found" });
+
     const stmt = db.prepare(`
     INSERT INTO cameras
       (name, login, ip, password, operatorId, status,type)
@@ -37,6 +41,10 @@ const PUTCAMERAS = async (req, res) => {
   try {
     const { name, login, ip, password, operatorId, status, type } = req.body;
     const { id } = req.params;
+
+    const info = await fetch(`http://${ip}/GetDeviceInfo`);
+
+    if (info.status != 200) return res.status(400).send({ message: "Camera not found" });
 
     const data = db
       .prepare(
