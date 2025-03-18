@@ -11,15 +11,13 @@ const GETCAMERAS = async (req, res) => {
   }
 };
 
-const GETCAMERAOPERATOR = async (req, res) => {
+const GETCAMERAOPERATOR = async (ip) => {
   try {
-    const { ip } = req.body;
-
     const data = db.prepare("SELECT * FROM cameras WHERE ip = ? ORDER BY id ASC").get(ip);
 
-    res.status(200).send(data);
+    return data;
   } catch (error) {
-    res.status(400).send({ message: error.message });
+    return null;
   }
 };
 

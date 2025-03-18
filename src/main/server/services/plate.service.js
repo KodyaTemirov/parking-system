@@ -9,7 +9,9 @@ const inputCar = async (req, res) => {
       throw new Error("No body in request");
     }
 
-    // const operator = await GETCAMERAOPERATOR(req.headers.host);
+    const operator = await GETCAMERAOPERATOR(req.headers.host);
+
+    if (!operator) return res.status(200).send("Operator not found");
 
     const { fullImage, plateImage, number } = parsePlateData(req.body);
 
@@ -18,12 +20,12 @@ const inputCar = async (req, res) => {
       plateImage,
       fullImage,
       cameraIp: req.headers.host,
-      // operator,
+      operatorId: operator.operatorId,
     });
 
     res.status(200).send("OK");
   } catch (error) {
-    console.error(`❌ Error processing ${eventName}:`, error);
+    console.log(error);
     res.status(400).send(error);
   }
 };
@@ -41,7 +43,6 @@ const outputCar = (req, res) => {
 
     res.status(200).send("OK");
   } catch (error) {
-    console.error(`❌ Error processing ${eventName}:`, error);
     res.status(400).send(error);
   }
 };
