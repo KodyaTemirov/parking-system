@@ -1,5 +1,6 @@
 import db from "@/db/database.js";
 import { getIO } from "../../utils/socket.js";
+import { openFetch } from "./plate.service.js";
 
 const registerSession = async (req, res) => {
   const { number, plateImage, fullImage, eventName, tariffType, paymentMethod, cameraIp } =
@@ -30,6 +31,14 @@ const registerSession = async (req, res) => {
     .get(result.lastInsertRowid);
 
   await getIO().emit("newSession", insertedData);
+
+  const camera = await getCameraOperator(req.headers.host);
+
+  openFetch(true, req.headers.host, camera.login, camera.password);
+
+  setTimeout(() => {
+    openFetch(false, req.headers.host, camera.login, camera.password);
+  }, 100);
 
   res.status(201).send(insertedData);
 };

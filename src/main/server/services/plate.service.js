@@ -87,4 +87,33 @@ const calculatePrice = (startTime, endTime, tariffType) => {
   return totalPrice || tarifCost;
 };
 
-export { inputCar, outputCar };
+const openFetch = async (status, ip, login, password) => {
+  try {
+    const config = {
+      headers: {
+        "Content-Type": "application/xml",
+        Authorization: "Basic " + btoa(`${login}:${password}`),
+        Cookie: "Secure; Secure",
+      },
+      httpsAgent: new (require("https").Agent)({ rejectUnauthorized: false }), // Игнорируем самоподписанный сертификат
+    };
+
+    const raw = `<?xml version="1.0" encoding="UTF-8"?>
+<config version="1.0" xmlns="http://www.ipc.com/ver10">
+  <action>
+    <status>${status}</status>
+  </action>
+</config>`;
+
+    const response = await axios.post(`https://${ip}/ManualAlarmOut/1`, raw, config);
+    console.log(response.data);
+  } catch (error) {
+    console.error("Ошибка запроса:", error.message);
+    if (error.response) {
+      console.error("Статус:", error.response.status);
+      console.error("Ответ:", error.response.data);
+    }
+  }
+};
+
+export { inputCar, outputCar, openFetch };
