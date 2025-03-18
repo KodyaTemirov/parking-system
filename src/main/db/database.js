@@ -19,7 +19,9 @@ db.prepare(
     login TEXT,
     ip TEXT,
     password TEXT,
-    operatorId INTEGER
+    operatorId INTEGER,
+    status TEXT,
+    type TEXT
   );
   `
 ).run();
