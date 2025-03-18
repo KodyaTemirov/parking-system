@@ -24,7 +24,7 @@ const POSTCAMERAS = async (req, res) => {
     const result = stmt.run(name, login, ip, password, Number(operatorId), status, type);
 
     const insertedData = db
-      .prepare("SELECT * FROM sessions WHERE id = ?")
+      .prepare("SELECT * FROM cameras WHERE id = ?")
       .get(result.lastInsertRowid);
 
     res.status(200).send(insertedData);
@@ -40,7 +40,7 @@ const PUTCAMERAS = async (req, res) => {
 
     const data = db
       .prepare(
-        `UPDATE users
+        `UPDATE cameras
          SET name = ?,
          login = ?,
          ip = ?,
@@ -52,7 +52,7 @@ const PUTCAMERAS = async (req, res) => {
       )
       .run(name, login, ip, password, operatorId, status, type, id);
 
-    const updatedData = db.prepare("SELECT * FROM sessions WHERE id = ?").get(id);
+    const updatedData = db.prepare("SELECT * FROM cameras WHERE id = ?").get(id);
 
     res.status(200).send(updatedData);
   } catch (error) {
@@ -66,7 +66,7 @@ const DELETECAMERAS = async (req, res) => {
 
     const data = db
       .prepare(
-        `DELETE FROM users
+        `DELETE FROM cameras
 WHERE id = ?;`
       )
       .run(id);
