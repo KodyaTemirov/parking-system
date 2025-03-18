@@ -22,9 +22,7 @@ export const createServer = (mainWindow) => {
   // app.use("/api", plateRoutes(mainWindow));
   app.use("/api", router);
 
-  const server = listenApp.listen(9061, "0.0.0.0", () =>
-    console.log("Server is listening on port 9061")
-  );
+  const server = listenApp.listen(9061, () => console.log("Server is listening on port 9061"));
 
   return server;
 };
