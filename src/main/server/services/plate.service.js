@@ -1,6 +1,7 @@
 import { parsePlateData } from "@/utils/parsePlateData.js";
 import { getIO } from "../../utils/socket";
 import { GETCAMERAOPERATOR } from "./camera.service.js";
+import tarifs from "@/helpers/prices.js";
 
 const inputCar = async (req, res) => {
   try {
@@ -30,7 +31,7 @@ const inputCar = async (req, res) => {
   }
 };
 
-const outputCar = (req, res) => {
+const outputCar = async (req, res) => {
   try {
     if (!req.body) {
       res.status(400).send("No body in request");
@@ -39,12 +40,31 @@ const outputCar = (req, res) => {
 
     const { fullImage, plateImage, number } = parsePlateData(req.body);
 
+    const session = await getSessionByNumber(number);
+
+    if (!session) return res.status(400).send({ message: "Session not found" });
+
+    const price = calculatePrice(session.startTime, new Date().toISOString(), session.tariffType);
+
     getIO().emit("outputCar", { number, plateImage, fullImage });
 
     res.status(200).send("OK");
   } catch (error) {
     res.status(400).send(error);
   }
+};
+
+const calculatePrice = (startTime, endTime, tariffType) => {
+  const start = new Date(startTime);
+  const end = endTime ? new Date(endTime) : new Date();
+  const tarifCost = tarifs.find((tarif) => tarif.id === tariffType).price;
+
+  if (end < start) return "0м 0с";
+
+  const durationMs = end - start;
+  const days = Math.floor(durationMs / (1000 * 60 * 60 * 24));
+
+  return `${days > 0 ? `${days}д ` : ""}${hours > 0 ? `${hours}ч ` : ""}${minutes > 0 ? `${minutes}м` : "Только что"}`;
 };
 
 export { inputCar, outputCar };

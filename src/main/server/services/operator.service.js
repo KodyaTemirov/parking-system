@@ -71,6 +71,8 @@ WHERE id = ?;`
       )
       .run(id);
 
+    db.prepare(`DELETE FROM cameras WHERE operatorId = ?`).run(id);
+
     res.status(200).send({
       message: "Deleted successfully",
     });

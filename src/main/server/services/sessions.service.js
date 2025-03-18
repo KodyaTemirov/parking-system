@@ -71,4 +71,12 @@ const getSessions = (req, res) => {
   res.status(200).send(data);
 };
 
-export { registerSession, getSessions, outputSession };
+const getSessionByNumber = (number) => {
+  const data = db
+    .prepare("SELECT * FROM sessions WHERE plateNumber = ? and paymentStatus = 0")
+    .get(number);
+
+  return data;
+};
+
+export { registerSession, getSessions, outputSession, getSessionByNumber };
