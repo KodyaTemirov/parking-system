@@ -51,7 +51,7 @@ const POSTCAMERAS = async (req, res) => {
     VALUES (?, ?, ?, ?, ?, ?)
   `);
 
-    const result = stmt.run(name, login, ip, password, Number(operatorId), status, type);
+    const result = stmt.run(name, login, ip, password, Number(operatorId), type);
 
     const insertedData = db
       .prepare("SELECT * FROM cameras WHERE id = ?")
