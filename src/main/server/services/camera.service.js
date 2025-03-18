@@ -47,8 +47,8 @@ const POSTCAMERAS = async (req, res) => {
 
     const stmt = db.prepare(`
     INSERT INTO cameras
-      (name, login, ip, password, operatorId, status,type)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+      (name, login, ip, password, operatorId,type)
+    VALUES (?, ?, ?, ?, ?, ?)
   `);
 
     const result = stmt.run(name, login, ip, password, Number(operatorId), status, type);
@@ -84,7 +84,6 @@ const PUTCAMERAS = async (req, res) => {
          ip = ?,
          password = ?,
          operatorId = ?,
-         status = ?,
          type = ?
          WHERE id = ?;`
       )

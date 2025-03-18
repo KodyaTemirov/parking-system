@@ -20,7 +20,6 @@ db.prepare(
     ip TEXT,
     password TEXT,
     operatorId INTEGER,
-    status TEXT,
     type TEXT
   );
   `
