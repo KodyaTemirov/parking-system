@@ -1,6 +1,7 @@
 import { parsePlateData } from "@/utils/parsePlateData.js";
 import { getIO } from "../../utils/socket";
-import { GETCAMERAOPERATOR } from "./camera.service.js";
+import { getCameraOperator } from "./camera.service.js";
+import { getSessionByNumber } from "./sessions.service.js";
 import tarifs from "@/helpers/prices.js";
 
 const inputCar = async (req, res) => {
@@ -10,7 +11,7 @@ const inputCar = async (req, res) => {
       throw new Error("No body in request");
     }
 
-    const operator = await GETCAMERAOPERATOR(req.headers.host);
+    const operator = await getCameraOperator(req.headers.host);
 
     if (!operator) return res.status(200).send("Operator not found");
 
@@ -50,6 +51,7 @@ const outputCar = async (req, res) => {
 
     res.status(200).send("OK");
   } catch (error) {
+    console.log(error);
     res.status(400).send(error);
   }
 };
