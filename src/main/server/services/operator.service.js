@@ -14,9 +14,7 @@ const GETOPERATORS = async (req, res) => {
 const POSTOPERATORS = async (req, res) => {
   try {
     const stmt = db.prepare(`
-    INSERT INTO operators
-      ()
-    VALUES ()
+   INSERT INTO operators DEFAULT VALUES
   `);
 
     const result = stmt.run();
