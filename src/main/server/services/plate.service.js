@@ -45,9 +45,21 @@ const outputCar = async (req, res) => {
 
     if (!session) return res.status(400).send({ message: "Session not found" });
 
+    const operator = await getCameraOperator(req.headers.host);
+
+    if (!operator) return res.status(200).send("Operator not found");
+
     const price = calculatePrice(session.startTime, new Date().toISOString(), session.tariffType);
 
-    getIO().emit("outputCar", { number, plateImage, fullImage, price, session });
+    getIO().emit("outputCar", {
+      number,
+      plateImage,
+      fullImage,
+      price,
+      cameraIp: req.headers.host,
+      operatorId: operator.operatorId,
+      session,
+    });
 
     res.status(200).send("OK");
   } catch (error) {
