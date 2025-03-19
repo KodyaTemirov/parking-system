@@ -1,12 +1,12 @@
 import axios from "axios";
 import { parsePlateData } from "./parsePlateData";
 
-export const getSnapshot = async () => {
+export const getSnapshot = async (ip, login, password) => {
   try {
-    const { data } = await axios.get("http://10.20.10.131/GetSnapshot/1", {
+    const { data } = await axios.get(`http://${ip}/GetSnapshot/1`, {
       headers: {
         "Content-Type": "application/xml",
-        Authorization: "Basic YWRtaW46MTIzNDU2",
+        Authorization: "Basic " + btoa(`${login}:${password}`),
         Cookie: "Secure; Secure; Secure",
       },
       maxRedirects: 5,
