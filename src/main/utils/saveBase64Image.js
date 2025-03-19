@@ -1,25 +1,54 @@
 import fs from "fs";
 import path from "path";
 
-const saveBase64Image = (base64String, outputPath) => {
-  try {
-    const base64Data = base64String.includes(",")
-      ? base64String.split(",")[1]
-      : base64String;
+const dbFolder = isDev
+  ? process.cwd() // Корень проекта в dev режиме
+  : app.getPath("userData");
 
-    const imageBuffer = Buffer.from(base64Data, "base64");
+const imagesFolder = path.join(dbFolder, "images");
 
-    const dirPath = path.dirname(outputPath);
-    if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath, { recursive: true });
-    }
+if (!fs.existsSync(imagesFolder)) {
+  fs.mkdirSync(imagesFolder, { recursive: true });
+}
 
-    fs.writeFileSync(outputPath, imageBuffer);
+const saveBase64Image = (base64String) => {
+  const matches = base64String.match(/^data:(.+);base64,(.+)$/);
+  if (!matches || matches.length !== 3) {
+    throw new Error("Некорректный формат base64 изображения");
+  }
 
-    console.log(`Изображение сохранено по пути: ${outputPath}`);
-  } catch (error) {
-    console.error(`Ошибка при сохранении изображения: ${error}`);
+  const mimeType = matches[1];
+  const base64Data = matches[2];
+  const extension = mimeType.split("/")[1];
+
+  const fileName = `${Date.now()}.${extension}`;
+  const filePath = path.join(imagesFolder, fileName); // Используем imagesFolder
+
+  fs.writeFileSync(filePath, base64Data, "base64");
+  console.log("Изображение сохранено:", filePath);
+
+  return filePath;
+};
+
+const deleteImageFile = (imagePath) => {
+  if (!imagePath) {
+    console.error("Путь к файлу не указан");
+    return;
+  }
+
+  const imageFullPath = path.join(imagesFolder, imagePath);
+
+  if (fs.existsSync(imageFullPath)) {
+    fs.unlink(imageFullPath, (err) => {
+      if (err) {
+        console.error("Ошибка при удалении файла:", err);
+      } else {
+        console.log("Файл успешно удалён:", imageFullPath);
+      }
+    });
+  } else {
+    console.log("Файл не найден, возможно уже удалён:", imageFullPath);
   }
 };
 
-export default saveBase64Image;
+export { saveBase64Image, deleteImageFile };

@@ -2,10 +2,14 @@ import db from "@/db/database.js";
 import { getIO } from "../../utils/socket.js";
 import { openFetch } from "./plate.service.js";
 import { getCameraOperator } from "./camera.service.js";
+import { saveBase64Image, deleteImageFile } from "./saveBase64Image";
 
 const registerSession = async (req, res) => {
   const { number, plateImage, fullImage, eventName, tariffType, paymentMethod, cameraIp } =
     req.body;
+
+  const plateImageFile = saveBase64Image(plateImage);
+  const fullImageFile = saveBase64Image(fullImage);
 
   const stmt = db.prepare(`
     INSERT INTO sessions
@@ -15,8 +19,8 @@ const registerSession = async (req, res) => {
 
   const result = stmt.run(
     number,
-    plateImage || null,
-    fullImage || null,
+    plateImageFile || null,
+    fullImageFile || null,
     new Date().toISOString(),
     null,
     eventName,

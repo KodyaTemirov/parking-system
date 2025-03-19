@@ -1,5 +1,3 @@
-import saveBase64Image from "./saveBase64Image";
-
 export const parsePlateData = (body) => {
   const plateNumber = body.config.listinfo[0].item[1].platenumber[0]._;
   const plateImage = body.config.listinfo[0].item[1].targetimagedata[0].targetbase64data[0]._;
