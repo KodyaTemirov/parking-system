@@ -18,7 +18,7 @@ const inputCar = async (req, res) => {
 
     const { fullImage, plateImage, number } = parsePlateData(req.body);
 
-    getIO().emit("inputCar", {
+    getIO().emit(`inputCar-${operator.operatorId}`, {
       number,
       plateImage,
       fullImage,
@@ -52,7 +52,7 @@ const outputCar = async (req, res) => {
 
     const price = calculatePrice(session.startTime, new Date().toISOString(), session.tariffType);
 
-    getIO().emit("outputCar", {
+    getIO().emit(`outputCar-${operator.operatorId}`, {
       number,
       plateImage,
       fullImage,
