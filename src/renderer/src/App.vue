@@ -119,7 +119,11 @@
 
 <template>
   <div class="wrapper">
-    <Button @click="openDrawer">Новая сессия</Button>
+    <div class="flex gap-4">
+      <Button @click="openDrawer">Новый въезд</Button>
+      <Button @click="openDrawer">Новый выезд</Button>
+    </div>
+
     <Drawer title="Новая сессия" ref="drawerRef" v-model="isOpen">
       <div class="rows">
         <div class="row">

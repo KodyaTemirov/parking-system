@@ -7,7 +7,7 @@
     aria-modal="true"
   >
     <div
-      class="fixed inset-0 bg-gray-500/75 transition-opacity"
+      class="fixed inset-0 bg-black/50 transition-opacity"
       @click.self="closeDrawer"
       aria-hidden="true"
     ></div>

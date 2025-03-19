@@ -14,6 +14,7 @@ export function createWindow() {
     height: 670,
     show: false,
     title: "Parkly",
+    fullscreen: true, // Добавлено для полноэкранного режима
 
     webPreferences: {
       nodeIntegration: false,
