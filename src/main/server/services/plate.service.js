@@ -79,12 +79,10 @@ const calculatePrice = (startTime, endTime, tariffType) => {
   const durationMs = end - start;
   const hours = Math.floor(durationMs / (1000 * 60 * 60));
 
-  // Если меньше 24 часов - бесплатно
   if (hours < 24) {
     return 0;
   }
 
-  // Количество полных дней после первых 24 часов
   const days = Math.floor(hours / 24);
 
   return days * tarifCost;
@@ -98,7 +96,7 @@ const openFetch = async (status, ip, login, password) => {
         Authorization: "Basic " + btoa(`${login}:${password}`),
         Cookie: "Secure; Secure",
       },
-      httpsAgent: new (require("https").Agent)({ rejectUnauthorized: false }), // Игнорируем самоподписанный сертификат
+      httpsAgent: new (require("https").Agent)({ rejectUnauthorized: false }),
     };
 
     const raw = `<?xml version="1.0" encoding="UTF-8"?>
