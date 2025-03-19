@@ -74,18 +74,20 @@ const calculatePrice = (startTime, endTime, tariffType) => {
   const end = endTime ? new Date(endTime) : new Date();
   const tarifCost = tarifs.find((tarif) => tarif.id === tariffType).price;
 
-  if (end < start) return "0м 0с";
+  if (end < start) return 0;
 
   const durationMs = end - start;
-  const hours = Math.floor((durationMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const hours = Math.floor(durationMs / (1000 * 60 * 60));
 
-  const days = Math.floor(durationMs / (1000 * 60 * 60 * 24));
+  // Если меньше 24 часов - бесплатно
+  if (hours < 24) {
+    return 0;
+  }
 
-  const daysPrice = days * tarifCost;
+  // Количество полных дней после первых 24 часов
+  const days = Math.floor(hours / 24);
 
-  const totalPrice = hours > 0 ? daysPrice + tarifCost : daysPrice;
-
-  return totalPrice || tarifCost;
+  return days * tarifCost;
 };
 
 const openFetch = async (status, ip, login, password) => {
