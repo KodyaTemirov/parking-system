@@ -5,3 +5,5 @@ out
 *.log*
 xml_log copy.json
 xml_log.json
+images
+data.db
