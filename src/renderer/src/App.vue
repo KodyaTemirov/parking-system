@@ -1,5 +1,5 @@
-<script setup lang="ts">
-  import { onMounted, reactive, ref, watch } from "vue";
+<script setup>
+  import { onMounted, ref, watch } from "vue";
   import { socket } from "@/helpers";
   import { useSessionsStore } from "@/store";
   import axios from "axios";
@@ -8,31 +8,16 @@
   const currentTariff = ref();
   const initialCar = { paymentMethod: 1, tariffType: 1, eventName: "output" };
   const newCar = ref({ ...initialCar });
-
   const selectedOperator = ref(null);
-
   const backendURL = "http://10.20.10.136:9061";
   const isOpenInput = ref(false);
   const isOpenOutput = ref(false);
 
-  const addCam = ref({
-    open: false,
-    id: null,
-  });
+  const addCam = ref({ open: false, id: null });
 
   const openModalHandler = (id) => {
     addCam.value = { open: true, id };
   };
-
-  socket.on(`inputCar-${selectedOperator.value}`, async (data) => {
-    newCar.value = { ...initialCar, ...data };
-    isOpenInput.value = true;
-  });
-
-  socket.on(`outputCar-${selectedOperator.value}`, async (data) => {
-    newCar.value = data;
-    isOpenInput.value = true;
-  });
 
   const addSessionHandler = async () => {
     const { number, plateImage, fullImage, eventName, paymentMethod, tariffType, cameraIp } =
@@ -60,19 +45,34 @@
     isOpenOutput.value = true;
   };
 
-  const selectPaymentMethod = (id) => {
-    newCar.value = { ...newCar.value, paymentMethod: id };
-  };
-
   const getAllSession = async () => {
     try {
       const { data } = await axios.get(`${backendURL}/api/session`);
-
       sessionStore.setSessions(data);
     } catch (error) {
       console.log(error, "ERRROR");
     }
   };
+
+  watch(selectedOperator, (newOperator, oldOperator) => {
+    if (oldOperator) {
+      socket.off(`inputCar-${oldOperator}`);
+      socket.off(`outputCar-${oldOperator}`);
+    }
+
+    if (newOperator) {
+      socket.connect();
+      socket.on(`inputCar-${newOperator}`, async (data) => {
+        console.log("inputCar", data);
+        newCar.value = { ...initialCar, ...data };
+        isOpenInput.value = true;
+      });
+      socket.on(`outputCar-${newOperator}`, async (data) => {
+        newCar.value = data;
+        isOpenOutput.value = true;
+      });
+    }
+  });
 
   socket.on("newSession", async (info) => {
     try {
@@ -89,7 +89,6 @@
     window.api.send("request-selected-operator");
 
     window.api.onMessage("add-camera", openModalHandler);
-
     window.api.onMessage("selected-operator", (operator) => {
       selectedOperator.value = operator;
     });
