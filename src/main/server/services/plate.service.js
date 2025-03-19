@@ -17,7 +17,6 @@ const inputCar = async (req, res) => {
     if (!operator) return res.status(200).send("Operator not found");
 
     const { fullImage, plateImage, number } = parsePlateData(req.body);
-    console.log(`inputCar-${operator.operatorId}`);
 
     getIO().emit(`inputCar-${operator.operatorId}`, {
       number,
