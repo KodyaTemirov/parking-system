@@ -19,7 +19,7 @@
 
   const selectedOperator = ref(null);
 
-  const backendURL = "http://10.20.10.157:9061";
+  const backendURL = "http://10.20.10.136:9061";
   const isOpen = ref(false);
 
   const addCam = ref({
