@@ -24,6 +24,10 @@
     addCam.value = { open: true, id };
   };
 
+  setInterval(() => {
+    console.log(`inputCar-${selectedOperator.value}`);
+  }, 1000);
+
   socket.on(`inputCar-${selectedOperator.value}`, async (data) => {
     newCar.value = { ...initialCar, ...data };
     isOpenInput.value = true;
