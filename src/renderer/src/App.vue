@@ -24,12 +24,12 @@
     addCam.value = { open: true, id };
   };
 
-  socket.on(`inputCar-${selectedOperator}`, async (data) => {
+  socket.on(`inputCar-${selectedOperator.value}`, async (data) => {
     newCar.value = { ...initialCar, ...data };
     isOpenInput.value = true;
   });
 
-  socket.on(`outputCar-${selectedOperator}`, async (data) => {
+  socket.on(`outputCar-${selectedOperator.value}`, async (data) => {
     newCar.value = data;
     isOpenInput.value = true;
   });
