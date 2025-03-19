@@ -29,7 +29,7 @@
     isOpenInput.value = true;
   });
 
-  socket.on(`inputCar-${selectedOperator}`, async (data) => {
+  socket.on(`outputCar-${selectedOperator}`, async (data) => {
     newCar.value = data;
     isOpenInput.value = true;
   });
