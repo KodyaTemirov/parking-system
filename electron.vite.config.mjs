@@ -11,7 +11,7 @@ export default defineConfig({
         "@/server": resolve("src/main/server"),
         "@/events": resolve("src/main/events"),
         "@/utils": resolve("src/main/utils"),
-        "@/helpers": resolve("src/renderer/src/helpers"),
+        "@/helpers": resolve("src/main/src/helpers"),
       },
     },
 

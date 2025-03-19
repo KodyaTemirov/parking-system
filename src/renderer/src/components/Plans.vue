@@ -1,7 +1,7 @@
 <script setup>
   import { ref, computed } from "vue";
   import PlanItem from "./PlanItem.vue";
-  import pricesData from "@/helpers/prices";
+  import { pricesData } from "@/helpers";
 
   const props = defineProps(["modelValue"]);
   const emit = defineEmits(["update:modelValue"]);

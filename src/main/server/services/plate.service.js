@@ -2,7 +2,7 @@ import { parsePlateData } from "@/utils/parsePlateData.js";
 import { getIO } from "../../utils/socket";
 import { getCameraOperator } from "./camera.service.js";
 import { getSessionByNumber } from "./sessions.service.js";
-import tarifs from "@/helpers/prices.js";
+import { tarifs } from "@/utils/prices.js";
 import axios from "axios";
 
 const inputCar = async (req, res) => {

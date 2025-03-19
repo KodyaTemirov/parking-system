@@ -1,15 +1,7 @@
 <script setup lang="ts">
   import { onMounted, reactive, ref, watch } from "vue";
-  import Sessions from "./components/Sessions.vue";
-  import Button from "./components/Button.vue";
-  import Drawer from "./components/Drawer.vue";
-  import CarPlate from "./components/CarPlate.vue";
-  import Plans from "./components/Plans.vue";
-  import PaymentSelector from "./components/PaymentSelector.vue";
-  import AddCamera from "./components/AddCamera.vue";
-
-  import socket from "./helpers/socket.js";
-  import { useSessionsStore } from "@/store/SessionsStore";
+  import { socket } from "@/helpers";
+  import { useSessionsStore } from "@/store";
   import axios from "axios";
 
   const sessionStore = useSessionsStore();
@@ -20,7 +12,8 @@
   const selectedOperator = ref(null);
 
   const backendURL = "http://10.20.10.136:9061";
-  const isOpen = ref(false);
+  const isOpenInput = ref(false);
+  const isOpenOutput = ref(false);
 
   const addCam = ref({
     open: false,
@@ -31,17 +24,14 @@
     addCam.value = { open: true, id };
   };
 
-  socket.on("inputCar", async (data) => {
-    if (selectedOperator.value !== data.operatorId) return;
-    newCar.value = data;
-    isOpen.value = true;
+  socket.on(`inputCar-${selectedOperator}`, async (data) => {
+    newCar.value = { ...initialCar, ...data };
+    isOpenInput.value = true;
   });
 
-  socket.on("outputCar", async (data) => {
-    console.log(data, "output");
-    if (selectedOperator.value !== data.operatorId) return;
+  socket.on(`inputCar-${selectedOperator}`, async (data) => {
     newCar.value = data;
-    isOpen.value = true;
+    isOpenInput.value = true;
   });
 
   const addSessionHandler = async () => {
@@ -58,12 +48,16 @@
       cameraIp,
     });
 
-    isOpen.value = false;
+    isOpenInput.value = false;
   };
 
   const openDrawer = () => {
-    isOpen.value = true;
+    isOpenInput.value = true;
     newCar.value = { ...initialCar };
+  };
+
+  const openDrawerOutput = () => {
+    isOpenOutput.value = true;
   };
 
   const selectPaymentMethod = (id) => {
@@ -89,42 +83,58 @@
     }
   });
 
-  watch(
-    () => selectedOperator.value,
-    (newValue) => {
-      console.log("selectedOperator new", newValue);
-    }
-  );
-
   onMounted(() => {
     socket.connect();
     getAllSession();
+    window.api.send("request-selected-operator");
 
     window.api.onMessage("add-camera", openModalHandler);
 
     window.api.onMessage("selected-operator", (operator) => {
       selectedOperator.value = operator;
     });
-
-    window.api.send("request-selected-operator");
   });
-
-  watch(
-    () => currentTariff.value,
-    (newValue) => {
-      console.log("newValue", newValue);
-    }
-  );
 </script>
 
 <template>
   <div class="wrapper">
+    <div class="sub-title">Оператор</div>
+    {{ selectedOperator }}
     <div class="flex gap-4">
-      <Button @click="openDrawer">Новый въезд</Button>
-      <Button @click="openDrawer">Новый выезд</Button>
+      <Button @click="openDrawer" class="flex items-center gap-2">
+        <Icon icon="material-symbols:input-circle" />
+        Новый въезд
+      </Button>
+      <Button @click="openDrawerOutput" class="flex items-center gap-2">
+        <Icon icon="material-symbols:output-circle" />
+        Новый выезд
+      </Button>
     </div>
 
-    <Drawer title="Новая сессия" ref="drawerRef" v-model="isOpen">
+    <Drawer title="Новый въезд" ref="drawerRef" v-model="isOpenInput" position="left">
+      <div class="rows">
+        <div class="row">
+          <span>Гос-номер:</span>
+          <span class="flex items-center">
+            <CarPlate :plateNumber="newCar.number" />
+          </span>
+        </div>
+      </div>
+
+      <div class="sub-title">Выберите тип тарифа</div>
+      <Plans v-model="newCar.tariffType" />
+      <div class="sub-title">Выберите метод оплаты</div>
+      <PaymentSelector v-model="newCar.paymentMethod" />
+      <div class="sub-title">IP камеры: {{ newCar.cameraIp }}</div>
+
+      <div class="sub-title">Снимок с камеры:</div>
+
+      <img :src="newCar.fullImage" alt="" />
+
+      <Button @click="addSessionHandler" class="my-4 w-full">Открыть ворота</Button>
+    </Drawer>
+
+    <Drawer title="Новый выезд" ref="drawerRef" v-model="isOpenOutput" position="right">
       <div class="rows">
         <div class="row">
           <span>Гос-номер:</span>
@@ -142,6 +152,7 @@
 
       <Button @click="addSessionHandler" class="my-4 w-full">Открыть ворота</Button>
     </Drawer>
+
     <Sessions />
   </div>
   <AddCamera v-model:open="addCam.open" :id="addCam.id" />

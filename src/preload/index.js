@@ -7,7 +7,7 @@ const api = {
   },
 
   send: (channel, data) => {
-    console.log(`Sending data to ${channel}:`, data);
+    // console.log(`Sending data to ${channel}:`, data);
     ipcRenderer.send(channel, data);
   },
 

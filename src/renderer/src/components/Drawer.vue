@@ -6,20 +6,24 @@
     role="dialog"
     aria-modal="true"
   >
-    <div
-      class="fixed inset-0 bg-black/50 transition-opacity"
-      @click.self="closeDrawer"
-      aria-hidden="true"
-    ></div>
-
-    <div class="fixed inset-0 overflow-hidden">
-      <div class="absolute inset-0 overflow-hidden">
-        <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
-          <div class="pointer-events-auto relative w-screen max-w-md">
-            <div class="absolute top-0 left-0 -ml-8 flex pt-4 pr-2 sm:-ml-10 sm:pr-4">
+    <div class="fixed inset-0 z-10 bg-black/50 transition-opacity" @click.self="closeDrawer">
+      <div
+        class="fixed inset-y-0 flex max-w-full"
+        :class="position === 'left' ? 'left-0 pr-10' : 'right-0 pl-10'"
+      >
+        <transition :name="position === 'left' ? 'slide-left' : 'slide-right'" appear>
+          <div
+            v-if="isOpen"
+            class="pointer-events-auto relative w-screen max-w-md transform bg-white shadow-xl transition-transform"
+            :style="{ zIndex }"
+          >
+            <div
+              class="absolute top-0"
+              :class="position === 'left' ? 'right-0 pr-2' : 'left-0 -ml-8 sm:-ml-10 sm:pr-4'"
+            >
               <button
                 type="button"
-                class="relative rounded-md text-gray-300 hover:text-white focus:ring-2 focus:ring-white focus:outline-hidden"
+                class="relative rounded-md text-gray-300 hover:text-white focus:ring-2 focus:ring-white focus:outline-none"
                 @click="closeDrawer"
               >
                 <span class="absolute -inset-2.5"></span>
@@ -36,8 +40,7 @@
                 </svg>
               </button>
             </div>
-
-            <div class="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
+            <div class="flex h-full flex-col overflow-y-scroll py-6">
               <div class="px-4 sm:px-6">
                 <h2 class="text-base font-semibold text-gray-900" id="slide-over-title">
                   {{ props.title }}
@@ -48,7 +51,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </transition>
       </div>
     </div>
   </div>
@@ -66,11 +69,20 @@
       type: Boolean,
       default: false,
     },
+    position: {
+      type: String,
+      default: "right", // Возможные значения: 'left', 'right'
+      validator: (value) => ["left", "right"].includes(value),
+    },
+    zIndex: {
+      type: Number,
+      default: 50,
+    },
   });
 
   const isOpen = ref(props.modelValue);
+  const emit = defineEmits();
 
-  // Слежение за изменениями modelValue
   watch(
     () => props.modelValue,
     (newValue) => {
@@ -87,6 +99,24 @@
     isOpen.value = false;
     emit("update:modelValue", false);
   };
-
-  const emit = defineEmits();
 </script>
+
+<style>
+  .slide-right-enter-active,
+  .slide-right-leave-active {
+    transition: transform 0.3s ease-in-out;
+  }
+  .slide-right-enter-from,
+  .slide-right-leave-to {
+    transform: translateX(100%);
+  }
+
+  .slide-left-enter-active,
+  .slide-left-leave-active {
+    transition: transform 0.3s ease-in-out;
+  }
+  .slide-left-enter-from,
+  .slide-left-leave-to {
+    transform: translateX(-100%);
+  }
+</style>

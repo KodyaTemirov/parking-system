@@ -1,4 +1,4 @@
-export const pricesData = [
+export const tarifs = [
   {
     value: "Легковой автомобиль",
     price: 20000,

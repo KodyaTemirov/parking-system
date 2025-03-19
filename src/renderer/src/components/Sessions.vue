@@ -1,6 +1,6 @@
 <script setup>
   import { useSessionsStore } from "@/store/SessionsStore";
-  import prices from "../helpers/prices";
+  import { pricesData } from "@/helpers";
 
   const sessionStore = useSessionsStore();
 
@@ -43,7 +43,7 @@
         <td class="px-4 py-2">{{ session.id }}</td>
         <td class="px-4 py-2">{{ session.plateNumber }}</td>
         <td class="px-4 py-2">{{ new Date(session.startTime).toLocaleString() }}</td>
-        <td class="px-4 py-2">{{ prices[session.tariffType - 1]?.value }}</td>
+        <td class="px-4 py-2">{{ pricesData[session.tariffType - 1]?.value }}</td>
         <td class="px-4 py-2">{{ calculateDuration(session.startTime, session.endTime) }}</td>
         <td class="px-4 py-2">{{ session.cost }} сум</td>
         <td class="px-4 py-2">{{ session.paymentMethod === 1 ? "Наличные" : "Карта" }}</td>
