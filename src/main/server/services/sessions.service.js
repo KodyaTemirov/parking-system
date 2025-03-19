@@ -2,7 +2,7 @@ import db from "@/db/database.js";
 import { getIO } from "../../utils/socket.js";
 import { openFetch } from "./plate.service.js";
 import { getCameraOperator } from "./camera.service.js";
-import { saveBase64Image, deleteImageFile } from "./saveBase64Image";
+import { saveBase64Image, deleteImageFile } from "../../utils/saveBase64Image.js";
 
 const registerSession = async (req, res) => {
   const { number, plateImage, fullImage, eventName, tariffType, paymentMethod, cameraIp } =

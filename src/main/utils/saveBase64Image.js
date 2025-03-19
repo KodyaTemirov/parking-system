@@ -1,5 +1,8 @@
 import fs from "fs";
 import path from "path";
+import { app } from "electron";
+
+const isDev = !app.isPackaged;
 
 const dbFolder = isDev
   ? process.cwd() // Корень проекта в dev режиме

@@ -38,6 +38,7 @@
   });
 
   socket.on("outputCar", async (data) => {
+    console.log(data, "output");
     if (selectedOperator.value !== data.operatorId) return;
     newCar.value = data;
     isOpen.value = true;
