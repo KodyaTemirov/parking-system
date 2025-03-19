@@ -30,7 +30,7 @@ const saveBase64Image = (base64String) => {
   fs.writeFileSync(filePath, base64Data, "base64");
   console.log("Изображение сохранено:", filePath);
 
-  return filePath;
+  return fileName;
 };
 
 const deleteImageFile = (imagePath) => {
