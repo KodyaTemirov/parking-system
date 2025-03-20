@@ -269,6 +269,52 @@ const getSessionByNumber = (number) => {
   return data;
 };
 
+const isPayedToday = (number) => {
+  // Получаем последнюю оплаченную сессию
+  const data = db
+    .prepare(
+      `SELECT * FROM sessions
+       WHERE plateNumber = ?
+       AND endTime IS NOT NULL
+       ORDER BY startTime DESC
+       LIMIT 1`
+    )
+    .get(number);
+
+  if (!data) return false;
+
+  // Проверяем, не истек ли оплаченный период
+  const lastPaymentTime = new Date(data.startTime);
+  const now = new Date();
+  const hoursSincePayment = (now - lastPaymentTime) / (1000 * 60 * 60);
+
+  // Получаем количество оплаченных дней
+  const paidDays = Math.floor(data.outputCost / data.inputCost);
+
+  // Проверяем, не превысили ли мы оплаченный период
+  return hoursSincePayment <= paidDays * 24;
+};
+
+const getLastPaymentTime = (number) => {
+  const data = db
+    .prepare(
+      `SELECT startTime, outputCost, inputCost FROM sessions
+       WHERE plateNumber = ?
+       AND endTime IS NOT NULL
+       ORDER BY startTime DESC
+       LIMIT 1`
+    )
+    .get(number);
+
+  if (!data) return null;
+
+  // Возвращаем время последней оплаты и количество оплаченных дней
+  return {
+    startTime: data.startTime,
+    paidDays: Math.floor(data.outputCost / data.inputCost),
+  };
+};
+
 const getSessionsInfo = async (req, res) => {
   try {
     const allData = db
@@ -335,4 +381,6 @@ export {
   getSessionByNumber,
   getSessionsInfo,
   handleOutputSession,
+  isPayedToday,
+  getLastPaymentTime,
 };

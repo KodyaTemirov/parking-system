@@ -18,6 +18,32 @@ const inputCar = async (req, res) => {
 
     const { fullImage, plateImage, number } = parsePlateData(req.body);
 
+    const isPayedToday = await isPayedToday(number);
+    const lastPaymentTime = await getLastPaymentTime(number);
+
+    if (isPayedToday) {
+      getIO().to(`operator-${operator.operatorId}`).emit("payedToday", {
+        number,
+        plateImage,
+        fullImage,
+        cameraIp: req.headers.host,
+        operatorId: operator.operatorId,
+        lastPaymentTime,
+        eventName: "input",
+      });
+
+      const camera = await getCameraOperator(req.headers.host);
+      // openFetch(true, req.headers.host, camera.login, camera.password);
+
+      // setTimeout(() => {
+      //   openFetch(false, req.headers.host, camera.login, camera.password);
+      // }, 100);
+
+      res.status(200).send("Car already payed today");
+
+      return;
+    }
+
     getIO().emit(`inputCar-${operator.operatorId}`, {
       number,
       plateImage,

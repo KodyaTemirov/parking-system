@@ -17,7 +17,7 @@ db.prepare(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
     login TEXT,
-    ip TEXT,
+    ip TEXT UNIQUE,
     password TEXT,
     operatorId INTEGER,
     type TEXT
