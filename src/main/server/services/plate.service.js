@@ -1,7 +1,12 @@
 import { parsePlateData } from "@/utils/parsePlateData.js";
 import { getIO } from "../../utils/socket";
 import { getCameraOperator } from "./camera.service.js";
-import { getLastPaymentTime, getSessionByNumber, handleOutputSession } from "./sessions.service.js";
+import {
+  getLastPaymentTime,
+  getSessionByNumber,
+  handleOutputSession,
+  isPayedToday,
+} from "./sessions.service.js";
 import { tarifs } from "@/utils/prices.js";
 import axios from "axios";
 
@@ -18,10 +23,10 @@ const inputCar = async (req, res) => {
 
     const { fullImage, plateImage, number } = parsePlateData(req.body);
 
-    const isPayedToday = await isPayedToday(number);
+    const isPayedTodayValue = await isPayedToday(number);
     const lastPaymentTime = await getLastPaymentTime(number);
 
-    if (isPayedToday) {
+    if (isPayedTodayValue) {
       getIO().emit(`payedToday-${operator.operatorId}`, {
         number,
         plateImage,
@@ -78,18 +83,28 @@ const outputCar = async (req, res) => {
     if (!operator) return res.status(200).send("Operator not found");
 
     // Проверяем, не оплатил ли он уже за этот период
-    const isPayedToday = await isPayedToday(number);
+    const isPayedTodayValue = await isPayedToday(number);
 
-    if (isPayedToday) {
-      // Если уже оплатил - просто закрываем сессию
-      handleOutputSession({
+    console.log(isPayedTodayValue);
+
+    if (isPayedTodayValue) {
+      console.log("payed");
+      const lastPaymentTime = await getLastPaymentTime(number);
+
+      getIO().emit(`payedToday-${operator.operatorId}`, {
         number,
         plateImage,
-        paymentMethod: 1, // По умолчанию наличные
-        cameraIp: req.headers.host,
         fullImage,
-        outputCost: 0,
+        cameraIp: req.headers.host,
+        operatorId: operator.operatorId,
+        lastPaymentTime,
+        eventName: "output",
       });
+
+      // openFetch(true, cameraIp, camera.login, camera.password);
+      // setTimeout(() => {
+      //   openFetch(false, cameraIp, camera.login, camera.password);
+      // }, 100);
       res.status(200).send("OK");
       return;
     }
@@ -109,15 +124,28 @@ const outputCar = async (req, res) => {
         eventName: "output",
       });
     } else {
+      console.log("payed");
+      const lastPaymentTime = await getLastPaymentTime(number);
+
       // Если меньше 24 часов - просто закрываем сессию
       handleOutputSession({
         number,
         plateImage,
-        paymentMethod,
+        paymentMethod: 1,
         cameraIp: req.headers.host,
         fullImage,
         outputCost: 0,
       });
+      getIO().emit(`payedToday-${operator.operatorId}`, {
+        number,
+        plateImage,
+        fullImage,
+        cameraIp: req.headers.host,
+        operatorId: operator.operatorId,
+        lastPaymentTime,
+        eventName: "output",
+      });
+
       // openFetch(true, cameraIp, camera.login, camera.password);
       // setTimeout(() => {
       //   openFetch(false, cameraIp, camera.login, camera.password);

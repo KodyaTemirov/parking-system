@@ -117,7 +117,7 @@ const registerSession = async (req, res) => {
   //   openFetch(false, cameraIp, camera.login, camera.password);
   // }, 100);
 
-  await printReceipt(number, tariffType, insertedData.startTime);
+  // await printReceipt(number, tariffType, insertedData.startTime);
 
   res.status(201).send(insertedData);
 };
@@ -270,7 +270,6 @@ const getSessionByNumber = (number) => {
 };
 
 const isPayedToday = (number) => {
-  // Получаем последнюю оплаченную сессию
   const data = db
     .prepare(
       `SELECT * FROM sessions
@@ -283,12 +282,10 @@ const isPayedToday = (number) => {
 
   if (!data) return false;
 
-  // Проверяем, не истек ли оплаченный период
   const lastPaymentTime = new Date(data.startTime);
   const now = new Date();
   const hoursSincePayment = (now - lastPaymentTime) / (1000 * 60 * 60);
 
-  // Получаем количество оплаченных дней
   const paidDays = Math.floor(data.outputCost / data.inputCost);
 
   // Проверяем, не превысили ли мы оплаченный период
