@@ -1,9 +1,16 @@
 import { Router } from "express";
-import { getSessions, registerSession, getSessionsInfo } from "../services/sessions.service.js";
+import {
+  getSessions,
+  registerSession,
+  getSessionsInfo,
+  outputSession,
+} from "../services/sessions.service.js";
 
 const router = Router();
 
 router.post("/register-session", registerSession);
+
+router.post("/output-session", outputSession);
 
 router.get("/session", getSessions);
 

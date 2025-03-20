@@ -9,6 +9,7 @@ import {
 } from "./sessions.service.js";
 import { tarifs } from "@/utils/prices.js";
 import axios from "axios";
+import { saveBase64Image } from "../../utils/saveBase64Image.js";
 
 const inputCar = async (req, res) => {
   try {
@@ -25,6 +26,8 @@ const inputCar = async (req, res) => {
 
     const isPayedTodayValue = await isPayedToday(number);
     const lastPaymentTime = await getLastPaymentTime(number);
+
+    console.log(isPayedTodayValue);
 
     if (isPayedTodayValue) {
       getIO().emit(`payedToday-${operator.operatorId}`, {

@@ -19,18 +19,31 @@
   };
 
   const addSessionHandler = async () => {
-    const { number, plateImage, fullImage, eventName, paymentMethod, tariffType, cameraIp } =
+    const { number, plateImage, fullImage, eventName, paymentMethod, tariffType, cameraIp, price } =
       newCar.value;
 
-    await axios.post(`${ipServer}/api/register-session`, {
-      number,
-      plateImage,
-      fullImage,
-      eventName: eventName || "input",
-      paymentMethod,
-      tariffType: tariffType || 1,
-      cameraIp,
-    });
+    if (eventName === "input") {
+      await axios.post(`${ipServer}/api/register-session`, {
+        number,
+        plateImage,
+        fullImage,
+        eventName: eventName || "input",
+        paymentMethod,
+        tariffType: tariffType || 1,
+        cameraIp,
+      });
+    } else {
+      await axios.post(`${ipServer}/api/output-session`, {
+        number,
+        plateImage,
+        fullImage,
+        eventName: eventName || "input",
+        paymentMethod,
+        tariffType: tariffType || 1,
+        cameraIp,
+        outputCost: price,
+      });
+    }
 
     isOpenInput.value = false;
   };
@@ -57,6 +70,7 @@
     if (oldOperator) {
       socket.off(`inputCar-${oldOperator}`);
       socket.off(`outputCar-${oldOperator}`);
+      socket.off(`payedToday-${oldOperator}`);
     }
 
     if (newOperator) {
@@ -66,7 +80,14 @@
         newCar.value = { ...initialCar, ...data };
         isOpenInput.value = true;
       });
+      socket.on(`payedToday-${newOperator}`, async (data) => {
+        console.log("payedToday", data);
+        newCar.value = { ...initialCar, ...data };
+        isOpenInput.value = true;
+      });
       socket.on(`outputCar-${newOperator}`, async (data) => {
+        console.log(data);
+
         newCar.value = data;
         isOpenOutput.value = true;
       });
@@ -147,6 +168,7 @@
       <div class="sub-title">Выберите метод оплаты</div>
       <PaymentSelector v-model="newCar.paymentMethod" />
       <div class="sub-title">IP камеры: {{ newCar.cameraIp }}</div>
+      <div class="sub-title">Стоимость простоя: {{ newCar.price }}</div>
 
       <Button @click="addSessionHandler" class="my-4 w-full">Открыть ворота</Button>
     </Drawer>

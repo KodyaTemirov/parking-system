@@ -20,19 +20,19 @@ const printReceipt = async (plateNumber, tariffType, startTime) => {
     <head>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-          font-family: Arial, sans-serif; 
-          font-size: 12px; 
-          display: flex; 
-          justify-content: center; 
+        body {
+          font-family: Arial, sans-serif;
+          font-size: 12px;
+          display: flex;
+          justify-content: center;
           align-items: flex-start;
           width: 100%;
           height: auto;
         }
-        .receipt { 
+        .receipt {
           width: 100%; /* Теперь чек занимает всю ширину */
           max-width: 70mm;
-          text-align: center; 
+          text-align: center;
           padding: 5px;
           display: block;
           margin: 0 auto; /* Центрируем */
@@ -168,14 +168,14 @@ const outputSession = async (req, res) => {
   `);
 
   const result = stmt.run(
-    number,
     plateImage || null,
     fullImage || null,
     new Date().toISOString(),
     null,
     outputCost,
     paymentMethod,
-    cameraIp
+    cameraIp,
+    number
   );
 
   const insertedData = db
