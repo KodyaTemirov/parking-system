@@ -876,6 +876,36 @@
     lodash "^4.17.15"
     tmp-promise "^3.0.2"
 
+"@node-escpos/adapter@0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@node-escpos/adapter/-/adapter-0.0.1.tgz#82375cfdc92f4cb217746c81a95f4b395d04b30a"
+  integrity sha512-I1RT6GjwxkzqCZBJ27XVDvSwPEzpP4aPJfjWCym5LY2Zj1o+fSXcIOMnR/U5cp4FZTFfERFcQpkDvMAHu+qnHA==
+  dependencies:
+    eventemitter3 "^4.0.7"
+
+"@node-escpos/core@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@node-escpos/core/-/core-0.6.0.tgz#bfd2a276b61c1f37ab29cd230ca1369e0961115a"
+  integrity sha512-6JccIYy0o5epBcLE9GcxT19YTL4ydQeP3TPj3grsFjHmGZ+D6whwXtGZ5VosW6PbU01dXtxJG2IotPtZPLWTqA==
+  dependencies:
+    "@node-escpos/adapter" "0.0.1"
+    "@types/ndarray" "^1.0.11"
+    "@types/qr-image" "^3.2.4"
+    eventemitter3 "^4.0.7"
+    get-pixels "*"
+    iconv-lite "*"
+    mutable-buffer "^2.0.3"
+    ndarray "^1.0.19"
+    qr-image "*"
+
+"@node-escpos/usb-adapter@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@node-escpos/usb-adapter/-/usb-adapter-0.3.1.tgz#a6dcda386a33934fd990faeacbfe451a24ee0442"
+  integrity sha512-n1e3k73nN6RJAmbRNSrVD3zjlkFvDiXB9u2UsH4V2UxSqU4FFbBO6zn3aVMFJU/SAoIa5GWZqBnRvaH/Q9DAZw==
+  dependencies:
+    "@node-escpos/adapter" "0.0.1"
+    usb "*"
+
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.npmjs.org/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz"
@@ -1220,6 +1250,11 @@
   resolved "https://registry.npmjs.org/@types/ms/-/ms-2.1.0.tgz"
   integrity sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==
 
+"@types/ndarray@^1.0.11":
+  version "1.0.14"
+  resolved "https://registry.yarnpkg.com/@types/ndarray/-/ndarray-1.0.14.tgz#96b28c09a3587a76de380243f87bb7a2d63b4b23"
+  integrity sha512-oANmFZMnFQvb219SSBIhI1Ih/r4CvHDOzkWyJS/XRqkMrGH5/kaPSA1hQhdIBzouaE+5KpE/f5ylI9cujmckQg==
+
 "@types/node@*", "@types/node@>=10.0.0":
   version "22.13.10"
   resolved "https://registry.npmjs.org/@types/node/-/node-22.13.10.tgz"
@@ -1241,6 +1276,13 @@
   dependencies:
     "@types/node" "*"
     xmlbuilder ">=11.0.1"
+
+"@types/qr-image@^3.2.4":
+  version "3.2.9"
+  resolved "https://registry.yarnpkg.com/@types/qr-image/-/qr-image-3.2.9.tgz#0457d7adda32543f8ade10d409472ec57f75b456"
+  integrity sha512-vmqTI+ehoC07jtzjT9Dc+3eMpXTgdluD9orVHtp9bN1gE81SnOuMe9+EwmRuWfTH04YNyk1mihI/Vr7BIhUCZg==
+  dependencies:
+    "@types/node" "*"
 
 "@types/responselike@^1.0.0":
   version "1.0.3"
@@ -2694,23 +2736,6 @@ escape-string-regexp@^4.0.0:
   resolved "https://registry.npmjs.org/escape-string-regexp/-/escape-string-regexp-4.0.0.tgz"
   integrity sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==
 
-escpos-usb@^3.0.0-alpha.4:
-  version "3.0.0-alpha.4"
-  resolved "https://registry.yarnpkg.com/escpos-usb/-/escpos-usb-3.0.0-alpha.4.tgz#ed9953eff54b9b847a47406697c5401c8e37e234"
-  integrity sha512-SX/MlDZ0HEXFb4OZeUmXvA9hOkozU9IbWoxw4H7JbuQlVLZxBsL6bx/ZeReZlXViN2SyFJedIyNrFvVFu2Mpsw==
-  dependencies:
-    usb "*"
-
-escpos@^3.0.0-alpha.6:
-  version "3.0.0-alpha.6"
-  resolved "https://registry.yarnpkg.com/escpos/-/escpos-3.0.0-alpha.6.tgz#2044edc0c5000d34bf50ea77a59600581035ce05"
-  integrity sha512-c8AkmO6i9+Jjp1+KWlS3Bv/1VspaS1VSM+UX4XMN/7ICwnrdgF0Y4Oi+8kJxIit7M9xXEdN6ry//7Vbgr/Q0dw==
-  dependencies:
-    get-pixels "*"
-    iconv-lite "*"
-    mutable-buffer "^2.0.3"
-    qr-image "*"
-
 eslint-config-prettier@^9.0.0:
   version "9.1.0"
   resolved "https://registry.npmjs.org/eslint-config-prettier/-/eslint-config-prettier-9.1.0.tgz"
@@ -2837,6 +2862,11 @@ etag@~1.8.1:
   version "1.8.1"
   resolved "https://registry.npmjs.org/etag/-/etag-1.8.1.tgz"
   integrity sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==
+
+eventemitter3@^4.0.7:
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.7.tgz#2de9b68f6528d5644ef5c59526a1b4a07306169f"
+  integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
 
 expand-template@^2.0.3:
   version "2.0.3"
@@ -4195,7 +4225,7 @@ ndarray-pack@^1.1.1:
     cwise-compiler "^1.1.2"
     ndarray "^1.0.13"
 
-ndarray@^1.0.13:
+ndarray@^1.0.13, ndarray@^1.0.19:
   version "1.0.19"
   resolved "https://registry.yarnpkg.com/ndarray/-/ndarray-1.0.19.tgz#6785b5f5dfa58b83e31ae5b2a058cfd1ab3f694e"
   integrity sha512-B4JHA4vdyZU30ELBw3g7/p9bZupyew5a7tX1Y/gGeF2hafrPaQZhgrGQfsvgfYbgdFZjYwuEcnaobeM/WMW+HQ==

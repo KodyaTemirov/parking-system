@@ -5,36 +5,71 @@ import { getCameraOperator } from "./camera.service.js";
 import { saveBase64Image, deleteImageFile } from "../../utils/saveBase64Image.js";
 import { getSnapshot } from "../../utils/getSnapshot.js";
 import { tarifs } from "../../utils/prices.js";
-import USB from "escpos-usb";
-import escpos from "escpos";
-import QRCode from "qrcode";
+
+import USB from "@node-escpos/usb-adapter";
+import { Printer, Image } from "@node-escpos/core";
 
 const printReceipt = async (plateNumber, tariffType, startTime) => {
+  const device = new USB();
+  console.log(device);
+
   try {
-    const device = new USB();
-    const printer = new escpos.Printer(device);
-    console.log(device);
-
-    const tariff = tarifs.find((item) => item.id == tariffType);
-    const price = tariff ? tariff.price : 0;
-
-    // Генерация QR-кода с номером машины
-    const qrBuffer = await QRCode.toBuffer(plateNumber || "Без номера");
-
-    device.open(() => {
-      printer
-        .align("ct")
-        .text("=== ПАРКИНГ ЧЕК ===")
-        .text(`Номер авто: ${plateNumber || "Нет"}`)
-        .text(`Тариф: ${tariff ? tariff.name : "Неизвестно"}`)
-        .text(`Стоимость: ${price} сум`)
-        .text(`Время въезда:`)
-        .text(startTime)
-        .align("ct")
-        .image(qrBuffer, "s8")
-        .cut()
-        .close();
-    });
+    // device.open(async function (err) {
+    //   if (err) {
+    //     // handle error
+    //     return;
+    //   }
+    //   // encoding is optional
+    //   const options = { encoding: "GB18030" /* default */ };
+    //   let printer = new Printer(device, options);
+    //   // Path to png image
+    //   const filePath = join("/PATH/TO/IMAGE");
+    //   const image = await Image.load(filePath);
+    //   printer
+    //     .font("a")
+    //     .align("ct")
+    //     .style("bu")
+    //     .size(1, 1)
+    //     .text("May the gold fill your pocket")
+    //     .text("恭喜发财")
+    //     .barcode(112233445566, "EAN13", { width: 50, height: 50 })
+    //     .table(["One", "Two", "Three"])
+    //     .tableCustom(
+    //       [
+    //         { text: "Left", align: "LEFT", width: 0.33, style: "B" },
+    //         { text: "Center", align: "CENTER", width: 0.33 },
+    //         { text: "Right", align: "RIGHT", width: 0.33 },
+    //       ],
+    //       { encoding: "cp857", size: [1, 1] } // Optional
+    //     );
+    //   // inject qrimage to printer
+    //   printer = await printer.qrimage("https://github.com/node-escpos/driver");
+    //   // inject image to printer
+    //   printer = await printer.image(
+    //     image,
+    //     "s8" // changing with image
+    //   );
+    //   printer.cut().close();
+    // });
+    // const printer = new escpos.Printer(device);
+    // const tariff = tarifs.find((item) => item.id == tariffType);
+    // const price = tariff ? tariff.price : 0;
+    // // Генерация QR-кода с номером машины
+    // const qrBuffer = await QRCode.toBuffer(plateNumber || "Без номера");
+    // device.open(() => {
+    //   printer
+    //     .align("ct")
+    //     .text("=== ПАРКИНГ ЧЕК ===")
+    //     .text(`Номер авто: ${plateNumber || "Нет"}`)
+    //     .text(`Тариф: ${tariff ? tariff.name : "Неизвестно"}`)
+    //     .text(`Стоимость: ${price} сум`)
+    //     .text(`Время въезда:`)
+    //     .text(startTime)
+    //     .align("ct")
+    //     .image(qrBuffer, "s8")
+    //     .cut()
+    //     .close();
+    // });
   } catch (error) {
     console.error("Ошибка при печати чека:", error);
   }
