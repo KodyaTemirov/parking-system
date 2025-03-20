@@ -1,7 +1,7 @@
 import { parsePlateData } from "@/utils/parsePlateData.js";
 import { getIO } from "../../utils/socket";
 import { getCameraOperator } from "./camera.service.js";
-import { getSessionByNumber, handleOutputSession } from "./sessions.service.js";
+import { getLastPaymentTime, getSessionByNumber, handleOutputSession } from "./sessions.service.js";
 import { tarifs } from "@/utils/prices.js";
 import axios from "axios";
 
@@ -22,7 +22,7 @@ const inputCar = async (req, res) => {
     const lastPaymentTime = await getLastPaymentTime(number);
 
     if (isPayedToday) {
-      getIO().to(`operator-${operator.operatorId}`).emit("payedToday", {
+      getIO().emit(`payedToday-${operator.operatorId}`, {
         number,
         plateImage,
         fullImage,
@@ -77,20 +77,39 @@ const outputCar = async (req, res) => {
 
     if (!operator) return res.status(200).send("Operator not found");
 
+    // Проверяем, не оплатил ли он уже за этот период
+    const isPayedToday = await isPayedToday(number);
+
+    if (isPayedToday) {
+      // Если уже оплатил - просто закрываем сессию
+      handleOutputSession({
+        number,
+        plateImage,
+        paymentMethod: 1, // По умолчанию наличные
+        cameraIp: req.headers.host,
+        fullImage,
+        outputCost: 0,
+      });
+      res.status(200).send("OK");
+      return;
+    }
+
     const price = calculatePrice(session.startTime, new Date().toISOString(), session.tariffType);
 
-    getIO().emit(`outputCar-${operator.operatorId}`, {
-      number,
-      plateImage,
-      fullImage,
-      price,
-      cameraIp: req.headers.host,
-      operatorId: operator.operatorId,
-      session,
-      eventName: "output",
-    });
-
-    if (price == 0) {
+    // Если есть цена (простоял больше 24 часов)
+    if (price > 0) {
+      getIO().emit(`outputCar-${operator.operatorId}`, {
+        number,
+        plateImage,
+        fullImage,
+        price,
+        cameraIp: req.headers.host,
+        operatorId: operator.operatorId,
+        session,
+        eventName: "output",
+      });
+    } else {
+      // Если меньше 24 часов - просто закрываем сессию
       handleOutputSession({
         number,
         plateImage,
