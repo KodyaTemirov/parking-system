@@ -52,12 +52,18 @@ const registerSession = async (req, res) => {
 };
 
 const outputSession = async (req, res) => {
-  const { number, plateImage, fullImage, eventName, tariffType, paymentMethod } = req.body;
+  const { number, plateImage, fullImage, paymentMethod, outputCost, cameraIp } = req.body;
 
   const stmt = db.prepare(`
-    INSERT INTO sessions
-      (plateNumber, plateImage, fullImage, startTime, endTime, event, tariffType, duration, cost, paymentMethod)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    UPDATE sessions
+    SET outputPlateImage = ?,
+        outputFullImage = ?,
+        endTime = ?,
+        duration = ?,
+        outputCost = ?,
+        outputPaymentMethod = ?,
+        cameraIp = ?
+    WHERE plateNumber = ? AND endTime IS NULL
   `);
 
   const result = stmt.run(
@@ -66,11 +72,9 @@ const outputSession = async (req, res) => {
     fullImage || null,
     new Date().toISOString(),
     null,
-    eventName,
-    tariffType,
-    null,
-    null,
-    paymentMethod
+    outputCost,
+    paymentMethod,
+    cameraIp
   );
 
   const insertedData = db
@@ -111,26 +115,24 @@ const getSessions = (req, res) => {
   });
 };
 
-const getSnapshotSession = async (eventName, tariffType, paymentMethod, cameraIp, res) => {
+const getSnapshotSession = async (tariffType, paymentMethod, cameraIp, res) => {
   const camera = await getCameraOperator(cameraIp);
   const snapImage = await getSnapshot(cameraIp, camera.login, camera.password);
   const snapUrl = saveBase64Image(snapImage);
 
   const stmt = db.prepare(`
     INSERT INTO sessions
-      (plateNumber, fullImage, startTime, endTime, event, tariffType, duration, cost, paymentMethod,cameraIp)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (plateNumber, inputFullImage, startTime, tariffType, duration, inputCost, inputPaymentMethod,cameraIp)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   const result = stmt.run(
     null,
     snapUrl || null,
     new Date().toISOString(),
-    null,
-    eventName,
     tariffType,
     null,
-    null,
+    tarifs.find((item) => item.id == tariffType).price,
     paymentMethod,
     cameraIp
   );
@@ -152,9 +154,7 @@ const getSnapshotSession = async (eventName, tariffType, paymentMethod, cameraIp
 
 const getSessionByNumber = (number) => {
   const data = db
-    .prepare(
-      "SELECT * FROM sessions WHERE plateNumber = ? AND event = 'input' ORDER BY startTime DESC"
-    )
+    .prepare("SELECT * FROM sessions WHERE plateNumber = ? and endTime is null")
     .get(number);
 
   return data;
