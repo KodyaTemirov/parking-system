@@ -122,6 +122,44 @@ const outputSession = async (req, res) => {
   res.status(201).send(insertedData);
 };
 
+const handleOutputSession = async ({
+  number,
+  plateImage,
+  fullImage,
+  paymentMethod,
+  outputCost,
+  cameraIp,
+}) => {
+  const stmt = db.prepare(`
+    UPDATE sessions
+    SET outputPlateImage = ?,
+        outputFullImage = ?,
+        endTime = ?,
+        duration = ?,
+        outputCost = ?,
+        outputPaymentMethod = ?,
+        cameraIp = ?
+    WHERE plateNumber = ? AND endTime IS NULL
+  `);
+
+  const result = stmt.run(
+    number,
+    plateImage || null,
+    fullImage || null,
+    new Date().toISOString(),
+    null,
+    outputCost,
+    paymentMethod,
+    cameraIp
+  );
+
+  const insertedData = db
+    .prepare("SELECT * FROM sessions WHERE id = ?")
+    .get(result.lastInsertRowid);
+
+  await getIO().emit("newSession", insertedData);
+};
+
 const getSessions = (req, res) => {
   const { page = 1, size = 10, search } = req.query;
   const offset = (page - 1) * size;
@@ -255,4 +293,11 @@ const getSessionsInfo = async (req, res) => {
   }
 };
 
-export { registerSession, getSessions, outputSession, getSessionByNumber, getSessionsInfo };
+export {
+  registerSession,
+  getSessions,
+  outputSession,
+  getSessionByNumber,
+  getSessionsInfo,
+  handleOutputSession,
+};
