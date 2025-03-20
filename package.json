@@ -29,6 +29,8 @@
     "cors": "^2.8.5",
     "electron-store": "^10.0.1",
     "electron-updater": "^6.3.9",
+    "escpos": "^3.0.0-alpha.6",
+    "escpos-usb": "^3.0.0-alpha.4",
     "express": "^4.21.2",
     "express-xml-bodyparser": "^0.3.0",
     "http": "^0.0.1-security",

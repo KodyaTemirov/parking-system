@@ -5,76 +5,106 @@ import { getCameraOperator } from "./camera.service.js";
 import { saveBase64Image, deleteImageFile } from "../../utils/saveBase64Image.js";
 import { getSnapshot } from "../../utils/getSnapshot.js";
 import { tarifs } from "../../utils/prices.js";
-
-import USB from "@node-escpos/usb-adapter";
-import { Printer, Image } from "@node-escpos/core";
-
+import { BrowserWindow } from "electron";
+import fs from "fs";
 const printReceipt = async (plateNumber, tariffType, startTime) => {
-  const device = new USB();
-  console.log(device);
+  const win = new BrowserWindow({
+    show: false,
+    webPreferences: {
+      offscreen: true, // Позволяет рендерить страницу без открытия окна
+    },
+  });
 
-  try {
-    // device.open(async function (err) {
-    //   if (err) {
-    //     // handle error
-    //     return;
-    //   }
-    //   // encoding is optional
-    //   const options = { encoding: "GB18030" /* default */ };
-    //   let printer = new Printer(device, options);
-    //   // Path to png image
-    //   const filePath = join("/PATH/TO/IMAGE");
-    //   const image = await Image.load(filePath);
-    //   printer
-    //     .font("a")
-    //     .align("ct")
-    //     .style("bu")
-    //     .size(1, 1)
-    //     .text("May the gold fill your pocket")
-    //     .text("恭喜发财")
-    //     .barcode(112233445566, "EAN13", { width: 50, height: 50 })
-    //     .table(["One", "Two", "Three"])
-    //     .tableCustom(
-    //       [
-    //         { text: "Left", align: "LEFT", width: 0.33, style: "B" },
-    //         { text: "Center", align: "CENTER", width: 0.33 },
-    //         { text: "Right", align: "RIGHT", width: 0.33 },
-    //       ],
-    //       { encoding: "cp857", size: [1, 1] } // Optional
-    //     );
-    //   // inject qrimage to printer
-    //   printer = await printer.qrimage("https://github.com/node-escpos/driver");
-    //   // inject image to printer
-    //   printer = await printer.image(
-    //     image,
-    //     "s8" // changing with image
-    //   );
-    //   printer.cut().close();
-    // });
-    // const printer = new escpos.Printer(device);
-    // const tariff = tarifs.find((item) => item.id == tariffType);
-    // const price = tariff ? tariff.price : 0;
-    // // Генерация QR-кода с номером машины
-    // const qrBuffer = await QRCode.toBuffer(plateNumber || "Без номера");
-    // device.open(() => {
-    //   printer
-    //     .align("ct")
-    //     .text("=== ПАРКИНГ ЧЕК ===")
-    //     .text(`Номер авто: ${plateNumber || "Нет"}`)
-    //     .text(`Тариф: ${tariff ? tariff.name : "Неизвестно"}`)
-    //     .text(`Стоимость: ${price} сум`)
-    //     .text(`Время въезда:`)
-    //     .text(startTime)
-    //     .align("ct")
-    //     .image(qrBuffer, "s8")
-    //     .cut()
-    //     .close();
-    // });
-  } catch (error) {
-    console.error("Ошибка при печати чека:", error);
-  }
+  const htmlContent = `
+    <html>
+    <head>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+          font-family: Arial, sans-serif; 
+          font-size: 12px; 
+          display: flex; 
+          justify-content: center; 
+          align-items: flex-start;
+          width: 100%;
+          height: auto;
+        }
+        .receipt { 
+          width: 100%; /* Теперь чек занимает всю ширину */
+          max-width: 70mm;
+          text-align: center; 
+          padding: 5px;
+          display: block;
+          margin: 0 auto; /* Центрируем */
+        }
+        h2 { font-size: 14px; margin-bottom: 5px; }
+        p { margin: 2px 0; font-size: 12px;  }
+        hr { border: 1px dashed black; margin: 5px 0; }
+      </style>
+    </head>
+    <body>
+      <div class="receipt">
+        <h2>КАССОВЫЙ ЧЕК</h2>
+        <p><strong>Номер:</strong> ${plateNumber}</p>
+        <p><strong>Тариф:</strong> ${tariffType}</p>
+        <p><strong>Время начала:</strong> ${new Date(startTime).toLocaleString()}</p>
+        <hr>
+        <p>Спасибо за посещение!</p>
+      </div>
+    </body>
+    </html>
+  `;
+
+  win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`);
+
+  win.webContents.once("did-finish-load", async () => {
+    console.log("HTML загружен, создаем PDF...");
+
+    // Даем время на рендеринг перед печатью
+    await win.webContents.executeJavaScript("document.body.offsetHeight");
+
+    // Генерация PDF для отладки
+    const pdfData = await win.webContents.printToPDF({
+      marginsType: 0, // Без полей
+      pageSize: { width: 58 * 2.83465, height: 100 }, // Динамическая высота
+      printBackground: true,
+      scaleFactor: 1, // Оригинальный масштаб
+    });
+
+    const pdfPath = "receipt_debug.pdf";
+    if (fs.existsSync(pdfPath)) fs.unlinkSync(pdfPath);
+    fs.writeFileSync(pdfPath, pdfData);
+
+    // Получение списка принтеров
+    const printers = await win.webContents.getPrintersAsync();
+    console.log("Доступные принтеры:", printers);
+
+    const defaultPrinter = printers.find((p) => p.isDefault);
+    if (!defaultPrinter) {
+      console.error("Не найден принтер по умолчанию");
+      win.close();
+      return;
+    }
+
+    console.log("Отправка на принтер:", defaultPrinter.name);
+
+    // Ожидание рендеринга перед печатью
+    setTimeout(() => {
+      win.webContents.print(
+        {
+          silent: false,
+          printBackground: true,
+          deviceName: defaultPrinter.name,
+          margins: { marginType: "custom", top: 1, bottom: 1, left: 1, right: 1 }, // Убираем поля
+        },
+        (success, errorType) => {
+          if (!success) console.error("Ошибка печати:", errorType);
+          win.close();
+        }
+      );
+    }, 1000); // Даем 1 секунду на рендеринг перед печатью
+  });
 };
-
 const registerSession = async (req, res) => {
   const { number, plateImage, fullImage, eventName, tariffType, paymentMethod, cameraIp } =
     req.body;
@@ -178,14 +208,14 @@ const handleOutputSession = async ({
   `);
 
   const result = stmt.run(
-    number,
     plateImage || null,
     fullImage || null,
     new Date().toISOString(),
     null,
     outputCost,
     paymentMethod,
-    cameraIp
+    cameraIp,
+    number
   );
 
   const insertedData = db
@@ -286,8 +316,7 @@ const isPayedToday = (number) => {
   const now = new Date();
   const hoursSincePayment = (now - lastPaymentTime) / (1000 * 60 * 60);
 
-  const paidDays = Math.floor(data.outputCost / data.inputCost);
-
+  const paidDays = Math.floor(data.outputCost / data.inputCost) || 1;
   // Проверяем, не превысили ли мы оплаченный период
   return hoursSincePayment <= paidDays * 24;
 };

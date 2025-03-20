@@ -74,18 +74,23 @@ const outputCar = async (req, res) => {
 
     const { fullImage, plateImage, number } = parsePlateData(req.body);
 
-    const session = await getSessionByNumber(number);
-
-    if (!session) return res.status(400).send({ message: "Session not found" });
-
     const operator = await getCameraOperator(req.headers.host);
+    console.log("operator", operator);
 
     if (!operator) return res.status(200).send("Operator not found");
+    console.log("allWorks");
 
-    // Проверяем, не оплатил ли он уже за этот период
+    const session = await getSessionByNumber(number);
+    console.log("session", session);
+
     const isPayedTodayValue = await isPayedToday(number);
 
-    console.log(isPayedTodayValue);
+    console.log(!session && !isPayedTodayValue, session, isPayedTodayValue);
+
+    if (!session && !isPayedTodayValue)
+      return res.status(400).send({ message: "Session not found" });
+
+    // Проверяем, не оплатил ли он уже за   этот период
 
     if (isPayedTodayValue) {
       console.log("payed");
@@ -127,15 +132,19 @@ const outputCar = async (req, res) => {
       console.log("payed");
       const lastPaymentTime = await getLastPaymentTime(number);
 
+      const plateImageFile = saveBase64Image(plateImage);
+      const fullImageFile = saveBase64Image(fullImage);
+
       // Если меньше 24 часов - просто закрываем сессию
       handleOutputSession({
         number,
-        plateImage,
+        plateImageFile,
         paymentMethod: 1,
         cameraIp: req.headers.host,
-        fullImage,
+        fullImageFile,
         outputCost: 0,
       });
+
       getIO().emit(`payedToday-${operator.operatorId}`, {
         number,
         plateImage,
