@@ -171,7 +171,9 @@ const getSessionsInfo = async (req, res) => {
         t.name as tariffName
       FROM sessions s
       LEFT JOIN (
-        SELECT id, name, price
+        SELECT json_extract(value, '$.id') as id,
+               json_extract(value, '$.name') as name,
+               json_extract(value, '$.price') as price
         FROM json_each('${JSON.stringify(tarifs)}')
       ) t ON t.id = s.tariffType
       GROUP BY tariffType
