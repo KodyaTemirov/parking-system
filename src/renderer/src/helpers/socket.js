@@ -1,6 +1,7 @@
 import { io } from "socket.io-client";
+import { ipServer } from "@/config";
 
-export const socket = io("http://10.20.11.150:9061", {
+export const socket = io(ipServer, {
   reconnectionAttempts: 5,
   timeout: 20000, // 20 секунд
   pingTimeout: 60000,

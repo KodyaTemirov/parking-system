@@ -2,10 +2,11 @@ import { Menu, clipboard, ipcMain } from "electron";
 import Store from "electron-store";
 import { stopServer, startServer, getServerInfo } from "./serverControl";
 import axios from "axios";
+import { ipServer } from "@/config";
 
 const store = new Store();
-const API_BASE_URL = "http://10.20.11.150:9061/api/operator";
-const API_CAMERAS_BASE_URL = "http://10.20.11.150:9061/api/camera/operators";
+const API_BASE_URL = `${ipServer}/api/operator`;
+const API_CAMERAS_BASE_URL = `${ipServer}/api/camera/operators`;
 
 const getCheckboxState = () => store.get("checkboxState", false);
 const updateCheckboxState = (state) => store.set("checkboxState", state);

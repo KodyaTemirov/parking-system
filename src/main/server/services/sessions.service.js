@@ -5,6 +5,40 @@ import { getCameraOperator } from "./camera.service.js";
 import { saveBase64Image, deleteImageFile } from "../../utils/saveBase64Image.js";
 import { getSnapshot } from "../../utils/getSnapshot.js";
 import { tarifs } from "../../utils/prices.js";
+import USB from "escpos-usb";
+import escpos from "escpos";
+import QRCode from "qrcode";
+
+const printReceipt = async (plateNumber, tariffType, startTime) => {
+  try {
+    const device = new USB();
+    const printer = new escpos.Printer(device);
+    console.log(device);
+
+    const tariff = tarifs.find((item) => item.id == tariffType);
+    const price = tariff ? tariff.price : 0;
+
+    // Генерация QR-кода с номером машины
+    const qrBuffer = await QRCode.toBuffer(plateNumber || "Без номера");
+
+    device.open(() => {
+      printer
+        .align("ct")
+        .text("=== ПАРКИНГ ЧЕК ===")
+        .text(`Номер авто: ${plateNumber || "Нет"}`)
+        .text(`Тариф: ${tariff ? tariff.name : "Неизвестно"}`)
+        .text(`Стоимость: ${price} сум`)
+        .text(`Время въезда:`)
+        .text(startTime)
+        .align("ct")
+        .image(qrBuffer, "s8")
+        .cut()
+        .close();
+    });
+  } catch (error) {
+    console.error("Ошибка при печати чека:", error);
+  }
+};
 
 const registerSession = async (req, res) => {
   const { number, plateImage, fullImage, eventName, tariffType, paymentMethod, cameraIp } =
@@ -47,6 +81,8 @@ const registerSession = async (req, res) => {
   // setTimeout(() => {
   //   openFetch(false, cameraIp, camera.login, camera.password);
   // }, 100);
+
+  await printReceipt(number, tariffType, insertedData.startTime);
 
   res.status(201).send(insertedData);
 };

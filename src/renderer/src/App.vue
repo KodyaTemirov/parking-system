@@ -3,13 +3,12 @@
   import { socket } from "@/helpers";
   import { useSessionsStore } from "@/store";
   import axios from "axios";
-
+  import { ipServer } from "@/config";
   const sessionStore = useSessionsStore();
   const currentTariff = ref();
   const initialCar = { paymentMethod: 1, tariffType: 1, eventName: "output" };
   const newCar = ref({ ...initialCar });
   const selectedOperator = ref(null);
-  const backendURL = "http://10.20.11.150:9061";
   const isOpenInput = ref(false);
   const isOpenOutput = ref(false);
 
@@ -23,7 +22,7 @@
     const { number, plateImage, fullImage, eventName, paymentMethod, tariffType, cameraIp } =
       newCar.value;
 
-    await axios.post(`${backendURL}/api/register-session`, {
+    await axios.post(`${ipServer}/api/register-session`, {
       number,
       plateImage,
       fullImage,

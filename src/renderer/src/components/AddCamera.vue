@@ -12,9 +12,9 @@
     DialogClose,
   } from "radix-vue";
   import { Icon } from "@iconify/vue";
+  import { ipServer } from "@/config";
 
   const isDialogOpen = ref(true);
-  const backendURL = "http://10.20.11.150:9061";
   const isLoading = ref(false);
   const errorMessage = ref("");
 
@@ -41,7 +41,7 @@
       try {
         isLoading.value = true;
         errorMessage.value = "";
-        await axios.post(`${backendURL}/api/camera`, cameraInfo.value);
+        await axios.post(`${ipServer}/api/camera`, cameraInfo.value);
         isDialogOpen.value = false;
         cameraInfo.value = {
           name: "",
@@ -63,7 +63,7 @@
 
   const getAllOperators = async () => {
     try {
-      const { data } = await axios.get(`${backendURL}/api/operator`);
+      const { data } = await axios.get(`${ipServer}/api/operator`);
       operators.value = data;
     } catch (error) {
       console.error("Ошибка при получении операторов:", error);

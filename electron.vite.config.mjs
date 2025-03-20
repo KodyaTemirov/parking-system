@@ -12,6 +12,7 @@ export default defineConfig({
         "@/events": resolve("src/main/events"),
         "@/utils": resolve("src/main/utils"),
         "@/helpers": resolve("src/main/src/helpers"),
+        "@/config": resolve("src/main/config"),
       },
     },
 
@@ -31,6 +32,7 @@ export default defineConfig({
         "@/store": resolve("src/renderer/src/store"),
         "@/router": resolve("src/renderer/src/router"),
         "@/services": resolve("src/renderer/src/services"),
+        "@/config": resolve("src/main/config"),
       },
     },
     plugins: [vue(), tailwindcss()],
