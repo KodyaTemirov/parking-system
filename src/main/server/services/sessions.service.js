@@ -153,7 +153,9 @@ const getSnapshotSession = async (eventName, tariffType, paymentMethod, cameraIp
 
 const getSessionByNumber = (number) => {
   const data = db
-    .prepare("SELECT * FROM sessions WHERE plateNumber = ? and paymentStatus = 0")
+    .prepare(
+      "SELECT * FROM sessions WHERE plateNumber = ? AND event = 'input' ORDER BY startTime DESC"
+    )
     .get(number);
 
   return data;

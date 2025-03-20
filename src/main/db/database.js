@@ -49,7 +49,7 @@ db.prepare(
     duration INTEGER,
     cost REAL,
     paymentMethod INTEGER,
-    paymentStatus INTEGER DEFAULT 0,
+    paymentStatus INTEGER DEFAULT 1,
     isSync INTEGER DEFAULT 0,
     cameraIp TEXT
   );
