@@ -24,6 +24,7 @@ const inputCar = async (req, res) => {
       fullImage,
       cameraIp: req.headers.host,
       operatorId: operator.operatorId,
+      eventName: "input",
     });
 
     res.status(200).send("OK");
@@ -60,6 +61,7 @@ const outputCar = async (req, res) => {
       cameraIp: req.headers.host,
       operatorId: operator.operatorId,
       session,
+      eventName: "output",
     });
 
     res.status(200).send("OK");

@@ -47,7 +47,7 @@
         <td class="px-4 py-2">{{ calculateDuration(session.startTime, session.endTime) }}</td>
         <td class="px-4 py-2">{{ session.cost }} сум</td>
         <td class="px-4 py-2">{{ session.paymentMethod === 1 ? "Наличные" : "Карта" }}</td>
-        <td class="px-4 py-2">{{ session.event === "inputCar" ? "Въезд" : "Выезд" }}</td>
+        <td class="px-4 py-2">{{ session.event === "input" ? "Въезд" : "Выезд" }}</td>
       </tr>
     </tbody>
   </table>

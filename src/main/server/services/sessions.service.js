@@ -4,6 +4,7 @@ import { openFetch } from "./plate.service.js";
 import { getCameraOperator } from "./camera.service.js";
 import { saveBase64Image, deleteImageFile } from "../../utils/saveBase64Image.js";
 import { getSnapshot } from "../../utils/getSnapshot.js";
+import { tarifs } from "../../utils/prices.js";
 
 const registerSession = async (req, res) => {
   const { number, plateImage, fullImage, eventName, tariffType, paymentMethod, cameraIp } =
@@ -18,8 +19,8 @@ const registerSession = async (req, res) => {
 
   const stmt = db.prepare(`
     INSERT INTO sessions
-      (plateNumber, plateImage, fullImage, startTime, endTime, event, tariffType, duration, cost, paymentMethod,cameraIp)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (plateNumber, inputPlateImage, inputFullImage, startTime, tariffType, duration, inputCost, inputPaymentMethod,cameraIp)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   const result = stmt.run(
@@ -27,11 +28,9 @@ const registerSession = async (req, res) => {
     plateImageFile || null,
     fullImageFile || null,
     new Date().toISOString(),
-    null,
-    eventName,
     tariffType,
     null,
-    null,
+    tarifs.find((item) => item.id == tariffType).price,
     paymentMethod,
     cameraIp
   );
