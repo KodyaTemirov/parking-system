@@ -162,25 +162,58 @@ const getSessionByNumber = (number) => {
 
 const getSessionsInfo = async (req, res) => {
   try {
-    const data = db
+    const allData = db
       .prepare(
         `
       SELECT
         COUNT(*) as count,
-        tariffType,
-        t.name as tariffName
-      FROM sessions s
-      LEFT JOIN (
-        SELECT json_extract(value, '$.id') as id,
-               json_extract(value, '$.name') as name,
-               json_extract(value, '$.price') as price
-        FROM json_each('${JSON.stringify(tarifs)}')
-      ) t ON t.id = s.tariffType
+        tariffType
+      FROM sessions
       GROUP BY tariffType
     `
       )
       .all();
-    res.status(200).send(data);
+
+    const outputData = db
+      .prepare(
+        `
+      SELECT
+        COUNT(*) as count,
+        tariffType
+      FROM sessions
+      WHERE endTime is not null
+      GROUP BY tariffType
+    `
+      )
+      .all();
+
+    const inputData = db
+      .prepare(
+        `
+      SELECT
+        COUNT(*) as count,
+        tariffType
+      FROM sessions
+      WHERE endTime is null
+      GROUP BY tariffType
+    `
+      )
+      .all();
+
+    const totalCostToday = db
+      .prepare(
+        `
+      SELECT SUM(inputCost + outputCost) as totalCost FROM sessions WHERE date(startTime) = date('now')
+    `
+      )
+      .get();
+
+    res.status(200).send({
+      allData,
+      inputData,
+      outputData,
+      totalCostToday,
+    });
   } catch (error) {
     res.status(400).send(error);
   }
