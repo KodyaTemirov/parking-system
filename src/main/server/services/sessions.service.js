@@ -160,4 +160,28 @@ const getSessionByNumber = (number) => {
   return data;
 };
 
-export { registerSession, getSessions, outputSession, getSessionByNumber };
+const getSessionsInfo = async (req, res) => {
+  try {
+    const data = db
+      .prepare(
+        `
+      SELECT
+        COUNT(*) as count,
+        tariffType,
+        t.name as tariffName
+      FROM sessions s
+      LEFT JOIN (
+        SELECT id, name, price
+        FROM json_each('${JSON.stringify(tarifs)}')
+      ) t ON t.id = s.tariffType
+      GROUP BY tariffType
+    `
+      )
+      .all();
+    res.status(200).send(data);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
+
+export { registerSession, getSessions, outputSession, getSessionByNumber, getSessionsInfo };
