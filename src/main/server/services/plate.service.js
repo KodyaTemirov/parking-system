@@ -1,7 +1,7 @@
 import { parsePlateData } from "@/utils/parsePlateData.js";
 import { getIO } from "../../utils/socket";
 import { getCameraOperator } from "./camera.service.js";
-import { getSessionByNumber } from "./sessions.service.js";
+import { getSessionByNumber, handleOutputSession } from "./sessions.service.js";
 import { tarifs } from "@/utils/prices.js";
 import axios from "axios";
 
@@ -63,6 +63,21 @@ const outputCar = async (req, res) => {
       session,
       eventName: "output",
     });
+
+    if (price == 0) {
+      handleOutputSession({
+        number,
+        plateImage,
+        paymentMethod,
+        cameraIp: req.headers.host,
+        fullImage,
+        outputCost: 0,
+      });
+      // openFetch(true, cameraIp, camera.login, camera.password);
+      // setTimeout(() => {
+      //   openFetch(false, cameraIp, camera.login, camera.password);
+      // }, 100);
+    }
 
     res.status(200).send("OK");
   } catch (error) {
