@@ -84,9 +84,32 @@ const outputSession = async (req, res) => {
 };
 
 const getSessions = (req, res) => {
-  const data = db.prepare("SELECT * FROM sessions ORDER BY startTime DESC").all();
+  const { page = 1, size = 10, search } = req.query;
+  const offset = (page - 1) * size;
 
-  res.status(200).send(data);
+  let query = "SELECT * FROM sessions";
+  let countQuery = "SELECT COUNT(*) as total FROM sessions";
+  let params = [];
+
+  if (search) {
+    query += " WHERE plateNumber LIKE ?";
+    countQuery += " WHERE plateNumber LIKE ?";
+    params.push(`%${search}%`);
+  }
+
+  query += " ORDER BY startTime DESC LIMIT ? OFFSET ?";
+  params.push(Number(size), offset);
+
+  const data = db.prepare(query).all(...params);
+  const total = db.prepare(countQuery).get(...params.slice(0, -2));
+
+  res.status(200).send({
+    data,
+    total: total.total,
+    page: Number(page),
+    size: Number(size),
+    totalPages: Math.ceil(total.total / size),
+  });
 };
 
 const getSnapshotSession = async (eventName, tariffType, paymentMethod, cameraIp, res) => {
