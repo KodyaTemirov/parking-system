@@ -9,7 +9,7 @@
   const initialCar = { paymentMethod: 1, tariffType: 1, eventName: "output" };
   const newCar = ref({ ...initialCar });
   const selectedOperator = ref(null);
-  const backendURL = "http://10.20.10.136:9061";
+  const backendURL = "http://10.20.11.150:9061";
   const isOpenInput = ref(false);
   const isOpenOutput = ref(false);
 

@@ -203,7 +203,7 @@ const getSessionsInfo = async (req, res) => {
     const totalCostToday = db
       .prepare(
         `
-      SELECT SUM(inputCost + outputCost) as totalCost FROM sessions WHERE date(startTime) = date('now')
+      SELECT SUM(inputCost) as totalInputCost, SUM(outputCost) as totalOutputCost FROM sessions WHERE date(startTime) = date('now')
     `
       )
       .get();
@@ -212,7 +212,7 @@ const getSessionsInfo = async (req, res) => {
       allData,
       inputData,
       outputData,
-      totalCostToday,
+      totalCostToday: totalCostToday.totalInputCost + totalCostToday.totalOutputCost,
     });
   } catch (error) {
     res.status(400).send(error);

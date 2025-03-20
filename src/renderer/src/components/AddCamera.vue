@@ -14,7 +14,7 @@
   import { Icon } from "@iconify/vue";
 
   const isDialogOpen = ref(true);
-  const backendURL = "http://10.20.10.136:9061";
+  const backendURL = "http://10.20.11.150:9061";
   const isLoading = ref(false);
   const errorMessage = ref("");
 
