@@ -155,36 +155,96 @@ const registerSession = async (req, res) => {
 const outputSession = async (req, res) => {
   const { number, plateImage, fullImage, paymentMethod, outputCost, cameraIp } = req.body;
 
-  const stmt = db.prepare(`
-    UPDATE sessions
-    SET outputPlateImage = ?,
-        outputFullImage = ?,
-        endTime = ?,
-        duration = ?,
-        outputCost = ?,
-        outputPaymentMethod = ?,
-        cameraIp = ?
+  const lastSession = db
+    .prepare(
+      `
+    SELECT * FROM sessions
     WHERE plateNumber = ? AND endTime IS NULL
-  `);
+    ORDER BY startTime DESC
+    LIMIT 1
+  `
+    )
+    .get(number);
 
-  const result = stmt.run(
-    plateImage || null,
-    fullImage || null,
-    new Date().toISOString(),
-    null,
-    outputCost,
-    paymentMethod,
-    cameraIp,
-    number
-  );
+  if (lastSession) {
+    console.log(lastSession, "lastSession1111");
+    const stmt = db.prepare(`
+      UPDATE sessions
+      SET outputPlateImage = ?,
+          outputFullImage = ?,
+          endTime = ?,
+          duration = ?,
+          outputCost = ?,
+          outputPaymentMethod = ?,
+          cameraIp = ?
+      WHERE plateNumber = ? AND endTime IS NULL
+    `);
 
-  const insertedData = db
-    .prepare("SELECT * FROM sessions WHERE id = ?")
-    .get(result.lastInsertRowid);
+    const result = stmt.run(
+      plateImage || null,
+      fullImage || null,
+      new Date().toISOString(),
+      null,
+      outputCost,
+      paymentMethod,
+      cameraIp,
+      number
+    );
 
-  await getIO().emit("newSession", insertedData);
+    const insertedData = db
+      .prepare("SELECT * FROM sessions WHERE id = ?")
+      .get(result.lastInsertRowid);
 
-  res.status(201).send(insertedData);
+    await getIO().emit("newSession", insertedData);
+
+    res.status(201).send(insertedData);
+  } else {
+    console.log(lastSession, "lastSession2222");
+
+    const lastPaidSession = db
+      .prepare(
+        `
+    SELECT * FROM sessions
+    WHERE plateNumber = ? AND endTime IS NOT NULL
+    ORDER BY startTime DESC
+    LIMIT 1
+  `
+      )
+      .get(number);
+
+    if (lastPaidSession) {
+      const stmt = db.prepare(`
+        UPDATE sessions
+        SET outputPlateImage = ?,
+            outputFullImage = ?,
+            endTime = ?,
+            duration = ?,
+            outputCost = ?,
+            outputPaymentMethod = ?,
+            cameraIp = ?
+        WHERE plateNumber = ? AND endTime IS NOT NULL
+      `);
+
+      const result = stmt.run(
+        plateImage || null,
+        fullImage || null,
+        new Date().toISOString(),
+        null,
+        lastPaidSession.outputCost + outputCost,
+        paymentMethod,
+        cameraIp,
+        number
+      );
+
+      const insertedData = db
+        .prepare("SELECT * FROM sessions WHERE id = ?")
+        .get(result.lastInsertRowid);
+
+      await getIO().emit("newSession", insertedData);
+
+      res.status(201).send(insertedData);
+    }
+  }
 };
 
 const handleOutputSession = async ({
@@ -316,8 +376,11 @@ const isPayedToday = (number) => {
   const now = new Date();
   const hoursSincePayment = (now - lastPaymentTime) / (1000 * 60 * 60);
 
-  const paidDays = Math.floor(data.outputCost / data.inputCost) || 1;
+  const paidDays = Math.floor(data.outputCost / data.inputCost) + 1 || 1;
   // Проверяем, не превысили ли мы оплаченный период
+
+  console.log(paidDays, "paidDays", hoursSincePayment);
+
   return hoursSincePayment <= paidDays * 24;
 };
 

@@ -1,6 +1,7 @@
 import { parsePlateData } from "@/utils/parsePlateData.js";
 import { getIO } from "../../utils/socket";
 import { getCameraOperator } from "./camera.service.js";
+import db from "@/db/database.js";
 import {
   getLastPaymentTime,
   getSessionByNumber,
@@ -26,8 +27,6 @@ const inputCar = async (req, res) => {
 
     const isPayedTodayValue = await isPayedToday(number);
     const lastPaymentTime = await getLastPaymentTime(number);
-
-    console.log(isPayedTodayValue);
 
     if (isPayedTodayValue) {
       getIO().emit(`payedToday-${operator.operatorId}`, {
@@ -63,7 +62,6 @@ const inputCar = async (req, res) => {
 
     res.status(200).send("OK");
   } catch (error) {
-    console.log(error);
     res.status(400).send(error);
   }
 };
@@ -78,25 +76,57 @@ const outputCar = async (req, res) => {
     const { fullImage, plateImage, number } = parsePlateData(req.body);
 
     const operator = await getCameraOperator(req.headers.host);
-    console.log("operator", operator);
 
     if (!operator) return res.status(200).send("Operator not found");
-    console.log("allWorks");
 
     const session = await getSessionByNumber(number);
-    console.log("session", session);
 
     const isPayedTodayValue = await isPayedToday(number);
 
-    console.log(!session && !isPayedTodayValue, session, isPayedTodayValue);
+    if (!session && !isPayedTodayValue) {
+      const lastSession = db
+        .prepare(
+          `SELECT * FROM sessions
+         WHERE plateNumber = ?
+         ORDER BY startTime DESC
+         LIMIT 1`
+        )
+        .get(number);
 
-    if (!session && !isPayedTodayValue)
-      return res.status(400).send({ message: "Session not found" });
+      let price = 0;
+      if (lastSession) {
+        const lastEntryTime = new Date(lastSession.startTime);
+        const now = new Date();
+        const hoursSinceEntry = (now - lastEntryTime) / (1000 * 60 * 60);
+        price = Math.ceil((hoursSinceEntry - 24) / 24) * tarifs[0].price;
+
+        return getIO().emit(`outputCar-${operator.operatorId}`, {
+          number,
+          plateImage,
+          fullImage,
+          price: price - lastSession.outputCost,
+          cameraIp: req.headers.host,
+          operatorId: operator.operatorId,
+          session,
+          eventName: "output",
+        });
+      } else {
+        return getIO().emit(`outputCar-${operator.operatorId}`, {
+          number,
+          plateImage,
+          fullImage,
+          price: 100000,
+          cameraIp: req.headers.host,
+          operatorId: operator.operatorId,
+          session,
+          eventName: "output",
+        });
+      }
+    }
 
     // Проверяем, не оплатил ли он уже за   этот период
 
     if (isPayedTodayValue) {
-      console.log("payed");
       const lastPaymentTime = await getLastPaymentTime(number);
 
       getIO().emit(`payedToday-${operator.operatorId}`, {
@@ -132,7 +162,6 @@ const outputCar = async (req, res) => {
         eventName: "output",
       });
     } else {
-      console.log("payed");
       const lastPaymentTime = await getLastPaymentTime(number);
 
       const plateImageFile = saveBase64Image(plateImage);
@@ -166,7 +195,6 @@ const outputCar = async (req, res) => {
 
     res.status(200).send("OK");
   } catch (error) {
-    console.log(error);
     res.status(400).send(error);
   }
 };
