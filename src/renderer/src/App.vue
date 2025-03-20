@@ -48,7 +48,7 @@
   const getAllSession = async () => {
     try {
       const { data } = await axios.get(`${backendURL}/api/session`);
-      sessionStore.setSessions(data);
+      sessionStore.setSessions(data.data);
     } catch (error) {
       console.log(error, "ERRROR");
     }
