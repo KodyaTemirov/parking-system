@@ -1,6 +1,7 @@
-import { ipcMain } from "electron";
+import { ipcMain, BrowserWindow, app } from "electron";
 import axios from "axios";
 
+import fs from "fs/promises";
 import db from "@/db/database.js";
 const config = {
   headers: {

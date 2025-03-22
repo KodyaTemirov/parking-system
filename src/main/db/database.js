@@ -9,7 +9,7 @@ const dbPath = isDev
   : path.join(app.getPath("userData"), "data.db"); // В директории Electron в проде
 
 // Подключаем базу
-const db = new Database(dbPath, { verbose: console.log });
+const db = new Database(dbPath);
 
 db.prepare(
   `

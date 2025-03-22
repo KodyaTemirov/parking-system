@@ -98,6 +98,7 @@
     try {
       sessionStore.addSession(info);
       newCar.value = { ...initialCar };
+      window.api.send("print-receipt", info); // Отправка данных в main
     } catch (error) {
       console.error(error);
     }
