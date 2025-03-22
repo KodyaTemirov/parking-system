@@ -4,9 +4,20 @@ import fs from "fs";
 import ptp from "pdf-to-printer";
 import path from "path";
 import os from "os";
+import { getSelectedOperator } from "../menu"; // Укажите правильный путь
 
 export function registerPrintEvent() {
   ipcMain.on("print-receipt", async (event, info) => {
+    const selectedOperator = getSelectedOperator();
+
+    console.log("selectedOperator", selectedOperator);
+    console.log("info.operatorId", info.operatorId);
+
+    if (!selectedOperator || selectedOperator !== info.operatorId) {
+      console.error("Ошибка: оператор не совпадает, печать отменена.");
+      return;
+    }
+
     const pdfPath = path.join(os.tmpdir(), "receipt.pdf");
 
     if (!info || !info.plateNumber || !info.inputCost || !info.id) {

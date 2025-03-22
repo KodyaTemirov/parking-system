@@ -98,16 +98,15 @@
     try {
       sessionStore.addSession(info);
       newCar.value = { ...initialCar };
-      window.api.send("print-receipt", info); // Отправка данных в main
     } catch (error) {
       console.error(error);
     }
   });
 
-  onMounted(() => {
+  onMounted(async () => {
     socket.connect();
     getAllSession();
-    window.api.send("request-selected-operator");
+    selectedOperator.value = await window.api.getSelectedOperator();
 
     window.api.onMessage("add-camera", openModalHandler);
     window.api.onMessage("selected-operator", (operator) => {
