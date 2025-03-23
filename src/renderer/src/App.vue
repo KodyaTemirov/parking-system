@@ -103,10 +103,10 @@
     }
   });
 
-  onMounted(() => {
+  onMounted(async () => {
     socket.connect();
     getAllSession();
-    window.api.send("request-selected-operator");
+    selectedOperator.value = await window.api.getSelectedOperator();
 
     window.api.onMessage("add-camera", openModalHandler);
     window.api.onMessage("selected-operator", (operator) => {

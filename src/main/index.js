@@ -3,6 +3,7 @@ import Store from "electron-store";
 import { electronApp, optimizer } from "@electron-toolkit/utils";
 import { createWindow } from "./window";
 import { registerSessionEvents } from "./events/sessionEvents.js";
+import { registerPrintEvent } from "./events/printEvent.js";
 import db from "@/db/database.js";
 import { startServer, stopServer } from "./serverControl";
 import { updateMenu } from "./menu";
@@ -46,4 +47,5 @@ app.whenReady().then(() => {
   });
 
   registerSessionEvents();
+  registerPrintEvent();
 });

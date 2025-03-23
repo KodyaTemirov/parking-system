@@ -8,32 +8,28 @@ const store = new Store();
 const API_BASE_URL = `${ipServer}/api/operator`;
 const API_CAMERAS_BASE_URL = `${ipServer}/api/camera/operators`;
 
+// Получение и обновление состояния чекбокса
 const getCheckboxState = () => store.get("checkboxState", false);
 const updateCheckboxState = (state) => store.set("checkboxState", state);
 
-const getSelectedOperator = () => store.get("selectedOperator", null);
+// Получение и обновление выбранного оператора
+export const getSelectedOperator = () => store.get("selectedOperator", null);
 const updateSelectedOperator = (mainWindow, operatorId) => {
   mainWindow.webContents.send("selected-operator", operatorId);
-
   store.set("selectedOperator", operatorId);
 };
 
+// Обработчик переключения чекбокса
 export const handleCheckboxToggle = async (newState, mainWindow) => {
   updateCheckboxState(newState);
-
-  if (newState) {
-    await stopServer();
-  } else {
-    startServer(mainWindow);
-  }
-
+  newState ? await stopServer() : startServer(mainWindow);
   updateMenu(mainWindow);
 };
 
-const copyToClipboard = (text) => {
-  clipboard.writeText(text);
-};
+// Копирование текста в буфер обмена
+const copyToClipboard = (text) => clipboard.writeText(text);
 
+// Запрос списка операторов с сервера
 const fetchOperators = async () => {
   try {
     const response = await axios.get(API_BASE_URL);
@@ -44,6 +40,7 @@ const fetchOperators = async () => {
   }
 };
 
+// Запрос списка камер для оператора
 const fetchCameras = async (operatorId) => {
   try {
     const response = await axios.get(`${API_CAMERAS_BASE_URL}/${operatorId}`);
@@ -54,6 +51,7 @@ const fetchCameras = async (operatorId) => {
   }
 };
 
+// Добавление нового оператора
 const addOperator = async (mainWindow) => {
   try {
     const newOperator = { name: "Новый оператор" };
@@ -64,6 +62,7 @@ const addOperator = async (mainWindow) => {
   }
 };
 
+// Удаление оператора
 const deleteOperator = async (operatorId, mainWindow) => {
   try {
     await axios.delete(`${API_BASE_URL}/${operatorId}`);
@@ -73,6 +72,7 @@ const deleteOperator = async (operatorId, mainWindow) => {
   }
 };
 
+// Создание главного меню
 const createMainMenuTemplate = (mainWindow) => {
   const isChecked = getCheckboxState();
   const serverInfo = getServerInfo();
@@ -98,6 +98,7 @@ const createMainMenuTemplate = (mainWindow) => {
   ];
 };
 
+// Создание меню операторов
 const createOperatorsMenuTemplate = async (mainWindow) => {
   const operators = await fetchOperators();
   const selectedOperator = getSelectedOperator();
@@ -107,9 +108,7 @@ const createOperatorsMenuTemplate = async (mainWindow) => {
     submenu: [
       {
         label: "Обновить список",
-        click: async () => {
-          updateMenu(mainWindow);
-        },
+        click: async () => updateMenu(mainWindow),
       },
       {
         label: "Добавить оператора",
@@ -132,13 +131,11 @@ const createOperatorsMenuTemplate = async (mainWindow) => {
 
               {
                 label: "Добавить камеру",
-                click: () => {
-                  mainWindow.webContents.send("add-camera", operator.id);
-                },
+                click: () => mainWindow.webContents.send("add-camera", operator.id),
               },
               {
                 label: "Выбрать оператора",
-                type: "radio",
+                type: "checkbox",
                 checked: operator.id === selectedOperator,
                 click: () => {
                   updateSelectedOperator(mainWindow, operator.id);
@@ -157,6 +154,7 @@ const createOperatorsMenuTemplate = async (mainWindow) => {
   };
 };
 
+// Функция обновления меню
 export const updateMenu = async (mainWindow) => {
   const mainMenuTemplate = createMainMenuTemplate(mainWindow);
   const operatorsMenuTemplate = await createOperatorsMenuTemplate(mainWindow);
@@ -165,12 +163,9 @@ export const updateMenu = async (mainWindow) => {
   Menu.setApplicationMenu(menu);
 };
 
+// Регистрация обработчиков IPC
 ipcMain.on("request-add-camera", (event, operatorId) => {
   console.log("Добавление камеры для оператора:", operatorId);
 });
 
-ipcMain.handle("get-selected-operator", () => getSelectedOperator());
-
-ipcMain.on("request-selected-operator", (event) => {
-  event.sender.send("selected-operator", getSelectedOperator());
-});
+ipcMain.handle("get-selected-operator", () => getSelectedOperator()); // ✅ Оптимизирован IPC-хендлер
