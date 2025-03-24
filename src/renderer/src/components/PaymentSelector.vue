@@ -28,18 +28,26 @@
       :key="method.id"
       @click="selectPayment(method.id)"
       :class="[
-        'flex w-full items-center gap-3 rounded-lg border p-3 text-lg transition',
-        method.state ? 'bg-blue-500 text-white' : 'bg-gray-100 text-black',
+        'flex w-full items-center gap-3 rounded-lg border-2 p-3 text-lg transition',
+        method.state ? 'border-blue-500' : 'border-gray-200 text-black',
       ]"
     >
-      <Icon :icon="method.icon" class="text-2xl" />
+      <div class="icon-wrapper">
+        <Icon :icon="method.icon" />
+      </div>
       {{ method.name }}
     </button>
   </div>
 </template>
 
 <style scoped>
+  @reference "../assets/main.css";
+
   button {
     cursor: pointer;
+  }
+
+  .icon-wrapper {
+    @apply flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-sm;
   }
 </style>

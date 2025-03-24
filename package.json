@@ -6,7 +6,7 @@
   "author": "example.com",
   "type": "module",
   "scripts": {
-    "format": "prettier --write .",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,vue,json,css,scss,md}\"",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
     "start": "electron-vite preview",
     "dev": "electron-vite dev",

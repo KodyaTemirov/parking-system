@@ -5,7 +5,7 @@ import Drawer from "./Drawer.vue";
 import CarPlate from "./CarPlate.vue";
 import Plans from "./Plans.vue";
 import PaymentSelector from "./PaymentSelector.vue";
-
+import ToastContainer from "./ToastContainer.vue";
 import { Icon } from "@iconify/vue";
 
 const components = [
@@ -17,6 +17,7 @@ const components = [
   { name: "CarPlate", component: CarPlate },
   { name: "Plans", component: Plans },
   { name: "PaymentSelector", component: PaymentSelector },
+  { name: "ToastContainer", component: ToastContainer },
 ];
 
 export default {
