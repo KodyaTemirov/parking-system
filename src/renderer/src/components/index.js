@@ -6,6 +6,10 @@ import CarPlate from "./CarPlate.vue";
 import Plans from "./Plans.vue";
 import PaymentSelector from "./PaymentSelector.vue";
 import ToastContainer from "./ToastContainer.vue";
+import SubTitle from "./SubTitle.vue";
+import InputDrawer from "./InputDrawer.vue";
+import OutputDrawer from "./OutputDrawer.vue";
+
 import { Icon } from "@iconify/vue";
 
 const components = [
@@ -18,6 +22,9 @@ const components = [
   { name: "Plans", component: Plans },
   { name: "PaymentSelector", component: PaymentSelector },
   { name: "ToastContainer", component: ToastContainer },
+  { name: "SubTitle", component: SubTitle },
+  { name: "InputDrawer", component: InputDrawer },
+  { name: "OutputDrawer", component: OutputDrawer },
 ];
 
 export default {

@@ -33,6 +33,7 @@ export default defineConfig({
         "@/router": resolve("src/renderer/src/router"),
         "@/services": resolve("src/renderer/src/services"),
         "@/config": resolve("src/main/config"),
+        "@/composables": resolve("src/renderer/src/composables"),
       },
     },
     plugins: [vue(), tailwindcss()],

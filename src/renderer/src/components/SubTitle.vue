@@ -10,6 +10,6 @@
   @reference "@/assets/main.css";
 
   .sub-title {
-    @apply my-4 text-lg font-semibold text-gray-600;
+    @apply my-4 text-lg font-semibold text-gray-800;
   }
 </style>

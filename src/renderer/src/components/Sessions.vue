@@ -20,7 +20,7 @@
 </script>
 
 <template>
-  <h1 class="my-4 text-2xl font-bold">Парковочные сессии {{ sessionStore.sessions.length }}</h1>
+  <SubTitle>Парковочные сессии {{ sessionStore.sessions.length }}</SubTitle>
   <table class="min-w-full border border-gray-300 bg-white" v-if="sessionStore.sessions.length">
     <thead>
       <tr class="bg-gray-200 text-left">
