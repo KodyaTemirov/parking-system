@@ -51,7 +51,7 @@ const registerSession = async (req, res) => {
   // }, 100);
 
   // await printReceipt(number, tariffType, insertedData.startTime);
-
+  insertedData.event = "input";
   await postInfo({
     type: "insert",
     data: insertedData,
