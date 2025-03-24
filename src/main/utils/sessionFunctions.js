@@ -1,6 +1,7 @@
 import db from "../db/database.js";
 import { getCameraOperator } from "../server/services/camera.service";
 import { getSnapshot } from "./getSnapshot.js";
+import { openFetch } from "./plateFunctions.js";
 import { postInfo } from "./postInfo.js";
 import { tarifs } from "./prices.js";
 import { saveBase64Image } from "./saveBase64Image.js";

@@ -7,6 +7,7 @@ import { tarifs } from "../../utils/prices.js";
 import { postInfo } from "../../utils/postInfo.js";
 import { checkInternetConnection } from "../../utils/checkInternet.js";
 import { getSnapshotSession } from "../../utils/sessionFunctions.js";
+import { openFetch } from "../../utils/plateFunctions.js";
 
 const registerSession = async (req, res) => {
   const { number, plateImage, fullImage, eventName, tariffType, paymentMethod, cameraIp } =
