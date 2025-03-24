@@ -66,8 +66,15 @@ const uploadMedia = async (config) => {
   try {
     const res = await axios.post(
       "https://raqamli-bozor.uz/services/platon-core/web/v1/public/files/upload/category/universal",
-      config
+      config,
+      {
+        maxBodyLength: Infinity,
+        headers: {
+          ...config.getHeaders(),
+        },
+      }
     );
+
     return res;
   } catch (error) {
     throw error;
