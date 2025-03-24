@@ -5,6 +5,7 @@ import { getCameraOperator } from "./camera.service.js";
 import { saveBase64Image, deleteImageFile } from "../../utils/saveBase64Image.js";
 import { getSnapshot } from "../../utils/getSnapshot.js";
 import { tarifs } from "../../utils/prices.js";
+import { postInfo } from "../../utils/postInfo.js";
 
 const registerSession = async (req, res) => {
   const { number, plateImage, fullImage, eventName, tariffType, paymentMethod, cameraIp } =
@@ -50,6 +51,11 @@ const registerSession = async (req, res) => {
   // }, 100);
 
   // await printReceipt(number, tariffType, insertedData.startTime);
+
+  await postInfo({
+    type: "insert",
+    data: insertedData,
+  });
 
   res.status(201).send(insertedData);
 };
