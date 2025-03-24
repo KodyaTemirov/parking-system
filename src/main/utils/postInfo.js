@@ -65,7 +65,7 @@ const uploadImage = async (filePath) => {
 const uploadMedia = async (config) => {
   try {
     const res = await axios.post(
-      "https://raqamli-bozor.uz/services/platon-core/web/v1/public/files/upload/category/vehicles",
+      "https://raqamli-bozor.uz/services/platon-core/web/v1/public/files/upload/category/universal",
       config
     );
     return res;
