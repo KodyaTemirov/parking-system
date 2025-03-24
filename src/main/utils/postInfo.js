@@ -34,10 +34,12 @@ const postInfo = async (data) => {
     });
 
     if (data.type == "insert") {
-      db.prepare("UPDATE sessions SET isSync = 1 WHERE id = ?").run(data.data.id);
+      db.prepare("UPDATE sessions SET isSync = 1, isUpdated = 0 WHERE id = ?").run(data.data.id);
     } else {
       for (let i = 0; i < data.data.length; i++) {
-        db.prepare("UPDATE sessions SET isSync = 1 WHERE id = ?").run(data.data[i].id);
+        db.prepare("UPDATE sessions SET isSync = 1, isUpdated = 0 WHERE id = ?").run(
+          data.data[i].id
+        );
       }
     }
 

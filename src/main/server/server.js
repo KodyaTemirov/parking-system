@@ -3,6 +3,7 @@ import xmlParser from "express-xml-bodyparser";
 import router from "./routes/index";
 import { initializeSocket } from "../utils/socket.js";
 import http from "http";
+import startCronJob from "./crons/server.cron.js";
 import cors from "cors";
 
 export const createServer = (mainWindow) => {
@@ -16,6 +17,8 @@ export const createServer = (mainWindow) => {
       limit: "50mb",
     })
   );
+
+  startCronJob();
   initializeSocket(listenApp);
 
   // Маршруты
