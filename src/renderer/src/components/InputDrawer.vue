@@ -1,14 +1,8 @@
 <script setup>
-  import { useToast } from "../composables/useToast";
+  import { useToast } from "@/composables";
   import axios from "axios";
   import { ipServer } from "@/config";
-  import SubTitle from "./SubTitle.vue";
-  import Button from "./Button.vue";
-  import CarPlate from "./CarPlate.vue";
-  import Plans from "./Plans.vue";
-  import PaymentSelector from "./PaymentSelector.vue";
-  import Accordion from "./Accordion.vue";
-  import { ref, watch } from "vue";
+  import { ref, watch, onMounted } from "vue";
   import { pricesData } from "@/helpers";
 
   const { success } = useToast();
@@ -22,11 +16,17 @@
       type: Object,
       required: true,
     },
+    operator: {
+      type: Object,
+      required: true,
+    },
   });
 
-  const emit = defineEmits(["update:modelValue", "update:newCar"]);
+  const emit = defineEmits(["update:modelValue", "update:newCar", "update:operator"]);
 
   const isOpen = ref(props.modelValue);
+  const cameras = ref([]);
+  const selectCam = ref(null);
 
   watch(
     () => props.modelValue,
@@ -59,6 +59,34 @@
       console.error(error);
     }
   };
+
+  const getCams = async (operator) => {
+    try {
+      const { data } = await axios.get(`${ipServer}/api/camera/operators/${operator}`);
+      cameras.value = data;
+      console.log("console", cameras.value[0]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  watch(
+    () => props.operator,
+    (newValue) => {
+      getCams(newValue);
+    }
+  );
+
+  onMounted(() => {
+    getCams(props.operator);
+  });
+
+  watch(
+    () => selectCam.value,
+    (newValue) => {
+      console.log("selectCam", newValue);
+    }
+  );
 </script>
 
 <template>
@@ -77,8 +105,18 @@
       <Plans v-model="newCar.tariffType" />
       <SubTitle>Выберите метод оплаты</SubTitle>
       <PaymentSelector v-model="newCar.paymentMethod" />
+      <div v-if="!newCar.number">
+        <SubTitle>Выберите камеру</SubTitle>
+        <div class="flex flex-col gap-4">
+          <select name="" id="" v-model="selectCam">
+            <option v-for="camera in cameras" :key="camera.id" :value="camera.id">
+              {{ camera.name }}
+            </option>
+          </select>
+        </div>
+      </div>
 
-      <Accordion class="mt-4" title="Дополнительная информация">
+      <!-- <Accordion class="mt-4" title="Дополнительная информация">
         <div class="flex flex-col gap-4">
           <img :src="newCar.fullImage" alt="" class="w-full rounded-lg" />
           <img :src="newCar.plateImage" alt="" class="w-full rounded-lg" />
@@ -102,7 +140,7 @@
             {{ newCar.operatorId }}
           </span>
         </SubTitle>
-      </Accordion>
+      </Accordion> -->
     </div>
 
     <div class="fixed-button">

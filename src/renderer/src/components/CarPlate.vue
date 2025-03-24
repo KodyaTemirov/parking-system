@@ -1,13 +1,13 @@
 <template>
-  <div class="plate">
-    <div v-if="plateNumber" class="left">{{ region }}</div>
-    <div v-if="plateNumber" class="center">{{ formattedSerial }}</div>
-    <div v-if="plateNumber" class="right">
+  <div class="plate" v-if="plateNumber">
+    <div class="left">{{ region }}</div>
+    <div class="center">{{ formattedSerial }}</div>
+    <div class="right">
       <div class="flag"></div>
       <div class="country">UZ</div>
     </div>
-    <div v-else class="not-specified">Не указано</div>
   </div>
+  <div v-else class="plate not-specified px-6">Не указано</div>
 </template>
 
 <script setup>
@@ -87,6 +87,5 @@
     text-align: center;
     color: gray;
     font-size: 18px;
-    font-style: italic;
   }
 </style>

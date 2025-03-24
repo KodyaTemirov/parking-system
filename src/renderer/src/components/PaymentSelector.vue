@@ -28,12 +28,12 @@
       :key="method.id"
       @click="selectPayment(method.id)"
       :class="[
-        'flex w-full items-center gap-3 rounded-lg border-2 p-3 text-lg transition',
-        method.state ? 'border-blue-500' : 'border-gray-200 text-black',
+        'flex w-full items-center gap-3 rounded-lg border-2 p-3 text-lg transition hover:bg-gray-200',
+        method.state ? 'border-blue-600 hover:bg-white' : 'border-gray-200 text-black',
       ]"
     >
       <div class="icon-wrapper">
-        <Icon :icon="method.icon" />
+        <Icon :icon="method.icon" class="text-blue-600" />
       </div>
       {{ method.name }}
     </button>

@@ -16,6 +16,7 @@
   const isOpenOutput = ref(false);
 
   const addCam = ref({ open: false, id: null });
+  const isSocketConnected = ref(false);
 
   const openModalHandler = (id) => {
     addCam.value = { open: true, id };
@@ -106,6 +107,16 @@
 
   onMounted(async () => {
     socket.connect();
+    isSocketConnected.value = true;
+
+    socket.on("connect", () => {
+      isSocketConnected.value = true;
+    });
+
+    socket.on("disconnect", () => {
+      isSocketConnected.value = false;
+    });
+
     getAllSession();
     selectedOperator.value = await window.api.getSelectedOperator();
 
@@ -118,7 +129,16 @@
 
 <template>
   <div class="wrapper">
-    <SubTitle>Оператор {{ selectedOperator }}</SubTitle>
+    <SubTitle class="flex justify-between">
+      Оператор {{ selectedOperator }}
+      <div class="socket-wrapper">
+        <div
+          class="socket-status"
+          :class="{ connected: isSocketConnected, disconnected: !isSocketConnected }"
+        ></div>
+        {{ isSocketConnected ? "Подключен" : "Отключен" }}
+      </div>
+    </SubTitle>
     <div class="flex gap-4">
       <Button @click="openDrawer" class="flex w-full flex-col items-center gap-2">
         <Icon icon="material-symbols:input-circle" class="text-7xl" />
@@ -134,7 +154,11 @@
       </Button>
     </div>
 
-    <InputDrawer v-model="isOpenInput" v-model:newCar="inputCar" />
+    <InputDrawer
+      v-model="isOpenInput"
+      v-model:newCar="inputCar"
+      v-model:operator="selectedOperator"
+    />
     <OutputDrawer v-model="isOpenOutput" v-model:newCar="outputCar" />
 
     <Sessions />
@@ -165,5 +189,20 @@
 
   .rows {
     @apply flex flex-col gap-4;
+  }
+
+  .socket-status {
+    @apply h-3 w-3 rounded-full text-center;
+  }
+
+  .socket-wrapper {
+    @apply flex items-center gap-2 text-base font-medium;
+  }
+  .connected {
+    @apply bg-green-500 text-white;
+  }
+
+  .disconnected {
+    @apply bg-red-500 text-white;
   }
 </style>

@@ -20,7 +20,7 @@
   <AccordionRoot type="single" collapsible @update:value="toggleAccordion">
     <AccordionItem value="item-1">
       <AccordionTrigger
-        class="flex w-full cursor-pointer items-center justify-between border-b-2 border-gray-200 bg-white p-4 leading-none outline-none"
+        class="flex w-full cursor-pointer items-center justify-between rounded-lg border-2 border-gray-200 bg-white p-4 leading-none outline-none"
       >
         {{ title }}
         <Icon
