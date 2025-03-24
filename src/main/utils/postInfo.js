@@ -29,7 +29,11 @@ const postInfo = async (data) => {
     }
     console.log(data, "edited");
 
-    const response = await axios.post(`${url}/v1/desktop/market/vehicles`, data);
+    const response = await axios.post(`${url}/v1/desktop/market/vehicles`, data, {
+      headers: {
+        token: "68fa03a7-ff2f-cfdf-bbe7-c4e42e93a13e",
+      },
+    });
 
     if (data.type == "insert") {
       db.prepare("UPDATE sessions SET isSync = 1 WHERE id = ?").run(data.data.id);
