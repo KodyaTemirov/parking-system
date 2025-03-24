@@ -6,6 +6,7 @@ import { getSnapshot } from "../../utils/getSnapshot.js";
 import { tarifs } from "../../utils/prices.js";
 import { postInfo } from "../../utils/postInfo.js";
 import { checkInternetConnection } from "../../utils/checkInternet.js";
+import { getSnapshotSession } from "../../utils/sessionFunctions.js";
 
 const registerSession = async (req, res) => {
   const { number, plateImage, fullImage, eventName, tariffType, paymentMethod, cameraIp } =
@@ -327,54 +328,6 @@ const getSessions = (req, res) => {
     size: Number(size),
     totalPages: Math.ceil(total.total / size),
   });
-};
-
-const getSnapshotSession = async (tariffType, paymentMethod, cameraIp, res) => {
-  const camera = await getCameraOperator(cameraIp);
-  const snapImage = await getSnapshot(cameraIp, camera.login, camera.password);
-  const snapUrl = saveBase64Image(snapImage);
-
-  const stmt = db.prepare(`
-    INSERT INTO sessions
-      (plateNumber, inputFullImage, startTime, tariffType, duration, inputCost, inputPaymentMethod,cameraIp)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-
-  const result = stmt.run(
-    null,
-    snapUrl || null,
-    new Date().toISOString(),
-    tariffType,
-    null,
-    tarifs.find((item) => item.id == tariffType).price,
-    paymentMethod,
-    cameraIp
-  );
-
-  const insertedData = db
-    .prepare("SELECT * FROM sessions WHERE id = ?")
-    .get(result.lastInsertRowid);
-
-  insertedData.operatorId = camera.operatorId;
-
-  if (checkInternetConnection()) {
-    insertedData.event = "input";
-    await postInfo({
-      type: "insert",
-      data: insertedData,
-      event: "input",
-    });
-  }
-
-  await getIO().emit("newSession", insertedData);
-
-  // openFetch(true, cameraIp, camera.login, camera.password);
-
-  // setTimeout(() => {
-  //   openFetch(false, cameraIp, camera.login, camera.password);
-  // }, 100);
-
-  res.status(201).send(insertedData);
 };
 
 const getSessionsInfo = async (req, res) => {
