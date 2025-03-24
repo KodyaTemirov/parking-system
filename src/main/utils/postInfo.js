@@ -3,11 +3,10 @@ import db from "@/db/database.js";
 import { getImageFile } from "./getImageFile.js";
 import fs from "fs";
 import axios from "axios";
+import FormData from "form-data";
 
 const postInfo = async (data) => {
   try {
-    console.log(data);
-
     if (data.type == "insert" && data.event == "input") {
       const image = getImageFile(data.data.inputPlateImage);
       const imageFull = getImageFile(data.data.inputFullImage);
@@ -27,7 +26,6 @@ const postInfo = async (data) => {
       data.data.outputPlateImage = plateImageId;
       data.data.outputFullImage = fullImageId;
     }
-    console.log(data, "edited");
 
     const response = await axios.post(`${url}/v1/desktop/market/vehicles`, data, {
       headers: {
@@ -53,9 +51,12 @@ const uploadImage = async (filePath) => {
   try {
     const formDataOriginal = new FormData();
     const fileStream = fs.createReadStream(filePath);
+
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`Файл ${filePath} не найден`);
+    }
     formDataOriginal.append("file", fileStream);
     const original = await uploadMedia(formDataOriginal);
-    console.log(original.id, "fileId");
     return original.id;
   } catch (error) {
     throw error;
@@ -70,12 +71,12 @@ const uploadMedia = async (config) => {
       {
         maxBodyLength: Infinity,
         headers: {
-          ...config.getHeaders(),
+          "Content-Type": "multipart/form-data;",
         },
       }
     );
 
-    return res;
+    return res.data;
   } catch (error) {
     throw error;
   }
