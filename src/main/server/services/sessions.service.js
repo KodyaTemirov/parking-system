@@ -55,6 +55,7 @@ const registerSession = async (req, res) => {
   await postInfo({
     type: "insert",
     data: insertedData,
+    event: "input",
   });
 
   res.status(201).send(insertedData);

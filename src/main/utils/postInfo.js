@@ -1,6 +1,8 @@
 const url = "https://raqamli-bozor.uz/services/platon-core/api";
 import db from "@/db/database.js";
 import { getImageFile } from "./getImageFile.js";
+import fs from "fs";
+import axios from "axios";
 
 const postInfo = async (data) => {
   try {
@@ -25,6 +27,7 @@ const postInfo = async (data) => {
       data.data.outputPlateImage = plateImageId;
       data.data.outputFullImage = fullImageId;
     }
+    console.log(data, "edited");
 
     const response = await axios.post(`${url}/v1/desktop/market/vehicles`, data);
 
@@ -43,23 +46,28 @@ const postInfo = async (data) => {
 };
 
 const uploadImage = async (filePath) => {
-  const formDataOriginal = new FormData();
-  const fileStream = fs.createReadStream(filePath);
-  formDataOriginal.append("file", fileStream);
-  const original = await uploadMedia(formDataOriginal);
-
-  return original.id;
+  try {
+    const formDataOriginal = new FormData();
+    const fileStream = fs.createReadStream(filePath);
+    formDataOriginal.append("file", fileStream);
+    const original = await uploadMedia(formDataOriginal);
+    console.log(original.id, "fileId");
+    return original.id;
+  } catch (error) {
+    throw error;
+  }
 };
 
 const uploadMedia = async (config) => {
-  const res = await $fetch(
-    "https://raqamli-bozor.uz/services/platon-core/web/v1/public/files/upload/category/vehicles",
-    {
-      method: "POST",
-      body: config,
-    }
-  );
-  return res;
+  try {
+    const res = await axios.post(
+      "https://raqamli-bozor.uz/services/platon-core/web/v1/public/files/upload/category/vehicles",
+      config
+    );
+    return res;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export { postInfo, uploadImage };
