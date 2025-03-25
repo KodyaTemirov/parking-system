@@ -205,16 +205,45 @@ const outputCar = async (req, res) => {
         tarifs.find((item) => item.id == sessionNotEnded.tariffType).pricePerDay
       );
 
-      getIO().emit(`outputCar-${operator.operatorId}`, {
-        number,
-        plateImage,
-        fullImage,
-        price: price,
-        cameraIp: req.headers.host,
-        operatorId: operator.operatorId,
-        session: sessionNotEnded,
-        eventName: "output",
-      });
+      if (price > 0) {
+        getIO().emit(`outputCar-${operator.operatorId}`, {
+          number,
+          plateImage,
+          fullImage,
+          price: price,
+          cameraIp: req.headers.host,
+          operatorId: operator.operatorId,
+          session: sessionNotEnded,
+          eventName: "output",
+        });
+      } else {
+        const plateImageFile = saveBase64Image(plateImage);
+        const fullImageFile = saveBase64Image(fullImage);
+
+        handleOutputSession({
+          number,
+          plateImageFile,
+          paymentMethod: 1,
+          cameraIp: cameraIp,
+          fullImageFile,
+          outputCost: 0,
+        });
+
+        // openFetch(true, req.headers.host, operator.login, operator.password);
+        // setTimeout(() => {
+        //   openFetch(false, req.headers.host, operator.login, operator.password);
+        // }, 100);
+
+        getIO().emit(`payedToday-${operator.operatorId}`, {
+          number,
+          plateImage,
+          fullImage,
+          cameraIp: req.headers.host,
+          operatorId: operator.operatorId,
+          session: sessionNotEnded,
+          eventName: "output",
+        });
+      }
       return res.status(200).send("OK");
     }
   } catch (error) {
@@ -295,16 +324,44 @@ const outputCarById = async (req, res) => {
         tarifs.find((item) => item.id == sessionNotEnded.tariffType).pricePerDay
       );
 
-      return res.status(200).send({
-        number: null,
-        plateImage: null,
-        fullImage: snapImage,
-        price: price,
-        cameraIp: cameraIp,
-        operatorId: operator.operatorId,
-        session: sessionNotEnded,
-        eventName: "output",
-      });
+      if (price > 0) {
+        return res.status(200).send({
+          number: null,
+          plateImage: null,
+          fullImage: snapImage,
+          price: price,
+          cameraIp: cameraIp,
+          operatorId: operator.operatorId,
+          session: sessionNotEnded,
+          eventName: "output",
+        });
+      } else {
+        const snapUrl = saveBase64Image(snapImage);
+
+        handleOutputSession({
+          number: null,
+          plateImageFile: null,
+          paymentMethod: 1,
+          cameraIp: cameraIp,
+          fullImageFile: snapUrl,
+          outputCost: 0,
+        });
+
+        // openFetch(true, req.headers.host, operator.login, operator.password);
+        // setTimeout(() => {
+        //   openFetch(false, req.headers.host, operator.login, operator.password);
+        // }, 100);
+
+        return res.status(200).send({
+          number: null,
+          plateImage: null,
+          fullImage: snapImage,
+          cameraIp: cameraIp,
+          operatorId: operator.operatorId,
+          session: sessionNotEnded,
+          eventName: "payedToday",
+        });
+      }
     }
   } catch (error) {
     res.status(400).send(error);
