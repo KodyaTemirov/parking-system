@@ -1,0 +1,6 @@
+-- database: C:\Users\User\Documents\GitHub\parking-system\data.db
+
+SELECT * FROM sessions
+WHERE plateNumber = '10Q269CB';
+
+DELETE FROM sessions WHERE id in (8,7,6)

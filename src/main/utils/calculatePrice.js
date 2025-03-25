@@ -1,4 +1,5 @@
-import { tarifs } from "./prices";
+import { tarifs } from "./prices.js";
+import db from "../db/database.js";
 
 const calculateParkingCost = (entryTime, dailyCost) => {
   try {
@@ -63,4 +64,4 @@ console.log(calculateParkingCost("2025-03-24T10:00:00Z", 10000));
 
 console.log(isPeriodPaid("2025-03-24T10:00:00Z", 0));
 
-isPayedToday();
+isPayedToday("01L087WB");
