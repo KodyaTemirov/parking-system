@@ -79,14 +79,15 @@ const inputCarById = async (req, res) => {
       throw new Error("No body in request");
     }
 
-    const operator = await getCameraOperator(req.headers.host);
+    const { id } = req.params;
+    const { cameraIp } = req.body;
+
+    const operator = await getCameraOperator(cameraIp);
 
     if (!operator) return res.status(200).send("Operator not found");
 
-    const { id } = parsePlateData(req.body);
-
-    const snapImage = await getSnapshot(req.headers.host, operator.login, operator.password);
-    const snapUrl = saveBase64Image(snapImage);
+    const snapImage = await getSnapshot(cameraIp, operator.login, operator.password);
+    // const snapUrl = saveBase64Image(snapImage);
 
     const isPayedTodayValue = await isPayedTodayId(id);
 
@@ -97,17 +98,17 @@ const inputCarById = async (req, res) => {
         number: null,
         plateImage: null,
         fullImage: snapImage,
-        cameraIp: req.headers.host,
+        cameraIp: cameraIp,
         operatorId: operator.operatorId,
         lastPaymentTime,
         eventName: "input",
       });
 
-      const camera = await getCameraOperator(req.headers.host);
-      // openFetch(true, req.headers.host, camera.login, camera.password);
+      const camera = await getCameraOperator(cameraIp);
+      // openFetch(true, cameraIp, camera.login, camera.password);
 
       // setTimeout(() => {
-      //   openFetch(false, req.headers.host, camera.login, camera.password);
+      //   openFetch(false, cameraIp, camera.login, camera.password);
       // }, 100);
 
       res.status(200).send("Car already payed today");
@@ -119,7 +120,7 @@ const inputCarById = async (req, res) => {
       number: null,
       plateImage: null,
       fullImage: snapImage,
-      cameraIp: req.headers.host,
+      cameraIp: cameraIp,
       operatorId: operator.operatorId,
       eventName: "input",
     });
@@ -280,14 +281,14 @@ const outputCarById = async (req, res) => {
       throw new Error("No body in request");
     }
 
-    const { id } = parsePlateData(req.params);
+    const { id } = req.params;
+    const { cameraIp } = req.body;
 
-    const operator = await getCameraOperator(req.headers.host);
+    const operator = await getCameraOperator(cameraIp);
 
     if (!operator) return res.status(200).send("Operator not found");
 
-    const snapImage = await getSnapshot(req.headers.host, operator.login, operator.password);
-    const snapUrl = saveBase64Image(snapImage);
+    const snapImage = await getSnapshot(cameraIp, operator.login, operator.password);
 
     const session = await getSessionById(id);
 
@@ -315,7 +316,7 @@ const outputCarById = async (req, res) => {
           plateImage: null,
           fullImage: snapImage,
           price: price - lastSession.outputCost,
-          cameraIp: req.headers.host,
+          cameraIp: cameraIp,
           operatorId: operator.operatorId,
           session,
           eventName: "output",
@@ -326,7 +327,7 @@ const outputCarById = async (req, res) => {
           plateImage: null,
           fullImage: snapImage,
           price: 100000,
-          cameraIp: req.headers.host,
+          cameraIp: cameraIp,
           operatorId: operator.operatorId,
           session,
           eventName: "output",
@@ -343,7 +344,7 @@ const outputCarById = async (req, res) => {
         number: null,
         plateImage: null,
         fullImage: snapImage,
-        cameraIp: req.headers.host,
+        cameraIp: cameraIp,
         operatorId: operator.operatorId,
         lastPaymentTime,
         eventName: "output",
@@ -366,20 +367,21 @@ const outputCarById = async (req, res) => {
         plateImage: null,
         fullImage: snapImage,
         price,
-        cameraIp: req.headers.host,
+        cameraIp: cameraIp,
         operatorId: operator.operatorId,
         session,
         eventName: "output",
       });
     } else {
       const lastPaymentTime = await getLastPaymentTimeId(id);
+      const snapUrl = saveBase64Image(snapImage);
 
       // Если меньше 24 часов - просто закрываем сессию
       handleOutputSessionId({
         id,
         plateImageFile: null,
         paymentMethod: 1,
-        cameraIp: req.headers.host,
+        cameraIp: cameraIp,
         fullImageFile: snapUrl,
         outputCost: 0,
       });
@@ -388,7 +390,7 @@ const outputCarById = async (req, res) => {
         number: null,
         plateImage: null,
         fullImage: snapImage,
-        cameraIp: req.headers.host,
+        cameraIp: cameraIp,
         operatorId: operator.operatorId,
         lastPaymentTime,
         eventName: "output",

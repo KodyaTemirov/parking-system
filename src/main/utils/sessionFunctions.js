@@ -79,7 +79,7 @@ const handleOutputSessionId = async ({
         outputPaymentMethod = ?,
         cameraIp = ?,
         isUpdated = 1
-    WHERE id = ? 
+    WHERE id = ?
   `);
 
   const result = stmt.run(
