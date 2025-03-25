@@ -32,7 +32,7 @@ const handleOutputSession = async ({
         outputCost = ?,
         outputPaymentMethod = ?,
         cameraIp = ?
-    WHERE plateNumber = ? AND endTime IS NULL
+    WHERE id = (SELECT MAX(id) FROM sessions WHERE plateNumber = ?)
   `);
 
   const result = stmt.run(
