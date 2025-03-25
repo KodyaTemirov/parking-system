@@ -85,7 +85,7 @@ const inputCarById = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { cameraIp } = req.body;
+    const { cameraIp } = req.query;
 
     const operator = await getCameraOperator(cameraIp);
 
@@ -230,7 +230,7 @@ const outputCarById = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { cameraIp } = req.body;
+    const { cameraIp } = req.query;
 
     const operator = await getCameraOperator(cameraIp);
 

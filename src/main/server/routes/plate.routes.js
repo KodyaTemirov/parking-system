@@ -7,8 +7,8 @@ router.post("/input", inputCar);
 
 router.post("/output", outputCar);
 
-router.post("/output/:id", outputCarById);
+router.get("/output/:id", outputCarById);
 
-router.post("/input/:id", inputCarById);
+router.get("/input/:id", inputCarById);
 
 export default router;
