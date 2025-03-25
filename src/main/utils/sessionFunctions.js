@@ -77,7 +77,7 @@ const handleOutputSessionId = async ({
         outputCost = ?,
         outputPaymentMethod = ?,
         cameraIp = ?
-    WHERE id = ? AND endTime IS NULL
+    WHERE id = ? 
   `);
 
   const result = stmt.run(
@@ -91,9 +91,7 @@ const handleOutputSessionId = async ({
     id
   );
 
-  const insertedData = db
-    .prepare("SELECT * FROM sessions WHERE id = ?")
-    .get(result.lastInsertRowid);
+  const insertedData = db.prepare("SELECT * FROM sessions WHERE id = ?").get(id);
 
   const camera = await getCameraOperator(cameraIp);
   insertedData.operatorId = camera.operatorId;
