@@ -76,7 +76,8 @@ const handleOutputSessionId = async ({
         duration = ?,
         outputCost = ?,
         outputPaymentMethod = ?,
-        cameraIp = ?
+        cameraIp = ?,
+        isUpdated = 1
     WHERE id = ? 
   `);
 
