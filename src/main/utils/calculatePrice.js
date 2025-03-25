@@ -64,4 +64,7 @@ console.log(calculateParkingCost("2025-03-24T10:00:00Z", 10000));
 
 console.log(isPeriodPaid("2025-03-24T10:00:00Z", 0));
 
-isPayedToday("01L087WB");
+// isPayedToday("01L087WB");
+// isPayedToday();
+
+console.log(0 / 1000);
