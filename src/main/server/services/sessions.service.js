@@ -105,9 +105,7 @@ const outputSession = async (req, res) => {
       number
     );
 
-    const insertedData = db
-      .prepare("SELECT * FROM sessions WHERE id = ?")
-      .get(result.lastInsertRowid);
+    const insertedData = db.prepare("SELECT * FROM sessions WHERE id = ?").get(lastSession.id);
 
     const camera = await getCameraOperator(cameraIp);
     insertedData.operatorId = camera.operatorId;
@@ -163,7 +161,7 @@ const outputSession = async (req, res) => {
 
       const insertedData = db
         .prepare("SELECT * FROM sessions WHERE id = ?")
-        .get(result.lastInsertRowid);
+        .get(lastPaidSession.id);
 
       const camera = await getCameraOperator(cameraIp);
       insertedData.operatorId = camera.operatorId;
@@ -223,9 +221,7 @@ const closeSnapshotSession = async (req, res) => {
       id
     );
 
-    const insertedData = db
-      .prepare("SELECT * FROM sessions WHERE id = ?")
-      .get(result.lastInsertRowid);
+    const insertedData = db.prepare("SELECT * FROM sessions WHERE id = ?").get(lastSession.id);
 
     const camera = await getCameraOperator(cameraIp);
     insertedData.operatorId = camera.operatorId;
@@ -279,9 +275,7 @@ const closeSnapshotSession = async (req, res) => {
         id
       );
 
-      const insertedData = db
-        .prepare("SELECT * FROM sessions WHERE id = ?")
-        .get(result.lastInsertRowid);
+      const insertedData = db.prepare("SELECT * FROM sessions WHERE id = ?").get(lastSession.id);
 
       const camera = await getCameraOperator(cameraIp);
       insertedData.operatorId = camera.operatorId;
