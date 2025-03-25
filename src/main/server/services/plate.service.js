@@ -11,11 +11,16 @@ import {
   getSessionByNumber,
   handleOutputSession,
   handleOutputSessionId,
-  isPayedToday,
   isPayedTodayId,
 } from "../../utils/sessionFunctions.js";
 import { calculatePrice, openFetch } from "../../utils/plateFunctions.js";
 import { getSnapshot } from "../../utils/getSnapshot.js";
+import {
+  calculateParkingCost,
+  getLastSession,
+  getLastSessionUniversal,
+  isPayedToday,
+} from "../../utils/calculatePrice.js";
 
 const inputCar = async (req, res) => {
   try {
@@ -33,7 +38,7 @@ const inputCar = async (req, res) => {
     const isPayedTodayValue = await isPayedToday(number);
 
     if (isPayedTodayValue) {
-      const lastPaymentTime = await getLastPaymentTime(number);
+      const lastSession = getLastSession(number);
 
       getIO().emit(`payedToday-${operator.operatorId}`, {
         number,
@@ -41,8 +46,8 @@ const inputCar = async (req, res) => {
         fullImage,
         cameraIp: req.headers.host,
         operatorId: operator.operatorId,
-        lastPaymentTime,
         eventName: "input",
+        session: lastSession,
       });
 
       const camera = await getCameraOperator(req.headers.host);
@@ -89,20 +94,10 @@ const inputCarById = async (req, res) => {
     const snapImage = await getSnapshot(cameraIp, operator.login, operator.password);
     // const snapUrl = saveBase64Image(snapImage);
 
-    const isPayedTodayValue = await isPayedTodayId(id);
+    const isPayedTodayValue = await isPayedToday(id, "id");
 
     if (isPayedTodayValue) {
-      const lastPaymentTime = await getLastPaymentTimeId(id);
-
-      getIO().emit(`payedToday-${operator.operatorId}`, {
-        number: null,
-        plateImage: null,
-        fullImage: snapImage,
-        cameraIp: cameraIp,
-        operatorId: operator.operatorId,
-        lastPaymentTime,
-        eventName: "input",
-      });
+      const lastSession = getLastSession(id, "id");
 
       const camera = await getCameraOperator(cameraIp);
       // openFetch(true, cameraIp, camera.login, camera.password);
@@ -111,12 +106,20 @@ const inputCarById = async (req, res) => {
       //   openFetch(false, cameraIp, camera.login, camera.password);
       // }, 100);
 
-      res.status(200).send("Car already payed today");
+      res.status(200).send({
+        number: null,
+        plateImage: null,
+        fullImage: snapImage,
+        cameraIp: cameraIp,
+        operatorId: operator.operatorId,
+        session: lastSession,
+        eventName: "payedToday",
+      });
 
       return;
     }
 
-    getIO().emit(`inputCar-${operator.operatorId}`, {
+    res.status(200).send({
       number: null,
       plateImage: null,
       fullImage: snapImage,
@@ -124,8 +127,6 @@ const inputCarById = async (req, res) => {
       operatorId: operator.operatorId,
       eventName: "input",
     });
-
-    res.status(200).send("OK");
   } catch (error) {
     res.status(400).send(error);
   }
@@ -144,61 +145,15 @@ const outputCar = async (req, res) => {
 
     if (!operator) return res.status(200).send("Operator not found");
 
-    const session = await getSessionByNumber(number);
-
-    const isPayedTodayValue = await isPayedToday(number);
-    if (!session && !isPayedTodayValue) {
-      const lastSession = db
-        .prepare(
-          `SELECT * FROM sessions
-         WHERE plateNumber = ?
-         ORDER BY startTime DESC
-         LIMIT 1`
-        )
-        .get(number);
-
-      let price = 0;
-      if (lastSession) {
-        const lastEntryTime = new Date(lastSession.startTime);
-        const lastSessionTarif = tarifs.find((item) => item.id === lastSession.tariffType);
-        const now = new Date();
-        const hoursSinceEntry = (now - lastEntryTime) / (1000 * 60 * 60);
-        price = Math.ceil((hoursSinceEntry - 24) / 24) * lastSessionTarif.pricePerDay;
-
-        return getIO().emit(`outputCar-${operator.operatorId}`, {
-          number,
-          plateImage,
-          fullImage,
-          price: price - lastSession.outputCost,
-          cameraIp: req.headers.host,
-          operatorId: operator.operatorId,
-          session,
-          eventName: "output",
-        });
-      } else {
-        return getIO().emit(`outputCar-${operator.operatorId}`, {
-          number,
-          plateImage,
-          fullImage,
-          price: 100000,
-          cameraIp: req.headers.host,
-          operatorId: operator.operatorId,
-          session,
-          eventName: "output",
-        });
-      }
-    }
-    // Проверяем, не оплатил ли он уже за   этот период
+    const isPayedTodayValue = isPayedToday(number);
+    const session = getLastSession(number);
 
     if (isPayedTodayValue) {
-      const lastPaymentTime = await getLastPaymentTime(number);
+      const lastSession = getLastSession(number);
 
       const plateImageFile = saveBase64Image(plateImage);
       const fullImageFile = saveBase64Image(fullImage);
 
-      console.log("payedInfo", operator.operatorId);
-
-      // Если меньше 24 часов - просто закрываем сессию
       handleOutputSession({
         number,
         plateImageFile,
@@ -214,62 +169,54 @@ const outputCar = async (req, res) => {
         fullImage,
         cameraIp: req.headers.host,
         operatorId: operator.operatorId,
-        lastPaymentTime,
+        session: lastSession,
         eventName: "output",
       });
 
-      // openFetch(true, cameraIp, camera.login, camera.password);
+      // openFetch(true, req.headers.host, operator.login, operator.password);
       // setTimeout(() => {
-      //   openFetch(false, cameraIp, camera.login, camera.password);
+      //   openFetch(false, req.headers.host, operator.login, operator.password);
       // }, 100);
-      res.status(200).send("OK");
-      return;
-    }
-    const price = calculatePrice(session.startTime, new Date().toISOString(), session.tariffType);
-    // Если есть цена (простоял больше 24 часов)
-    if (price > 0) {
+
+      return res.status(200).send("OK");
+    } else if (session) {
+      const price = calculateParkingCost(
+        session.startTime,
+        tarifs.find((item) => item.id == session.tariffType).pricePerDay
+      );
+
       getIO().emit(`outputCar-${operator.operatorId}`, {
         number,
         plateImage,
         fullImage,
-        price,
+        price: price - session.outputCost,
         cameraIp: req.headers.host,
         operatorId: operator.operatorId,
         session,
         eventName: "output",
       });
+
+      return res.status(200).send("OK");
     } else {
-      const lastPaymentTime = await getLastPaymentTime(number);
+      const sessionNotEnded = getLastSessionUniversal(number);
 
-      const plateImageFile = saveBase64Image(plateImage);
-      const fullImageFile = saveBase64Image(fullImage);
+      const price = calculateParkingCost(
+        sessionNotEnded.startTime,
+        tarifs.find((item) => item.id == sessionNotEnded.tariffType).pricePerDay
+      );
 
-      // Если меньше 24 часов - просто закрываем сессию
-      handleOutputSession({
-        number,
-        plateImageFile,
-        paymentMethod: 1,
-        cameraIp: req.headers.host,
-        fullImageFile,
-        outputCost: 0,
-      });
-      getIO().emit(`payedToday-${operator.operatorId}`, {
+      getIO().emit(`outputCar-${operator.operatorId}`, {
         number,
         plateImage,
         fullImage,
+        price: price,
         cameraIp: req.headers.host,
         operatorId: operator.operatorId,
-        lastPaymentTime,
+        session: sessionNotEnded,
         eventName: "output",
       });
-
-      // openFetch(true, cameraIp, camera.login, camera.password);
-      // setTimeout(() => {
-      //   openFetch(false, cameraIp, camera.login, camera.password);
-      // }, 100);
+      return res.status(200).send("OK");
     }
-
-    res.status(200).send("OK");
   } catch (error) {
     res.status(400).send(error);
   }
@@ -289,97 +236,17 @@ const outputCarById = async (req, res) => {
 
     if (!operator) return res.status(200).send("Operator not found");
 
-    const snapImage = await getSnapshot(cameraIp, operator.login, operator.password);
-
-    const session = await getSessionById(id);
-
-    const isPayedTodayValue = await isPayedTodayId(id);
-
-    if (!session && !isPayedTodayValue) {
-      const lastSession = db
-        .prepare(
-          `SELECT * FROM sessions
-         WHERE id = ?
-         ORDER BY startTime DESC
-         LIMIT 1`
-        )
-        .get(id);
-
-      let price = 0;
-      if (lastSession) {
-        const lastEntryTime = new Date(lastSession.startTime);
-        const now = new Date();
-        const hoursSinceEntry = (now - lastEntryTime) / (1000 * 60 * 60);
-        price = Math.ceil((hoursSinceEntry - 24) / 24) * tarifs[0].price;
-
-        return getIO().emit(`outputCar-${operator.operatorId}`, {
-          number: null,
-          plateImage: null,
-          fullImage: snapImage,
-          price: price - lastSession.outputCost,
-          cameraIp: cameraIp,
-          operatorId: operator.operatorId,
-          session,
-          eventName: "output",
-        });
-      } else {
-        return getIO().emit(`outputCar-${operator.operatorId}`, {
-          number: null,
-          plateImage: null,
-          fullImage: snapImage,
-          price: 100000,
-          cameraIp: cameraIp,
-          operatorId: operator.operatorId,
-          session,
-          eventName: "output",
-        });
-      }
-    }
-
-    // Проверяем, не оплатил ли он уже за   этот период
+    const isPayedTodayValue = isPayedToday(id, "id");
+    const session = getLastSession(id, "id");
 
     if (isPayedTodayValue) {
-      const lastPaymentTime = await getLastPaymentTimeId(id);
+      const lastSession = getLastSession(id, "id");
 
-      getIO().emit(`payedToday-${operator.operatorId}`, {
-        number: null,
-        plateImage: null,
-        fullImage: snapImage,
-        cameraIp: cameraIp,
-        operatorId: operator.operatorId,
-        lastPaymentTime,
-        eventName: "output",
-      });
-
-      // openFetch(true, cameraIp, camera.login, camera.password);
-      // setTimeout(() => {
-      //   openFetch(false, cameraIp, camera.login, camera.password);
-      // }, 100);
-      res.status(200).send("OK");
-      return;
-    }
-
-    const price = calculatePrice(session.startTime, new Date().toISOString(), session.tariffType);
-
-    // Если есть цена (простоял больше 24 часов)
-    if (price > 0) {
-      getIO().emit(`outputCar-${operator.operatorId}`, {
-        number: null,
-        plateImage: null,
-        fullImage: snapImage,
-        price,
-        cameraIp: cameraIp,
-        operatorId: operator.operatorId,
-        session,
-        eventName: "output",
-      });
-    } else {
-      const lastPaymentTime = await getLastPaymentTimeId(id);
+      const snapImage = await getSnapshot(cameraIp, operator.login, operator.password);
       const snapUrl = saveBase64Image(snapImage);
 
-      // Если меньше 24 часов - просто закрываем сессию
-      handleOutputSessionId({
-        id,
+      handleOutputSession({
+        number: null,
         plateImageFile: null,
         paymentMethod: 1,
         cameraIp: cameraIp,
@@ -387,23 +254,58 @@ const outputCarById = async (req, res) => {
         outputCost: 0,
       });
 
-      getIO().emit(`payedToday-${operator.operatorId}`, {
+      // openFetch(true, req.headers.host, operator.login, operator.password);
+      // setTimeout(() => {
+      //   openFetch(false, req.headers.host, operator.login, operator.password);
+      // }, 100);
+
+      return res.status(200).send({
         number: null,
         plateImage: null,
         fullImage: snapImage,
         cameraIp: cameraIp,
         operatorId: operator.operatorId,
-        lastPaymentTime,
+        session: lastSession,
+        eventName: "payedToday",
+      });
+    } else if (session) {
+      const price = calculateParkingCost(
+        session.startTime,
+        tarifs.find((item) => item.id == session.tariffType).pricePerDay
+      );
+
+      const snapImage = await getSnapshot(cameraIp, operator.login, operator.password);
+
+      return res.status(200).send({
+        number: null,
+        plateImage: null,
+        fullImage: snapImage,
+        price: price - session.outputCost,
+        cameraIp: cameraIp,
+        operatorId: operator.operatorId,
+        session,
         eventName: "output",
       });
+    } else {
+      const sessionNotEnded = getLastSessionUniversal(id, "id");
+      const snapImage = await getSnapshot(cameraIp, operator.login, operator.password);
 
-      // openFetch(true, cameraIp, camera.login, camera.password);
-      // setTimeout(() => {
-      //   openFetch(false, cameraIp, camera.login, camera.password);
-      // }, 100);
+      const price = calculateParkingCost(
+        sessionNotEnded.startTime,
+        tarifs.find((item) => item.id == sessionNotEnded.tariffType).pricePerDay
+      );
+
+      return res.status(200).send({
+        number: null,
+        plateImage: null,
+        fullImage: snapImage,
+        price: price,
+        cameraIp: cameraIp,
+        operatorId: operator.operatorId,
+        session: sessionNotEnded,
+        eventName: "output",
+      });
     }
-
-    res.status(200).send("OK");
   } catch (error) {
     res.status(400).send(error);
   }

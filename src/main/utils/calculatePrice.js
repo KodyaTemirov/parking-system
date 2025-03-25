@@ -55,16 +55,46 @@ const isPayedToday = (item, type = "number") => {
 
   const currentTarif = tarifs.find((tarif) => tarif.id === session.tarifId).pricePerDay;
 
-  const payedDays = session.outputCost / currentTarif;
+  const payedDays = session.outputCost / currentTarif || 0;
 
   return isPeriodPaid(session.startTime, payedDays);
 };
 
-console.log(calculateParkingCost("2025-03-24T10:00:00Z", 10000));
+const getLastSession = (item, type = "number") => {
+  const session = db
+    .prepare(
+      `SELECT * FROM sessions
+       WHERE ${type == "number" ? "plateNumber" : "id"} = ?
+       AND endTime IS NOT NULL
+       ORDER BY startTime DESC
+       LIMIT 1`
+    )
+    .get(item);
 
-console.log(isPeriodPaid("2025-03-24T10:00:00Z", 0));
+  if (!session) return null;
 
-// isPayedToday("01L087WB");
-// isPayedToday();
+  return session;
+};
 
-console.log(0 / 1000);
+const getLastSessionUniversal = (item, type = "number") => {
+  const session = db
+    .prepare(
+      `SELECT * FROM sessions
+       WHERE ${type == "number" ? "plateNumber" : "id"} = ?
+       ORDER BY startTime DESC
+       LIMIT 1`
+    )
+    .get(item);
+
+  if (!session) return null;
+
+  return session;
+};
+
+export {
+  calculateParkingCost,
+  isPeriodPaid,
+  isPayedToday,
+  getLastSession,
+  getLastSessionUniversal,
+};
