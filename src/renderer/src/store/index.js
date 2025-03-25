@@ -1,2 +1,2 @@
-export { useCamerasStore } from "./CamerasStore";
+export { useAppStore } from "./AppStore";
 export { useSessionsStore } from "./SessionsStore";

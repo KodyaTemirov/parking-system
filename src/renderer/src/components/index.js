@@ -9,6 +9,8 @@ import ToastContainer from "./ToastContainer.vue";
 import SubTitle from "./SubTitle.vue";
 import InputDrawer from "./InputDrawer.vue";
 import OutputDrawer from "./OutputDrawer.vue";
+import Accordion from "./Accordion.vue";
+import Input from "./Input.vue";
 
 import { Icon } from "@iconify/vue";
 
@@ -25,6 +27,8 @@ const components = [
   { name: "SubTitle", component: SubTitle },
   { name: "InputDrawer", component: InputDrawer },
   { name: "OutputDrawer", component: OutputDrawer },
+  { name: "Accordion", component: Accordion },
+  { name: "Input", component: Input },
 ];
 
 export default {

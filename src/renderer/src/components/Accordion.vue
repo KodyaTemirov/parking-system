@@ -15,7 +15,6 @@
     isOpen.value = !isOpen.value;
   };
 </script>
-
 <template>
   <AccordionRoot type="single" collapsible @update:value="toggleAccordion">
     <AccordionItem value="item-1">
@@ -30,10 +29,37 @@
         />
       </AccordionTrigger>
       <AccordionContent
-        class="text-mauve11 bg-mauve2 data-[state=open]:animate-slideDown data-[state=closed]:animate-slideUp mt-4 overflow-hidden text-[15px]"
+        class="text-mauve11 bg-mauve2 mt-4 overflow-hidden text-[15px]"
+        :style="{
+          animation: isOpen ? 'slideDown 0.3s ease-out forwards' : 'slideUp 0.3s ease-in forwards',
+        }"
       >
         <slot />
       </AccordionContent>
     </AccordionItem>
   </AccordionRoot>
 </template>
+
+<style scoped>
+  @keyframes slideDown {
+    from {
+      height: 0;
+      opacity: 0;
+    }
+    to {
+      height: auto;
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      height: auto;
+      opacity: 1;
+    }
+    to {
+      height: 0;
+      opacity: 0;
+    }
+  }
+</style>

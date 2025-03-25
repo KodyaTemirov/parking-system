@@ -4,6 +4,7 @@
   import { ipServer } from "@/config";
   import { ref, watch, onMounted } from "vue";
   import { pricesData } from "@/helpers";
+  import { useAppStore } from "@/store";
 
   const { success } = useToast();
 
@@ -21,6 +22,8 @@
       required: true,
     },
   });
+
+  const appStore = useAppStore();
 
   const emit = defineEmits(["update:modelValue", "update:newCar", "update:operator"]);
 
@@ -51,7 +54,7 @@
         eventName: eventName || "input",
         paymentMethod,
         tariffType: tariffType || 1,
-        cameraIp,
+        cameraIp: cameraIp || selectCam.value,
       });
 
       isOpen.value = false;
@@ -64,29 +67,22 @@
     try {
       const { data } = await axios.get(`${ipServer}/api/camera/operators/${operator}`);
       cameras.value = data;
-      console.log("console", cameras.value[0]);
+      selectCam.value = data[0] && data[0].ip;
     } catch (error) {
       console.error(error);
     }
   };
 
   watch(
-    () => props.operator,
+    () => appStore.selectedOperator,
     (newValue) => {
       getCams(newValue);
     }
   );
 
   onMounted(() => {
-    getCams(props.operator);
+    getCams(appStore.selectedOperator);
   });
-
-  watch(
-    () => selectCam.value,
-    (newValue) => {
-      console.log("selectCam", newValue);
-    }
-  );
 </script>
 
 <template>
@@ -107,16 +103,20 @@
       <PaymentSelector v-model="newCar.paymentMethod" />
       <div v-if="!newCar.number">
         <SubTitle>Выберите камеру</SubTitle>
-        <div class="flex flex-col gap-4">
-          <select name="" id="" v-model="selectCam">
-            <option v-for="camera in cameras" :key="camera.id" :value="camera.id">
-              {{ camera.name }}
-            </option>
-          </select>
+        <div class="camera-selector">
+          <div
+            v-for="camera in cameras"
+            :key="camera.ip"
+            class="camera-card"
+            @click="selectCam = camera.ip"
+            :class="{ selected: selectCam === camera.ip }"
+          >
+            <h3>{{ camera.name }}</h3>
+          </div>
         </div>
       </div>
 
-      <!-- <Accordion class="mt-4" title="Дополнительная информация">
+      <Accordion class="mt-4" title="Дополнительная информация">
         <div class="flex flex-col gap-4">
           <img :src="newCar.fullImage" alt="" class="w-full rounded-lg" />
           <img :src="newCar.plateImage" alt="" class="w-full rounded-lg" />
@@ -140,7 +140,7 @@
             {{ newCar.operatorId }}
           </span>
         </SubTitle>
-      </Accordion> -->
+      </Accordion>
     </div>
 
     <div class="fixed-button">
@@ -172,5 +172,19 @@
 
   .fixed-button {
     @apply fixed right-0 bottom-0 left-0 border-t-2 border-gray-200 bg-white px-4 pb-4;
+  }
+
+  .camera-selector {
+    @apply grid grid-cols-2 gap-4;
+  }
+
+  .camera-card {
+    transition: background-color 0.3s;
+
+    @apply w-full cursor-pointer rounded-lg border-2 border-gray-200 p-4 transition-all ease-in-out hover:border-gray-200 hover:bg-gray-200;
+  }
+
+  .camera-card.selected {
+    @apply border-blue-600 hover:bg-white;
   }
 </style>

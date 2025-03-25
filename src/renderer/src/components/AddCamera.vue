@@ -14,7 +14,8 @@
   import { Icon } from "@iconify/vue";
   import { ipServer } from "@/config";
 
-  const isDialogOpen = ref(true);
+  const open = ref(false);
+  const operatorId = ref(null);
   const isLoading = ref(false);
   const errorMessage = ref("");
 
@@ -27,14 +28,12 @@
     type: "",
   });
 
-  const props = defineProps({
-    id: {
-      type: String,
-      default: "",
-    },
-  });
-
   const operators = ref([]);
+
+  const openModalHandler = (id) => {
+    cameraInfo.value.operatorId = id;
+    open.value = true;
+  };
 
   const addCamera = async () => {
     if (cameraInfo.value.ip.trim() && cameraInfo.value.name.trim() && cameraInfo.value.operatorId) {
@@ -42,7 +41,7 @@
         isLoading.value = true;
         errorMessage.value = "";
         await axios.post(`${ipServer}/api/camera`, cameraInfo.value);
-        isDialogOpen.value = false;
+        open.value = false;
         cameraInfo.value = {
           name: "",
           login: "",
@@ -51,7 +50,7 @@
           operatorId: "",
           type: "",
         };
-        isDialogOpen.value = false;
+        open.value = false;
       } catch (error) {
         console.error("Ошибка при добавлении камеры:", error);
         errorMessage.value = error.response?.data?.message || "Не удалось добавить камеру.";
@@ -70,21 +69,16 @@
     }
   };
 
-  watch(
-    () => props.id,
-    (newValue) => {
-      getAllOperators();
-      cameraInfo.value.operatorId = newValue;
-    }
-  );
-
   onMounted(() => {
     getAllOperators();
+
+    window.api.onMessage("add-camera", openModalHandler);
   });
 </script>
 
 <template>
-  <DialogRoot v-model="isDialogOpen">
+  <div></div>
+  <DialogRoot key="open" v-model:open="open">
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-30 bg-black/50" />
       <DialogContent

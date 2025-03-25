@@ -46,7 +46,7 @@
     @apply flex w-full cursor-pointer gap-4 rounded-md border-2 border-gray-200 px-4 py-2 text-left font-medium text-blue-600 hover:border-gray-200 hover:bg-gray-200;
   }
   .icon-wrapper {
-    @apply flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 text-3xl;
+    @apply flex h-14 w-14 flex-none items-center justify-center rounded-full bg-gray-100 text-3xl;
   }
   .price-title {
     @apply font-semibold text-gray-700;

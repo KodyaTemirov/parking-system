@@ -1,27 +1,39 @@
 <script setup>
+  import axios from "axios";
+  import { ipServer } from "@/config";
   import { useSessionsStore } from "@/store/SessionsStore";
-  import { pricesData } from "@/helpers";
-
+  import { pricesData, socket, calculateDuration } from "@/helpers";
+  import { onMounted } from "vue";
   const sessionStore = useSessionsStore();
 
-  const calculateDuration = (startTime, endTime) => {
-    const start = new Date(startTime);
-    const end = endTime ? new Date(endTime) : new Date();
+  socket.on("newSession", async (info) => {
+    try {
+      sessionStore.addSession(info);
+    } catch (error) {
+      console.error(error);
+    }
+  });
 
-    if (end < start) return "0м 0с";
-
-    const durationMs = end - start;
-    const days = Math.floor(durationMs / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((durationMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
-
-    return `${days > 0 ? `${days}д ` : ""}${hours > 0 ? `${hours}ч ` : ""}${minutes > 0 ? `${minutes}м` : "Только что"}`;
+  const getAllSession = async () => {
+    try {
+      const { data } = await axios.get(`${ipServer}/api/session`);
+      sessionStore.setSessions(data.data);
+    } catch (error) {
+      console.log(error, "ERRROR");
+    }
   };
+
+  onMounted(() => {
+    getAllSession();
+  });
 </script>
 
 <template>
   <SubTitle>Парковочные сессии {{ sessionStore.sessions.length }}</SubTitle>
-  <table class="min-w-full border border-gray-300 bg-white" v-if="sessionStore.sessions.length">
+  <table
+    class="min-w-full overflow-hidden rounded-lg border border-gray-200 bg-white"
+    v-if="sessionStore.sessions.length"
+  >
     <thead>
       <tr class="bg-gray-200 text-left">
         <th class="px-4 py-2">#</th>

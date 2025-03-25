@@ -1,26 +1,24 @@
 <script setup>
   import { onMounted, ref, watch } from "vue";
   import { socket } from "@/helpers";
-  import { useSessionsStore } from "@/store";
+  import { useSessionsStore, useAppStore } from "@/store";
   import axios from "axios";
   import { ipServer } from "@/config";
   import { useToast } from "@/composables";
   const { success } = useToast();
+
   const sessionStore = useSessionsStore();
+  const appStore = useAppStore();
+
   const currentTariff = ref();
   const initialCar = { paymentMethod: 1, tariffType: 1, eventName: "output" };
   const inputCar = ref({ ...initialCar });
   const outputCar = ref({ ...initialCar });
-  const selectedOperator = ref(null);
   const isOpenInput = ref(false);
   const isOpenOutput = ref(false);
 
   const addCam = ref({ open: false, id: null });
   const isSocketConnected = ref(false);
-
-  const openModalHandler = (id) => {
-    addCam.value = { open: true, id };
-  };
 
   const addSessionHandler = async () => {
     const { number, plateImage, fullImage, eventName, paymentMethod, tariffType, cameraIp, price } =
@@ -61,16 +59,7 @@
     isOpenOutput.value = true;
   };
 
-  const getAllSession = async () => {
-    try {
-      const { data } = await axios.get(`${ipServer}/api/session`);
-      sessionStore.setSessions(data.data);
-    } catch (error) {
-      console.log(error, "ERRROR");
-    }
-  };
-
-  watch(selectedOperator, (newOperator, oldOperator) => {
+  watch(appStore.selectedOperator, (newOperator, oldOperator) => {
     if (oldOperator) {
       socket.off(`inputCar-${oldOperator}`);
       socket.off(`outputCar-${oldOperator}`);
@@ -96,15 +85,6 @@
     }
   });
 
-  socket.on("newSession", async (info) => {
-    try {
-      sessionStore.addSession(info);
-      inputCar.value = { ...initialCar };
-    } catch (error) {
-      console.error(error);
-    }
-  });
-
   onMounted(async () => {
     socket.connect();
     isSocketConnected.value = true;
@@ -117,20 +97,14 @@
       isSocketConnected.value = false;
     });
 
-    getAllSession();
-    selectedOperator.value = await window.api.getSelectedOperator();
-
-    window.api.onMessage("add-camera", openModalHandler);
-    window.api.onMessage("selected-operator", (operator) => {
-      selectedOperator.value = operator;
-    });
+    appStore.initSelectOperator();
   });
 </script>
 
 <template>
   <div class="wrapper">
     <SubTitle class="flex justify-between">
-      Оператор {{ selectedOperator }}
+      Оператор {{ appStore.selectedOperator }}
       <div class="socket-wrapper">
         <div
           class="socket-status"
@@ -154,11 +128,7 @@
       </Button>
     </div>
 
-    <InputDrawer
-      v-model="isOpenInput"
-      v-model:newCar="inputCar"
-      v-model:operator="selectedOperator"
-    />
+    <InputDrawer v-model="isOpenInput" v-model:newCar="inputCar" />
     <OutputDrawer v-model="isOpenOutput" v-model:newCar="outputCar" />
 
     <Sessions />
