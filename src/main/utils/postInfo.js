@@ -8,23 +8,28 @@ import FormData from "form-data";
 const postInfo = async (data) => {
   try {
     if (data.type == "insert" && data.event == "input") {
-      const image = getImageFile(data.data.inputPlateImage);
-      const imageFull = getImageFile(data.data.inputFullImage);
-
-      const plateImageId = await uploadImage(image);
-      const fullImageId = await uploadImage(imageFull);
-
-      data.data.inputPlateImage = plateImageId;
-      data.data.inputFullImage = fullImageId;
+      if (data.data.inputPlateImage) {
+        const image = getImageFile(data.data.inputPlateImage);
+        const plateImageId = await uploadImage(image);
+        data.data.inputPlateImage = plateImageId;
+      }
+      if (data.data.inputFullImage) {
+        const imageFull = getImageFile(data.data.inputFullImage);
+        const fullImageId = await uploadImage(imageFull);
+        data.data.inputFullImage = fullImageId;
+      }
     } else if (data.type == "insert" && data.event == "output") {
-      const image = getImageFile(data.data.outputPlateImage);
-      const imageFull = getImageFile(data.data.outputFullImage);
+      if (data.data.outputPlateImage) {
+        const image = getImageFile(data.data.outputPlateImage);
+        const plateImageId = await uploadImage(image);
+        data.data.outputPlateImage = plateImageId;
+      }
 
-      const plateImageId = await uploadImage(image);
-      const fullImageId = await uploadImage(imageFull);
-
-      data.data.outputPlateImage = plateImageId;
-      data.data.outputFullImage = fullImageId;
+      if (data.data.outputFullImage) {
+        const imageFull = getImageFile(data.data.outputFullImage);
+        const fullImageId = await uploadImage(imageFull);
+        data.data.outputFullImage = fullImageId;
+      }
     }
 
     const response = await axios.post(`${url}/v1/desktop/market/vehicles`, data, {

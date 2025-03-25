@@ -1,5 +1,6 @@
 import db from "../db/database.js";
 import { getCameraOperator } from "../server/services/camera.service";
+import { checkInternetConnection } from "./checkInternet.js";
 import { getSnapshot } from "./getSnapshot.js";
 import { openFetch } from "./plateFunctions.js";
 import { postInfo } from "./postInfo.js";
@@ -192,7 +193,7 @@ const getSessionById = (id) => {
   return data;
 };
 
-const getSnapshotSession = async (tariffType, paymentMethod, cameraIp, res) => {
+const getSnapshotSession = async (eventName, tariffType, paymentMethod, cameraIp, res) => {
   const camera = await getCameraOperator(cameraIp);
   const snapImage = await getSnapshot(cameraIp, camera.login, camera.password);
   const snapUrl = saveBase64Image(snapImage);
@@ -200,7 +201,7 @@ const getSnapshotSession = async (tariffType, paymentMethod, cameraIp, res) => {
   const stmt = db.prepare(`
     INSERT INTO sessions
       (plateNumber, inputFullImage, startTime, tariffType, duration, inputCost, inputPaymentMethod,cameraIp)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   const result = stmt.run(
