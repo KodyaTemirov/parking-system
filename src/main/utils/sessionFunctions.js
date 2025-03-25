@@ -23,8 +23,6 @@ const handleOutputSession = async ({
   outputCost,
   cameraIp,
 }) => {
-  console.log(number);
-
   const session = db
     .prepare(`SELECT MAX(id) as id FROM sessions WHERE plateNumber = ?`)
     .get(number);
@@ -53,14 +51,10 @@ const handleOutputSession = async ({
     session.id
   );
 
-  console.log(result, "result");
-  const insertedData = db
-    .prepare("SELECT * FROM sessions WHERE id = ?")
-    .get(result.lastInsertRowid);
+  const insertedData = db.prepare("SELECT * FROM sessions WHERE id = ?").get(session.id);
 
   const camera = await getCameraOperator(cameraIp);
 
-  console.log(camera, "innerCamera", insertedData);
   insertedData.operatorId = camera.operatorId;
 
   await getIO().emit("newSession", insertedData);
