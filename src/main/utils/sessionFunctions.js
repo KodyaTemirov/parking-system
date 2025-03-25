@@ -25,6 +25,10 @@ const handleOutputSession = async ({
 }) => {
   console.log(number);
 
+  const session = db
+    .prepare(`SELECT MAX(id) as id FROM sessions WHERE plateNumber = ?`)
+    .get(number);
+
   const stmt = db.prepare(`
     UPDATE sessions
     SET outputPlateImage = ?,
@@ -35,7 +39,7 @@ const handleOutputSession = async ({
         outputPaymentMethod = ?,
         cameraIp = ?,
         isUpdated = 1
-    WHERE id = (SELECT MAX(id) FROM sessions WHERE plateNumber = ?)
+    WHERE id = ?
   `);
 
   const result = stmt.run(
@@ -46,7 +50,7 @@ const handleOutputSession = async ({
     outputCost,
     paymentMethod,
     cameraIp,
-    number
+    session.id
   );
 
   console.log(result, "result");
