@@ -25,7 +25,7 @@ const getOperatorCameras = async (req, res) => {
 
 const getCameraOperator = async (ip) => {
   try {
-    const data = db.prepare("SELECT * FROM cameras WHERE ip = ? ORDER BY id ASC").get(ip);
+    const data = await db.prepare("SELECT * FROM cameras WHERE ip = ? ORDER BY id ASC").get(ip);
 
     return data;
   } catch (error) {

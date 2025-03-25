@@ -87,11 +87,13 @@
       // Выводим уведомление если ранее оплачивал
       socket.on(`payedToday-${newOperator}`, async (data) => {
         success("Ворота открываются", "ID: " + data.id + " ранее оплачивал");
+        console.log(data, "payed");
       });
 
       socket.on(`outputCar-${newOperator}`, async (data) => {
         outputCar.value = data;
         isOpenOutput.value = true;
+        console.log(data, "output");
       });
     }
   });

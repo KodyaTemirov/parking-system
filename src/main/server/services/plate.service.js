@@ -146,7 +146,6 @@ const outputCar = async (req, res) => {
     const session = await getSessionByNumber(number);
 
     const isPayedTodayValue = await isPayedToday(number);
-
     if (!session && !isPayedTodayValue) {
       const lastSession = db
         .prepare(
@@ -187,11 +186,25 @@ const outputCar = async (req, res) => {
         });
       }
     }
-
     // Проверяем, не оплатил ли он уже за   этот период
 
     if (isPayedTodayValue) {
       const lastPaymentTime = await getLastPaymentTime(number);
+
+      const plateImageFile = saveBase64Image(plateImage);
+      const fullImageFile = saveBase64Image(fullImage);
+
+      console.log("payedInfo", operator.operatorId);
+
+      // Если меньше 24 часов - просто закрываем сессию
+      handleOutputSession({
+        number,
+        plateImageFile,
+        paymentMethod: 1,
+        cameraIp: req.headers.host,
+        fullImageFile,
+        outputCost: 0,
+      });
 
       getIO().emit(`payedToday-${operator.operatorId}`, {
         number,
@@ -210,9 +223,7 @@ const outputCar = async (req, res) => {
       res.status(200).send("OK");
       return;
     }
-
     const price = calculatePrice(session.startTime, new Date().toISOString(), session.tariffType);
-
     // Если есть цена (простоял больше 24 часов)
     if (price > 0) {
       getIO().emit(`outputCar-${operator.operatorId}`, {
@@ -240,7 +251,6 @@ const outputCar = async (req, res) => {
         fullImageFile,
         outputCost: 0,
       });
-
       getIO().emit(`payedToday-${operator.operatorId}`, {
         number,
         plateImage,

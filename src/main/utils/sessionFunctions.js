@@ -51,6 +51,8 @@ const handleOutputSession = async ({
     .get(result.lastInsertRowid);
 
   const camera = await getCameraOperator(cameraIp);
+
+  console.log(camera, "innerCamera", insertedData);
   insertedData.operatorId = camera.operatorId;
 
   await getIO().emit("newSession", insertedData);

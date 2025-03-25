@@ -1,4 +1,5 @@
-const { default: axios } = require("axios");
+import axios from "axios";
+import { tarifs } from "./prices";
 
 const calculatePrice = (startTime, endTime, tariffType) => {
   const start = new Date(startTime);
@@ -15,7 +16,6 @@ const calculatePrice = (startTime, endTime, tariffType) => {
   }
 
   const days = Math.floor(hours / 24);
-
   return days * tarifCost;
 };
 
