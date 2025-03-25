@@ -4,7 +4,7 @@ import { tarifs } from "./prices";
 const calculatePrice = (startTime, endTime, tariffType) => {
   const start = new Date(startTime);
   const end = endTime ? new Date(endTime) : new Date();
-  const tarifCost = tarifs.find((tarif) => tarif.id === tariffType).price;
+  const tarifCost = tarifs.find((tarif) => tarif.id === tariffType).pricePerDay;
 
   if (end < start) return 0;
 

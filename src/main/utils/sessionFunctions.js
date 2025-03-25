@@ -241,6 +241,114 @@ const getSnapshotSession = async (eventName, tariffType, paymentMethod, cameraIp
   res.status(201).send(insertedData);
 };
 
+const getParkStats = async () => {
+  try {
+    const allData = db
+      .prepare(
+        `
+    SELECT
+      COUNT(*) as count
+    FROM sessions
+  `
+      )
+      .get();
+
+    const outputData = db
+      .prepare(
+        `
+    SELECT
+      COUNT(*) as count
+    FROM sessions
+    WHERE endTime is not null
+  `
+      )
+      .all();
+
+    const inputData = db
+      .prepare(
+        `
+    SELECT
+      COUNT(*) as count
+    FROM sessions
+    WHERE endTime is null
+  `
+      )
+      .all();
+
+    const totalCostToday = db
+      .prepare(
+        `
+    SELECT SUM(inputCost) as totalInputCost, SUM(outputCost) as totalOutputCost FROM sessions WHERE date(startTime) = date('now')
+  `
+      )
+      .get();
+
+    return {
+      allData,
+      inputData,
+      outputData,
+      totalCostToday: totalCostToday.totalInputCost + totalCostToday.totalOutputCost,
+      totalCarInPark: inputData - outputData,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
+const sendParkStats = async () => {
+  try {
+    const allData = db
+      .prepare(
+        `
+    SELECT
+      COUNT(*) as count
+    FROM sessions
+  `
+      )
+      .get();
+
+    const outputData = db
+      .prepare(
+        `
+    SELECT
+      COUNT(*) as count
+    FROM sessions
+    WHERE endTime is not null
+  `
+      )
+      .all();
+
+    const inputData = db
+      .prepare(
+        `
+    SELECT
+      COUNT(*) as count
+    FROM sessions
+    WHERE endTime is null
+  `
+      )
+      .all();
+
+    const totalCostToday = db
+      .prepare(
+        `
+    SELECT SUM(inputCost) as totalInputCost, SUM(outputCost) as totalOutputCost FROM sessions WHERE date(startTime) = date('now')
+  `
+      )
+      .get();
+
+    getIO().emit("parkStats", {
+      allData,
+      inputData,
+      outputData,
+      totalCostToday: totalCostToday.totalInputCost + totalCostToday.totalOutputCost,
+      totalCarInPark: inputData - outputData,
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
 export {
   getSessionByNumber,
   handleOutputSession,
@@ -251,4 +359,6 @@ export {
   getLastPaymentTimeId,
   getSessionById,
   getSnapshotSession,
+  getParkStats,
+  sendParkStats,
 };

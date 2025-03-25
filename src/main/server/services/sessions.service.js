@@ -6,7 +6,7 @@ import { getSnapshot } from "../../utils/getSnapshot.js";
 import { tarifs } from "../../utils/prices.js";
 import { postInfo } from "../../utils/postInfo.js";
 import { checkInternetConnection } from "../../utils/checkInternet.js";
-import { getSnapshotSession } from "../../utils/sessionFunctions.js";
+import { getSnapshotSession, getParkStats, sendParkStats } from "../../utils/sessionFunctions.js";
 import { openFetch } from "../../utils/plateFunctions.js";
 
 const registerSession = async (req, res) => {
@@ -45,6 +45,7 @@ const registerSession = async (req, res) => {
   insertedData.operatorId = camera.operatorId;
 
   await getIO().emit("newSession", insertedData);
+  await sendParkStats();
 
   // openFetch(true, cameraIp, camera.login, camera.password);
 
@@ -111,6 +112,7 @@ const outputSession = async (req, res) => {
     insertedData.operatorId = camera.operatorId;
 
     await getIO().emit("newSession", insertedData);
+    await sendParkStats();
 
     if (checkInternetConnection()) {
       insertedData.event = "output";
@@ -167,6 +169,7 @@ const outputSession = async (req, res) => {
       insertedData.operatorId = camera.operatorId;
 
       await getIO().emit("newSession", insertedData);
+      await sendParkStats();
 
       if (checkInternetConnection()) {
         insertedData.event = "output";
@@ -227,6 +230,7 @@ const closeSnapshotSession = async (req, res) => {
     insertedData.operatorId = camera.operatorId;
 
     await getIO().emit("newSession", insertedData);
+    await sendParkStats();
 
     if (checkInternetConnection()) {
       insertedData.event = "output";
@@ -281,6 +285,7 @@ const closeSnapshotSession = async (req, res) => {
       insertedData.operatorId = camera.operatorId;
 
       await getIO().emit("newSession", insertedData);
+      await sendParkStats();
 
       if (checkInternetConnection()) {
         insertedData.event = "output";
@@ -327,58 +332,8 @@ const getSessions = (req, res) => {
 
 const getSessionsInfo = async (req, res) => {
   try {
-    const allData = db
-      .prepare(
-        `
-      SELECT
-        COUNT(*) as count,
-        tariffType
-      FROM sessions
-      GROUP BY tariffType
-    `
-      )
-      .all();
-
-    const outputData = db
-      .prepare(
-        `
-      SELECT
-        COUNT(*) as count,
-        tariffType
-      FROM sessions
-      WHERE endTime is not null
-      GROUP BY tariffType
-    `
-      )
-      .all();
-
-    const inputData = db
-      .prepare(
-        `
-      SELECT
-        COUNT(*) as count,
-        tariffType
-      FROM sessions
-      WHERE endTime is null
-      GROUP BY tariffType
-    `
-      )
-      .all();
-
-    const totalCostToday = db
-      .prepare(
-        `
-      SELECT SUM(inputCost) as totalInputCost, SUM(outputCost) as totalOutputCost FROM sessions WHERE date(startTime) = date('now')
-    `
-      )
-      .get();
-
-    res.status(200).send({
-      allData,
-      inputData,
-      outputData,
-      totalCostToday: totalCostToday.totalInputCost + totalCostToday.totalOutputCost,
-    });
+    const data = await getParkStats();
+    res.status(200).send(data);
   } catch (error) {
     res.status(400).send(error);
   }

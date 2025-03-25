@@ -160,9 +160,10 @@ const outputCar = async (req, res) => {
       let price = 0;
       if (lastSession) {
         const lastEntryTime = new Date(lastSession.startTime);
+        const lastSessionTarif = tarifs.find((item) => item.id === lastSession.tariffType);
         const now = new Date();
         const hoursSinceEntry = (now - lastEntryTime) / (1000 * 60 * 60);
-        price = Math.ceil((hoursSinceEntry - 24) / 24) * tarifs[0].price;
+        price = Math.ceil((hoursSinceEntry - 24) / 24) * lastSessionTarif.pricePerDay;
 
         return getIO().emit(`outputCar-${operator.operatorId}`, {
           number,
