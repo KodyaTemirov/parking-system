@@ -31,6 +31,7 @@ const startCronJob = () => {
         item.outputFullImage = fullImageId;
       }
     }
+
     axios.post(`https://raqamli-bozor.uz/services/platon-core/api/v2/desktop/market/vehicles`, {
       data: sessions,
     });
