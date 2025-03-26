@@ -4,22 +4,8 @@ import { getCameraOperator } from "./camera.service.js";
 import db from "@/db/database.js";
 import { tarifs } from "@/utils/prices.js";
 import { saveBase64Image } from "../../utils/saveBase64Image.js";
-import {
-  getLastPaymentTime,
-  getLastPaymentTimeId,
-  getSessionById,
-  getSessionByNumber,
-  handleOutputSession,
-  handleOutputSessionId,
-  isPayedTodayId,
-} from "../../utils/sessionFunctions.js";
-import {
-  calculatePrice,
-  isEnoughTime,
-  openFetch,
-  openFetchByIp,
-  setInner,
-} from "../../utils/plateFunctions.js";
+import { handleOutputSession, handleOutputSessionId } from "../../utils/sessionFunctions.js";
+import { isEnoughTime, setInner } from "../../utils/plateFunctions.js";
 import { getSnapshot } from "../../utils/getSnapshot.js";
 import {
   calculateParkingCost,
@@ -43,9 +29,7 @@ const inputCar = async (req, res) => {
 
     const check = await isEnoughTime(number, "number");
 
-    console.log(check);
-
-    const isPayedTodayValue = await isPayedToday(number);
+    const isPayedTodayValue = isPayedToday(number);
 
     if (isPayedTodayValue) {
       const lastSession = getLastSession(number);
