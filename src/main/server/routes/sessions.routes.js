@@ -17,6 +17,4 @@ router.get("/session", getSessions);
 
 router.get("/session/info", getSessionsInfo);
 
-router.post("/session/snapshot", closeSnapshotSession);
-
 export default router;

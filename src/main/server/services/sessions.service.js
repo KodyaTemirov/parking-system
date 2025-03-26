@@ -68,7 +68,18 @@ const registerSession = async (req, res) => {
 };
 
 const outputSession = async (req, res) => {
-  const { number, plateImage, fullImage, paymentMethod, outputCost, cameraIp } = req.body;
+  const { number, plateImage, fullImage, paymentMethod, outputCost, cameraIp, id } = req.body;
+
+  if (!number) {
+    return await closeSnapshotSession(
+      id,
+      plateImage,
+      fullImage,
+      paymentMethod,
+      outputCost,
+      cameraIp
+    );
+  }
 
   const lastSession = db
     .prepare(
@@ -185,9 +196,14 @@ const outputSession = async (req, res) => {
   }
 };
 
-const closeSnapshotSession = async (req, res) => {
-  const { id, plateImage, fullImage, paymentMethod, outputCost, cameraIp } = req.body;
-
+const closeSnapshotSession = async (
+  id,
+  plateImage,
+  fullImage,
+  paymentMethod,
+  outputCost,
+  cameraIp
+) => {
   const lastSession = db
     .prepare(
       `
@@ -241,7 +257,7 @@ const closeSnapshotSession = async (req, res) => {
       });
     }
 
-    res.status(201).send(insertedData);
+    return insertedData;
   } else {
     const lastPaidSession = db
       .prepare(
@@ -296,7 +312,7 @@ const closeSnapshotSession = async (req, res) => {
         });
       }
 
-      res.status(201).send(insertedData);
+      return insertedData;
     }
   }
 };
