@@ -274,8 +274,8 @@ const outputCarById = async (req, res) => {
       const snapImage = await getSnapshot(cameraIp, operator.login, operator.password);
       const snapUrl = saveBase64Image(snapImage);
 
-      handleOutputSession({
-        number: null,
+      handleOutputSessionId({
+        id: id,
         plateImageFile: null,
         paymentMethod: 1,
         cameraIp: cameraIp,
