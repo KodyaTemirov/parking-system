@@ -3,14 +3,14 @@ import { ref } from "vue";
 const toasts = ref([]);
 
 export function useToast() {
-  const addToast = ({ title, description, type = "default", duration = 5000 }) => {
+  const addToast = ({ title, description, type = "default", duration = 2000 }) => {
     const id = Date.now();
     toasts.value.push({
       id,
       title,
       description,
       type,
-      duration,
+      duration: 2000,
     });
     return id;
   };

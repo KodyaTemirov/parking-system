@@ -17,7 +17,6 @@
   const isOpenInput = ref(false);
   const isOpenOutput = ref(false);
 
-  const addCam = ref({ open: false, id: null });
   const isSocketConnected = ref(false);
 
   const addSessionHandler = async () => {
@@ -57,6 +56,7 @@
 
   const openDrawerOutput = () => {
     isOpenOutput.value = true;
+    outputCar.value = { ...initialCar };
   };
 
   const socketsConnect = (operator) => {
@@ -148,7 +148,7 @@
 
   <ToastContainer />
 
-  <AddCamera v-model:open="addCam.open" :id="addCam.id" />
+  <AddCamera />
 </template>
 <style scoped>
   @reference "@/assets/main.css";

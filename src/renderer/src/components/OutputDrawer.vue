@@ -37,11 +37,9 @@
   );
 
   const getCams = async (operator) => {
-    console.log("operator", operator);
     try {
       const { data } = await axios.get(`${ipServer}/api/camera/operators/${operator}`);
       cameras.value = data;
-      console.log("kameralar", data);
       selectCam.value = data.length > 0 ? data[0].ip : null;
     } catch (err) {
       console.error(err);
@@ -65,12 +63,13 @@
 
   watch(isOpen, (newValue) => {
     emit("update:modelValue", newValue);
+    checkId.value = "";
   });
 
   const addSessionHandler = async () => {
     const { number, plateImage, fullImage, paymentMethod, tariffType, price } = localNewCar.value;
 
-    if (!number || !paymentMethod || !price) {
+    if (!price) {
       showError("Ошибка", "Заполните все обязательные поля");
       return;
     }
@@ -85,6 +84,9 @@
         cameraIp: selectCam.value,
         outputCost: price,
       });
+
+      console.log("localNewCar.value", localNewCar.value);
+
       success("Успех!", "Операция выполнена успешно");
       isOpen.value = false;
     } catch (err) {
@@ -118,8 +120,12 @@
     }
   };
 
+  watch(selectCam, (newValue) => {
+    if (newValue && checkId.value) getCheckData();
+  });
+
   onMounted(() => {
-    if (props.operator) getCams(appStore.selectedOperator);
+    getCams(appStore.selectedOperator);
   });
 </script>
 
@@ -133,10 +139,10 @@
         </span>
       </div>
       <div v-else>
-        <div class="flex gap-2">
+        <form @submit.prevent="getCheckData" class="flex gap-2">
           <Input placeholder="Введите номер чека" v-model="checkId" />
-          <Button @click="getCheckData">Найти</Button>
-        </div>
+          <Button type="submit" @click="getCheckData">Найти</Button>
+        </form>
       </div>
     </div>
 
@@ -163,6 +169,7 @@
     <PaymentSelector v-model="localNewCar.paymentMethod" />
 
     <div class="fixed-button">
+      <SubTitle>Чек: {{ localNewCar.id }}</SubTitle>
       <SubTitle class="flex justify-between">
         Итого к оплате:
         <span class="text-2xl font-bold text-black">{{ localNewCar.price }} сум</span>

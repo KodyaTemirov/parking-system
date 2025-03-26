@@ -83,6 +83,7 @@
       <DialogOverlay class="fixed inset-0 z-30 bg-black/50" />
       <DialogContent
         class="fixed top-1/2 left-1/2 z-50 w-[90vw] max-w-[450px] -translate-x-1/2 -translate-y-1/2 transform rounded-md bg-white p-6 shadow-lg"
+        aria-describedby=""
       >
         <DialogTitle class="text-lg font-semibold">Добавить камеру</DialogTitle>
 

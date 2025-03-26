@@ -17,10 +17,6 @@
       type: Object,
       required: true,
     },
-    operator: {
-      type: Object,
-      required: true,
-    },
   });
 
   const appStore = useAppStore();

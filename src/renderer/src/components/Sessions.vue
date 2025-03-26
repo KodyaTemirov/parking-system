@@ -27,7 +27,6 @@
       const { data } = await axios.get(`${ipServer}/api/session`, {
         params: { page: page.value, size: size.value },
       });
-      console.log("Полученные данные:", data);
       sessionStore.setSessions([...sessionStore.sessions, ...data.data]);
       sessionStore.total = data.total;
       sessionStore.totalPages = data.totalPages;
