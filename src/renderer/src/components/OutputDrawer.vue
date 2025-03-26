@@ -3,7 +3,8 @@
   import axios from "axios";
   import { ipServer } from "@/config";
   import { ref, watch, onMounted } from "vue";
-  import { pricesData } from "@/helpers";
+  import { tariffs } from "@/config";
+
   import { useAppStore } from "@/store";
   const { success, error: showError } = useToast();
   const appStore = useAppStore();
@@ -108,11 +109,15 @@
 
       if (data.eventName === "payedToday") isOpen.value = false;
 
+      if (data) {
+        console.log("data", data);
+        localNewCar.value = {
+          ...data.session,
+          price: data.price,
+        };
+      }
       // Обновляем локальную копию и отправляем изменения в родительский компонент
-      localNewCar.value = {
-        ...data.session,
-        price: data.price,
-      };
+
       emit("update:newCar", localNewCar.value);
     } catch (err) {
       console.error(err);
@@ -141,7 +146,7 @@
       <div v-else>
         <form @submit.prevent="getCheckData" class="flex gap-2">
           <Input placeholder="Введите номер чека" v-model="checkId" />
-          <Button type="submit" @click="getCheckData">Найти</Button>
+          <Button type="submit">Найти</Button>
         </form>
       </div>
     </div>
@@ -163,7 +168,7 @@
 
     <SubTitle>
       Выбранный тариф:
-      {{ localNewCar.session && pricesData[localNewCar.session.tariffType - 1]?.value }}
+      {{ localNewCar.session && tariffs[localNewCar.session.tariffType - 1]?.value }}
     </SubTitle>
     <SubTitle>Выберите метод оплаты</SubTitle>
     <PaymentSelector v-model="localNewCar.paymentMethod" />
@@ -174,7 +179,15 @@
         Итого к оплате:
         <span class="text-2xl font-bold text-black">{{ localNewCar.price }} сум</span>
       </SubTitle>
-      <Button @click="addSessionHandler" class="w-full">Открыть ворота</Button>
+      <Button
+        @click="addSessionHandler"
+        variant="success"
+        class="flex w-full items-center justify-center gap-2"
+      >
+        <Icon icon="material-symbols:output-circle" />
+
+        Открыть ворота
+      </Button>
     </div>
   </Drawer>
 </template>

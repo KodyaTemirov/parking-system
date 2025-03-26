@@ -18,6 +18,10 @@
       type: Boolean,
       default: false,
     },
+    pricePerDay: {
+      type: Number,
+      default: 10000,
+    },
     icon: {
       type: String,
       default: "mdi-light:home",
@@ -34,7 +38,8 @@
       <div class="price-title">
         {{ props.value }}
       </div>
-      <div class="price">Цена: {{ props.price }} сум / за день</div>
+      <div class="price">Цена: {{ props.price }} сум</div>
+      <div class="price">За дополнительные дни: {{ props.pricePerDay }} сум</div>
     </div>
   </button>
 </template>

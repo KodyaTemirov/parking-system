@@ -3,10 +3,11 @@
   import axios from "axios";
   import { ipServer } from "@/config";
   import { ref, watch, onMounted } from "vue";
-  import { pricesData } from "@/helpers";
+  import { tariffs } from "@/config";
+
   import { useAppStore } from "@/store";
 
-  const { success } = useToast();
+  const { success, error: showError } = useToast();
 
   const props = defineProps({
     modelValue: {
@@ -24,8 +25,12 @@
   const emit = defineEmits(["update:modelValue", "update:newCar", "update:operator"]);
 
   const isOpen = ref(props.modelValue);
+
   const cameras = ref([]);
   const selectCam = ref(null);
+  const checkId = ref("");
+
+  const localNewCar = ref({ ...props.newCar });
 
   watch(
     () => props.modelValue,
@@ -34,9 +39,42 @@
     }
   );
 
+  watch(
+    () => props.newCar,
+    (newValue) => {
+      localNewCar.value = { ...newValue };
+    },
+    { immediate: true }
+  );
+
   watch(isOpen, (newValue) => {
     emit("update:modelValue", newValue);
   });
+
+  const getCheckData = async () => {
+    if (!checkId.value) {
+      showError("Ошибка", "Введите номер чека");
+      return;
+    }
+
+    try {
+      const { data } = await axios.get(
+        `${ipServer}/api/input/${checkId.value}?cameraIp=${selectCam.value}`
+      );
+
+      if (data.eventName === "payedToday") isOpen.value = false;
+
+      // Обновляем локальную копию и отправляем изменения в родительский компонент
+      localNewCar.value = {
+        ...data.session,
+        price: data.price,
+      };
+      emit("update:newCar", localNewCar.value);
+    } catch (err) {
+      console.error(err);
+      showError("Ошибка", "Не удалось найти данные по чеку");
+    }
+  };
 
   const addSessionHandler = async () => {
     const { number, plateImage, fullImage, eventName, paymentMethod, tariffType, cameraIp } =
@@ -85,13 +123,18 @@
   <Drawer title="Новый въезд" v-model="isOpen" position="left">
     <div class="drawer-content">
       <div class="rows">
-        <div class="row">
+        <div class="row" v-if="newCar.number">
           <span>Гос-номер:</span>
           <span class="flex items-center">
             <CarPlate :plateNumber="newCar.number" />
           </span>
         </div>
       </div>
+
+      <form v-if="!newCar.number" @submit.prevent="getCheckData" class="flex gap-2">
+        <Input placeholder="Введите номер чека" v-model="checkId" />
+        <Button type="submit">Найти</Button>
+      </form>
 
       <SubTitle>Выберите тип тарифа</SubTitle>
       <Plans v-model="newCar.tariffType" />
@@ -143,10 +186,13 @@
       <SubTitle class="flex justify-between">
         Итого к оплате:
         <span class="text-2xl font-bold text-black">
-          {{ pricesData[newCar.tariffType - 1].price }} сум
+          {{ tariffs[newCar.tariffType - 1].price }} сум
         </span>
       </SubTitle>
-      <Button @click="addSessionHandler" class="w-full">Открыть ворота</Button>
+      <Button @click="addSessionHandler" class="flex w-full items-center justify-center gap-2">
+        <Icon icon="material-symbols:input-circle" />
+        Открыть ворота
+      </Button>
     </div>
   </Drawer>
 </template>

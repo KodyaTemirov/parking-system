@@ -1,14 +1,14 @@
 <script setup>
   import { ref, computed } from "vue";
   import PlanItem from "./PlanItem.vue";
-  import { pricesData } from "@/helpers";
+  import { tariffs } from "@/config";
 
   const props = defineProps(["modelValue"]);
   const emit = defineEmits(["update:modelValue"]);
 
   // Делаем тариф с id = 1 активным по умолчанию
   const prices = ref(
-    pricesData.map((item) => ({
+    tariffs.map((item) => ({
       ...item,
       state: item.id === props.modelValue,
     }))
