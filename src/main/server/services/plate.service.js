@@ -5,7 +5,7 @@ import db from "@/db/database.js";
 import { tarifs } from "@/utils/prices.js";
 import { saveBase64Image } from "../../utils/saveBase64Image.js";
 import { handleOutputSession, handleOutputSessionId } from "../../utils/sessionFunctions.js";
-import { isEnoughTime, setInner } from "../../utils/plateFunctions.js";
+import { isEnoughTime, isInner, setInner } from "../../utils/plateFunctions.js";
 import { getSnapshot } from "../../utils/getSnapshot.js";
 import {
   calculateParkingCost,
@@ -29,19 +29,29 @@ const inputCar = async (req, res) => {
 
     const check = await isEnoughTime(number, "number");
 
+    if (!check) {
+      res.status(200).send("Not 30 sec yet");
+    }
+
+    const isInnerCheck = await isInner(number, "number");
+
+    if (isInnerCheck) {
+      getIO().emit(`notification-${operator.operatorId}`, {
+        type: "error",
+        message: `${isInnerCheck.id} уже внутри!`,
+      });
+      res.status(200).send("Car already inner");
+      return;
+    }
+
     const isPayedTodayValue = isPayedToday(number);
 
     if (isPayedTodayValue) {
       const lastSession = getLastSession(number);
 
-      getIO().emit(`payedToday-${operator.operatorId}`, {
-        number,
-        plateImage,
-        fullImage,
-        cameraIp: req.headers.host,
-        operatorId: operator.operatorId,
-        eventName: "input",
-        session: lastSession,
+      getIO().emit(`notification-${operator.operatorId}`, {
+        type: "success",
+        message: `${lastSession.id} не имеет долгов!`,
       });
 
       await setInner(number, 1, "number");
@@ -83,6 +93,17 @@ const inputCarById = async (req, res) => {
 
     if (!operator) return res.status(200).send("Operator not found");
 
+    const isInnerCheck = await isInner(id, "id");
+
+    if (isInnerCheck) {
+      getIO().emit(`notification-${operator.operatorId}`, {
+        type: "error",
+        message: `${isInnerCheck.id} уже внутри!`,
+      });
+      res.status(200).send("Car already inner");
+      return;
+    }
+
     const snapImage = await getSnapshot(cameraIp, operator.login, operator.password);
     // const snapUrl = saveBase64Image(snapImage);
 
@@ -94,6 +115,11 @@ const inputCarById = async (req, res) => {
       // await openFetchByIp(cameraIp);
 
       await setInner(id, 1, "id");
+
+      getIO().emit(`notification-${operator.operatorId}`, {
+        type: "success",
+        message: `${lastSession.id} не имеет долгов!`,
+      });
 
       res.status(200).send({
         number: null,
@@ -130,6 +156,12 @@ const outputCar = async (req, res) => {
 
     const { fullImage, plateImage, number } = parsePlateData(req.body);
 
+    const check = await isEnoughTime(number, "number");
+
+    if (!check) {
+      res.status(200).send("Car already payed today");
+    }
+
     const operator = await getCameraOperator(req.headers.host);
 
     if (!operator) return res.status(200).send("Operator not found");
@@ -154,14 +186,9 @@ const outputCar = async (req, res) => {
 
       await setInner(number, 0, "number");
 
-      getIO().emit(`payedToday-${operator.operatorId}`, {
-        number,
-        plateImage,
-        fullImage,
-        cameraIp: req.headers.host,
-        operatorId: operator.operatorId,
-        session: lastSession,
-        eventName: "output",
+      getIO().emit(`notification-${operator.operatorId}`, {
+        type: "success",
+        message: `${lastSession.id} не имеет долгов!`,
       });
 
       // await openFetchByIp(req.headers.host);
@@ -221,14 +248,9 @@ const outputCar = async (req, res) => {
 
         // await openFetchByIp(cameraIp);
 
-        getIO().emit(`payedToday-${operator.operatorId}`, {
-          number,
-          plateImage,
-          fullImage,
-          cameraIp: req.headers.host,
-          operatorId: operator.operatorId,
-          session: sessionNotEnded,
-          eventName: "output",
+        getIO().emit(`notification-${operator.operatorId}`, {
+          type: "success",
+          message: `${sessionNotEnded.id} не имеет долгов!`,
         });
       }
       return res.status(200).send("OK");
@@ -273,6 +295,11 @@ const outputCarById = async (req, res) => {
       await setInner(id, 0, "id");
 
       // await openFetchByIp(cameraIp);
+
+      getIO().emit(`notification-${operator.operatorId}`, {
+        type: "success",
+        message: `${lastSession.id} не имеет долгов!`,
+      });
 
       return res.status(200).send({
         number: null,
@@ -336,6 +363,11 @@ const outputCarById = async (req, res) => {
         // await openFetchByIp(cameraIp);
 
         await setInner(id, 0, "id");
+
+        getIO().emit(`notification-${operator.operatorId}`, {
+          type: "success",
+          message: `${sessionNotEnded.id} не имеет долгов!`,
+        });
 
         return res.status(200).send({
           number: null,

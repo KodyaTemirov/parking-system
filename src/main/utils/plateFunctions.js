@@ -94,4 +94,22 @@ const isEnoughTime = async (item, type) => {
   }
 };
 
-export { calculatePrice, openFetch, openFetchByIp, setInner, isEnoughTime };
+const isInner = async (item, type) => {
+  try {
+    const session = db
+      .prepare(
+        `SELECT * FROM sessions WHERE ${type == "number" ? "plateNumber" : "id"} = ? AND isInner = 1`
+      )
+      .get(item);
+
+    if (session) {
+      return session;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+export { calculatePrice, openFetch, openFetchByIp, setInner, isEnoughTime, isInner };
