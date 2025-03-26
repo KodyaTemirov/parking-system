@@ -7,7 +7,7 @@ import { tarifs } from "../../utils/prices.js";
 import { postInfo } from "../../utils/postInfo.js";
 import { checkInternetConnection } from "../../utils/checkInternet.js";
 import { getSnapshotSession, getParkStats, sendParkStats } from "../../utils/sessionFunctions.js";
-import { openFetch } from "../../utils/plateFunctions.js";
+import { openFetch, openFetchByIp } from "../../utils/plateFunctions.js";
 
 const registerSession = async (req, res) => {
   const { number, plateImage, fullImage, eventName, tariffType, paymentMethod, cameraIp } =
@@ -47,11 +47,7 @@ const registerSession = async (req, res) => {
   await getIO().emit("newSession", insertedData);
   await sendParkStats();
 
-  // openFetch(true, cameraIp, camera.login, camera.password);
-
-  // setTimeout(() => {
-  //   openFetch(false, cameraIp, camera.login, camera.password);
-  // }, 100);
+  // await openFetchByIp(cameraIp);
 
   // await printReceipt(number, tariffType, insertedData.startTime);
 
@@ -134,11 +130,7 @@ const outputSession = async (req, res) => {
       });
     }
 
-    // openFetch(true, cameraIp, camera.login, camera.password);
-
-    // setTimeout(() => {
-    //   openFetch(false, cameraIp, camera.login, camera.password);
-    // }, 100);
+    // await openFetchByIp(cameraIp);
 
     // await printReceipt(number, tariffType, insertedData.startTime);
 
@@ -199,11 +191,7 @@ const outputSession = async (req, res) => {
         });
       }
 
-      // openFetch(true, cameraIp, camera.login, camera.password);
-
-      // setTimeout(() => {
-      //   openFetch(false, cameraIp, camera.login, camera.password);
-      // }, 100);
+      // await openFetchByIp(cameraIp);
 
       // await printReceipt(number, tariffType, insertedData.startTime);
       res.status(201).send(insertedData);
@@ -272,11 +260,7 @@ const closeSnapshotSession = async (
       });
     }
 
-    // openFetch(true, cameraIp, camera.login, camera.password);
-
-    // setTimeout(() => {
-    //   openFetch(false, cameraIp, camera.login, camera.password);
-    // }, 100);
+    // await openFetchByIp(cameraIp);
 
     // await printReceipt(number, tariffType, insertedData.startTime);
 
@@ -335,11 +319,7 @@ const closeSnapshotSession = async (
         });
       }
 
-      // openFetch(true, cameraIp, camera.login, camera.password);
-
-      // setTimeout(() => {
-      //   openFetch(false, cameraIp, camera.login, camera.password);
-      // }, 100);
+      // await openFetchByIp(cameraIp);
 
       // await printReceipt(number, tariffType, insertedData.startTime);
 

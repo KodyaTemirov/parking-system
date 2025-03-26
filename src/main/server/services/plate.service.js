@@ -13,7 +13,7 @@ import {
   handleOutputSessionId,
   isPayedTodayId,
 } from "../../utils/sessionFunctions.js";
-import { calculatePrice, openFetch } from "../../utils/plateFunctions.js";
+import { calculatePrice, openFetch, openFetchByIp } from "../../utils/plateFunctions.js";
 import { getSnapshot } from "../../utils/getSnapshot.js";
 import {
   calculateParkingCost,
@@ -51,11 +51,7 @@ const inputCar = async (req, res) => {
       });
 
       const camera = await getCameraOperator(req.headers.host);
-      // openFetch(true, req.headers.host, camera.login, camera.password);
-
-      // setTimeout(() => {
-      //   openFetch(false, req.headers.host, camera.login, camera.password);
-      // }, 100);
+      // await openFetchByIp(req.headers.host);
 
       res.status(200).send("Car already payed today");
 
@@ -99,12 +95,7 @@ const inputCarById = async (req, res) => {
     if (isPayedTodayValue) {
       const lastSession = getLastSession(id, "id");
 
-      const camera = await getCameraOperator(cameraIp);
-      // openFetch(true, cameraIp, camera.login, camera.password);
-
-      // setTimeout(() => {
-      //   openFetch(false, cameraIp, camera.login, camera.password);
-      // }, 100);
+      // await openFetchByIp(cameraIp);
 
       res.status(200).send({
         number: null,
@@ -173,10 +164,7 @@ const outputCar = async (req, res) => {
         eventName: "output",
       });
 
-      // openFetch(true, req.headers.host, operator.login, operator.password);
-      // setTimeout(() => {
-      //   openFetch(false, req.headers.host, operator.login, operator.password);
-      // }, 100);
+      // await openFetchByIp(req.headers.host);
 
       return res.status(200).send("OK");
     } else if (session) {
@@ -229,10 +217,7 @@ const outputCar = async (req, res) => {
           outputCost: 0,
         });
 
-        // openFetch(true, req.headers.host, operator.login, operator.password);
-        // setTimeout(() => {
-        //   openFetch(false, req.headers.host, operator.login, operator.password);
-        // }, 100);
+        // await openFetchByIp(cameraIp);
 
         getIO().emit(`payedToday-${operator.operatorId}`, {
           number,
@@ -283,10 +268,7 @@ const outputCarById = async (req, res) => {
         outputCost: 0,
       });
 
-      // openFetch(true, req.headers.host, operator.login, operator.password);
-      // setTimeout(() => {
-      //   openFetch(false, req.headers.host, operator.login, operator.password);
-      // }, 100);
+      // await openFetchByIp(cameraIp);
 
       return res.status(200).send({
         number: null,
@@ -347,10 +329,7 @@ const outputCarById = async (req, res) => {
           outputCost: 0,
         });
 
-        // openFetch(true, req.headers.host, operator.login, operator.password);
-        // setTimeout(() => {
-        //   openFetch(false, req.headers.host, operator.login, operator.password);
-        // }, 100);
+        // await openFetchByIp(cameraIp);
 
         return res.status(200).send({
           number: null,

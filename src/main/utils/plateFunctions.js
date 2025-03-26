@@ -1,5 +1,6 @@
 import axios from "axios";
 import { tarifs } from "./prices";
+import { getCameraOperator } from "../server/services/camera.service";
 
 const calculatePrice = (startTime, endTime, tariffType) => {
   const start = new Date(startTime);
@@ -48,4 +49,14 @@ const openFetch = async (status, ip, login, password) => {
   }
 };
 
-export { calculatePrice, openFetch };
+const openFetchByIp = async (ip) => {
+  const camera = await getCameraOperator(ip);
+
+  openFetch(true, ip, camera.login, camera.password);
+
+  setTimeout(() => {
+    openFetch(false, ip, camera.login, camera.password);
+  }, 100);
+};
+
+export { calculatePrice, openFetch, openFetchByIp };

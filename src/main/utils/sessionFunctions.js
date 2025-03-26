@@ -2,7 +2,7 @@ import db from "../db/database.js";
 import { getCameraOperator } from "../server/services/camera.service";
 import { checkInternetConnection } from "./checkInternet.js";
 import { getSnapshot } from "./getSnapshot.js";
-import { openFetch } from "./plateFunctions.js";
+import { openFetch, openFetchByIp } from "./plateFunctions.js";
 import { postInfo } from "./postInfo.js";
 import { tarifs } from "./prices.js";
 import { saveBase64Image } from "./saveBase64Image.js";
@@ -232,11 +232,7 @@ const getSnapshotSession = async (eventName, tariffType, paymentMethod, cameraIp
 
   await getIO().emit("newSession", insertedData);
 
-  // openFetch(true, cameraIp, camera.login, camera.password);
-
-  // setTimeout(() => {
-  //   openFetch(false, cameraIp, camera.login, camera.password);
-  // }, 100);
+  // await openFetchByIp(cameraIp);
 
   res.status(201).send(insertedData);
 };
