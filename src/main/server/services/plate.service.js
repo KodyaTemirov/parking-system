@@ -105,7 +105,6 @@ const inputCarById = async (req, res) => {
     }
 
     const snapImage = await getSnapshot(cameraIp, operator.login, operator.password);
-    // const snapUrl = saveBase64Image(snapImage);
 
     const isPayedTodayValue = await isPayedToday(id, "id");
 
