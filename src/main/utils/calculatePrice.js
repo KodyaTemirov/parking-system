@@ -53,7 +53,7 @@ const isPayedToday = (item, type = "number") => {
 
   if (!session) return false;
 
-  const currentTarif = tarifs.find((tarif) => tarif.id === session.tarifId).pricePerDay;
+  const currentTarif = tarifs.find((tarif) => tarif.id === session.tariffType).pricePerDay;
 
   const payedDays = session.outputCost / currentTarif || 0;
 

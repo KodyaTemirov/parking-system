@@ -69,7 +69,8 @@ const handleOutputSessionId = async ({
   outputCost,
   cameraIp,
 }) => {
-  const stmt = db.prepare(`
+  try {
+    const stmt = db.prepare(`
     UPDATE sessions
     SET outputPlateImage = ?,
         outputFullImage = ?,
@@ -82,23 +83,25 @@ const handleOutputSessionId = async ({
     WHERE id = ?
   `);
 
-  const result = stmt.run(
-    plateImage || null,
-    fullImage || null,
-    new Date().toISOString(),
-    null,
-    outputCost,
-    paymentMethod,
-    cameraIp,
-    id
-  );
+    const result = stmt.run(
+      plateImage || null,
+      fullImage || null,
+      new Date().toISOString(),
+      null,
+      outputCost,
+      paymentMethod,
+      cameraIp,
+      id
+    );
 
-  const insertedData = db.prepare("SELECT * FROM sessions WHERE id = ?").get(id);
+    const insertedData = db.prepare("SELECT * FROM sessions WHERE id = ?").get(id);
+    const camera = await getCameraOperator(cameraIp);
+    insertedData.operatorId = camera.operatorId;
 
-  const camera = await getCameraOperator(cameraIp);
-  insertedData.operatorId = camera.operatorId;
-
-  await getIO().emit("newSession", insertedData);
+    await getIO().emit("newSession", insertedData);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const isPayedToday = (number) => {

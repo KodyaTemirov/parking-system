@@ -330,7 +330,6 @@ const outputCarById = async (req, res) => {
     } else {
       const sessionNotEnded = getLastSessionUniversal(id, "id");
       const snapImage = await getSnapshot(cameraIp, operator.login, operator.password);
-
       const price = calculateParkingCost(
         sessionNotEnded.startTime,
         tarifs.find((item) => item.id == sessionNotEnded.tariffType).pricePerDay
@@ -350,8 +349,8 @@ const outputCarById = async (req, res) => {
       } else {
         const snapUrl = saveBase64Image(snapImage);
 
-        handleOutputSession({
-          number: null,
+        handleOutputSessionId({
+          id: id,
           plateImageFile: null,
           paymentMethod: 1,
           cameraIp: cameraIp,
@@ -380,6 +379,7 @@ const outputCarById = async (req, res) => {
       }
     }
   } catch (error) {
+    console.log(error);
     res.status(400).send(error);
   }
 };
