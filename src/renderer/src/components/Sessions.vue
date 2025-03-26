@@ -3,8 +3,15 @@
   import { ipServer } from "@/config";
   import { useSessionsStore } from "@/store/SessionsStore";
   import { pricesData, socket, calculateDuration } from "@/helpers";
-  import { onMounted } from "vue";
+  import { onMounted, ref, watch } from "vue";
+
   const sessionStore = useSessionsStore();
+  const page = ref(1);
+  const size = ref(10);
+  const observer = ref(null);
+  const searchQuery = ref("");
+  const searchPage = ref(1);
+  const searchObserver = ref(null);
 
   socket.on("newSession", async (info) => {
     try {
@@ -15,21 +22,112 @@
   });
 
   const getAllSession = async () => {
+    if (sessionStore.totalPages !== 0 && page.value > sessionStore.totalPages) return;
     try {
-      const { data } = await axios.get(`${ipServer}/api/session`);
-      sessionStore.setSessions(data.data);
+      const { data } = await axios.get(`${ipServer}/api/session`, {
+        params: { page: page.value, size: size.value },
+      });
+      console.log("Полученные данные:", data);
+      sessionStore.setSessions([...sessionStore.sessions, ...data.data]);
+      sessionStore.total = data.total;
+      sessionStore.totalPages = data.totalPages;
+      page.value++;
     } catch (error) {
-      console.log(error, "ERRROR");
+      console.log(error, "ERROR");
     }
+  };
+
+  const loadMoreSearchResults = async () => {
+    if (!searchQuery.value) return;
+
+    if (searchPage.value > sessionStore.totalPages) return;
+    try {
+      const { data } = await axios.get(`${ipServer}/api/session`, {
+        params: { search: searchQuery.value, page: searchPage.value, size: size.value },
+      });
+
+      const newSessions = data.data.filter(
+        (s) => !sessionStore.sessions.some((existing) => existing.id === s.id)
+      );
+      sessionStore.setSessions([...sessionStore.sessions, ...newSessions]);
+      searchPage.value++;
+    } catch (error) {
+      console.log(error, "ERROR");
+    }
+  };
+
+  const searchSessions = async () => {
+    searchPage.value = 1; // Сбрасываем страницу поиска при новом запросе
+
+    if (!searchQuery.value) {
+      page.value = 1;
+      setupObserver(); // Включаем основной Observer после очистки поиска
+      return;
+    }
+
+    try {
+      observer.value?.disconnect(); // Отключаем обычный Observer
+
+      const { data } = await axios.get(`${ipServer}/api/session`, {
+        params: { search: searchQuery.value, page: searchPage.value, size: size.value },
+      });
+      sessionStore.setSessions(data.data);
+      sessionStore.total = data.total;
+      sessionStore.totalPages = data.totalPages;
+      searchPage.value++;
+      setupSearchObserver(); // Включаем Observer для поиска
+    } catch (error) {
+      console.log(error, "ERROR");
+    }
+  };
+
+  const setupObserver = () => {
+    if (observer.value) observer.value.disconnect();
+
+    observer.value = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        getAllSession();
+      }
+    });
+
+    observer.value.observe(document.querySelector("#load-more"));
+  };
+
+  const setupSearchObserver = () => {
+    if (searchObserver.value) searchObserver.value.disconnect();
+
+    searchObserver.value = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        loadMoreSearchResults();
+      }
+    });
+
+    searchObserver.value.observe(document.querySelector("#load-more"));
   };
 
   onMounted(() => {
     getAllSession();
+    setupObserver();
+  });
+
+  watch(searchQuery, (newVal) => {
+    if (!newVal) {
+      setupObserver(); // Если поисковый запрос очистился — включаем обычный Observer
+    }
   });
 </script>
 
 <template>
-  <SubTitle>Парковочные сессии {{ sessionStore.sessions.length }}</SubTitle>
+  <SubTitle class="flex items-center justify-between">
+    Парковочные сессии {{ sessionStore.sessions.length }}
+
+    <input
+      v-model="searchQuery"
+      @input="searchSessions"
+      placeholder="Поиск по гос-номеру..."
+      class="mb-4 rounded border border-gray-300 p-2"
+    />
+  </SubTitle>
   <table
     class="min-w-full overflow-hidden rounded-lg border border-gray-200 bg-white"
     v-if="sessionStore.sessions.length"
@@ -64,6 +162,7 @@
     </tbody>
   </table>
   <div v-else>Сессий нет</div>
+  <div id="load-more" class="h-10"></div>
 </template>
 
 <style scoped>

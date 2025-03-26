@@ -61,7 +61,6 @@
 
   const socketsConnect = (operator) => {
     if (!operator) return;
-    console.log("socketConnect", operator);
     socket.on(`inputCar-${operator}`, async (data) => {
       inputCar.value = { ...initialCar, ...data };
       isOpenInput.value = true;
@@ -70,9 +69,9 @@
     // Выводим уведомление если ранее оплачивал
     socket.on(`notification-${operator}`, async (data) => {
       if (data.type === "error") {
-        error(data.message);
+        error("Ошибка", data.message);
       } else if (data.type === "success") {
-        success(data.message);
+        success("Успешно", data.message);
       }
     });
 
