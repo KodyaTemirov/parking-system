@@ -5,7 +5,7 @@
   import axios from "axios";
   import { ipServer } from "@/config";
   import { useToast } from "@/composables";
-  const { success } = useToast();
+  const { success, error } = useToast();
 
   const sessionStore = useSessionsStore();
   const appStore = useAppStore();
@@ -59,31 +59,44 @@
     isOpenOutput.value = true;
   };
 
-  watch(appStore.selectedOperator, (newOperator, oldOperator) => {
-    if (oldOperator) {
-      socket.off(`inputCar-${oldOperator}`);
-      socket.off(`outputCar-${oldOperator}`);
-      socket.off(`payedToday-${oldOperator}`);
+  const socketsConnect = (operator) => {
+    if (!operator) return;
+    console.log("socketConnect", operator);
+    socket.on(`inputCar-${operator}`, async (data) => {
+      inputCar.value = { ...initialCar, ...data };
+      isOpenInput.value = true;
+    });
+
+    // Выводим уведомление если ранее оплачивал
+    socket.on(`notification-${operator}`, async (data) => {
+      if (data.type === "error") {
+        error(data.message);
+      } else if (data.type === "success") {
+        success(data.message);
+      }
+    });
+
+    socket.on(`outputCar-${operator}`, async (data) => {
+      outputCar.value = data;
+      isOpenOutput.value = true;
+    });
+  };
+
+  const socketOff = (operator) => {
+    socket.off(`inputCar-${operator}`);
+    socket.off(`outputCar-${operator}`);
+    socket.off(`notification-${operator}`);
+  };
+
+  watch(
+    () => appStore.selectedOperator,
+    (newValue, oldValue) => {
+      if (newValue) {
+        socketsConnect(newValue);
+        socketOff(oldValue);
+      }
     }
-
-    if (newOperator) {
-      socket.connect();
-      socket.on(`inputCar-${newOperator}`, async (data) => {
-        inputCar.value = { ...initialCar, ...data };
-        isOpenInput.value = true;
-      });
-
-      // Выводим уведомление если ранее оплачивал
-      socket.on(`payedToday-${newOperator}`, async (data) => {
-        success("Ворота открываются", "ID: " + data.id + " ранее оплачивал");
-      });
-
-      socket.on(`outputCar-${newOperator}`, async (data) => {
-        outputCar.value = data;
-        isOpenOutput.value = true;
-      });
-    }
-  });
+  );
 
   onMounted(async () => {
     socket.connect();

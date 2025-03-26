@@ -4,9 +4,9 @@
   import { ipServer } from "@/config";
   import { ref, watch, onMounted } from "vue";
   import { pricesData } from "@/helpers";
-
+  import { useAppStore } from "@/store";
   const { success, error: showError } = useToast();
-
+  const appStore = useAppStore();
   const props = defineProps({
     modelValue: {
       type: Boolean,
@@ -37,9 +37,11 @@
   );
 
   const getCams = async (operator) => {
+    console.log("operator", operator);
     try {
       const { data } = await axios.get(`${ipServer}/api/camera/operators/${operator}`);
       cameras.value = data;
+      console.log("kameralar", data);
       selectCam.value = data.length > 0 ? data[0].ip : null;
     } catch (err) {
       console.error(err);
@@ -48,7 +50,7 @@
   };
 
   watch(
-    () => props.operator,
+    () => appStore.selectedOperator,
     (newValue) => {
       if (newValue) getCams(newValue);
     }
@@ -102,6 +104,8 @@
         `${ipServer}/api/output/${checkId.value}?cameraIp=${selectCam.value}`
       );
 
+      if (data.eventName === "payedToday") isOpen.value = false;
+
       // Обновляем локальную копию и отправляем изменения в родительский компонент
       localNewCar.value = {
         ...data.session,
@@ -115,7 +119,7 @@
   };
 
   onMounted(() => {
-    if (props.operator) getCams(props.operator);
+    if (props.operator) getCams(appStore.selectedOperator);
   });
 </script>
 
@@ -189,7 +193,9 @@
   .camera-card {
     @apply cursor-pointer rounded-lg border-2 border-gray-200 p-4 text-center;
   }
-
+  .camera-selector {
+    @apply grid grid-cols-2 gap-4;
+  }
   .camera-card.selected {
     @apply border-blue-500 bg-blue-100;
   }
