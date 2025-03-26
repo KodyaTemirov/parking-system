@@ -279,9 +279,7 @@ const closeSnapshotSession = async (req, res) => {
         id
       );
 
-      const insertedData = db
-        .prepare("SELECT * FROM sessions WHERE id = ?")
-        .get(lastPaidSession.id);
+      const insertedData = db.prepare("SELECT * FROM sessions WHERE id = ?").get(id);
 
       const camera = await getCameraOperator(cameraIp);
       insertedData.operatorId = camera.operatorId;
