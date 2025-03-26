@@ -134,6 +134,14 @@ const outputSession = async (req, res) => {
       });
     }
 
+    // openFetch(true, cameraIp, camera.login, camera.password);
+
+    // setTimeout(() => {
+    //   openFetch(false, cameraIp, camera.login, camera.password);
+    // }, 100);
+
+    // await printReceipt(number, tariffType, insertedData.startTime);
+
     res.status(201).send(insertedData);
   } else {
     const lastPaidSession = db
@@ -191,6 +199,13 @@ const outputSession = async (req, res) => {
         });
       }
 
+      // openFetch(true, cameraIp, camera.login, camera.password);
+
+      // setTimeout(() => {
+      //   openFetch(false, cameraIp, camera.login, camera.password);
+      // }, 100);
+
+      // await printReceipt(number, tariffType, insertedData.startTime);
       res.status(201).send(insertedData);
     }
   }
@@ -257,6 +272,14 @@ const closeSnapshotSession = async (
       });
     }
 
+    // openFetch(true, cameraIp, camera.login, camera.password);
+
+    // setTimeout(() => {
+    //   openFetch(false, cameraIp, camera.login, camera.password);
+    // }, 100);
+
+    // await printReceipt(number, tariffType, insertedData.startTime);
+
     return insertedData;
   } else {
     const lastPaidSession = db
@@ -312,6 +335,14 @@ const closeSnapshotSession = async (
         });
       }
 
+      // openFetch(true, cameraIp, camera.login, camera.password);
+
+      // setTimeout(() => {
+      //   openFetch(false, cameraIp, camera.login, camera.password);
+      // }, 100);
+
+      // await printReceipt(number, tariffType, insertedData.startTime);
+
       return insertedData;
     }
   }
@@ -355,4 +386,4 @@ const getSessionsInfo = async (req, res) => {
   }
 };
 
-export { registerSession, getSessions, outputSession, getSessionsInfo, closeSnapshotSession };
+export { registerSession, getSessions, outputSession, getSessionsInfo };

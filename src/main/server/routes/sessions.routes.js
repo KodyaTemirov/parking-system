@@ -4,7 +4,6 @@ import {
   registerSession,
   getSessionsInfo,
   outputSession,
-  closeSnapshotSession,
 } from "../services/sessions.service.js";
 
 const router = Router();
