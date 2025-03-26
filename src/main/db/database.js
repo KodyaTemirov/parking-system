@@ -54,7 +54,9 @@ db.prepare(
     outputPaymentMethod INTEGER,
     isSync INTEGER DEFAULT 0,
     cameraIp TEXT,
-    isUpdated INTEGER DEFAULT 0
+    isUpdated INTEGER DEFAULT 0,
+    isInner INTEGER DEFAULT 1,
+    lastActivity TEXT
   );
 `
 ).run();

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { tarifs } from "./prices";
 import { getCameraOperator } from "../server/services/camera.service";
+import db from "../db/database.js";
 
 const calculatePrice = (startTime, endTime, tariffType) => {
   const start = new Date(startTime);
@@ -59,4 +60,31 @@ const openFetchByIp = async (ip) => {
   }, 100);
 };
 
-export { calculatePrice, openFetch, openFetchByIp };
+const setInner = async (item, value, type = "number") => {
+  try {
+    const stmt = db.prepare(`UPDATE sessions set isInner = ?, lastActivity = ? WHERE ${type} = ?`);
+
+    stmt.run(value, new Date().toISOString(), item);
+  } catch (error) {
+    console.error("Ошибка запроса:", error.message);
+  }
+};
+
+const isEnoughTime = async (item, type) => {
+  const session = db.prepare(`SELECT * FROM sessions WHERE ${type} = ?`).get(item);
+
+  if (session) {
+    const lastActivity = new Date(session.lastActivity);
+    const now = new Date();
+    const timeDiff = now - lastActivity;
+    if (timeDiff > 30000) {
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return true;
+  }
+};
+
+export { calculatePrice, openFetch, openFetchByIp, setInner, isEnoughTime };

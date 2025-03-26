@@ -7,7 +7,7 @@ import { tarifs } from "../../utils/prices.js";
 import { postInfo } from "../../utils/postInfo.js";
 import { checkInternetConnection } from "../../utils/checkInternet.js";
 import { getSnapshotSession, getParkStats, sendParkStats } from "../../utils/sessionFunctions.js";
-import { openFetch, openFetchByIp } from "../../utils/plateFunctions.js";
+import { openFetch, openFetchByIp, setInner } from "../../utils/plateFunctions.js";
 
 const registerSession = async (req, res) => {
   const { number, plateImage, fullImage, eventName, tariffType, paymentMethod, cameraIp } =
@@ -22,8 +22,8 @@ const registerSession = async (req, res) => {
 
   const stmt = db.prepare(`
     INSERT INTO sessions
-      (plateNumber, inputPlateImage, inputFullImage, startTime, tariffType, duration, inputCost, inputPaymentMethod,cameraIp)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (plateNumber, inputPlateImage, inputFullImage, startTime, tariffType, duration, inputCost, inputPaymentMethod,cameraIp,lastActivity)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)
   `);
 
   const result = stmt.run(
@@ -35,7 +35,8 @@ const registerSession = async (req, res) => {
     null,
     tarifs.find((item) => item.id == tariffType).price,
     paymentMethod,
-    cameraIp
+    cameraIp,
+    new Date().toISOString()
   );
 
   const insertedData = db
@@ -48,8 +49,6 @@ const registerSession = async (req, res) => {
   await sendParkStats();
 
   // await openFetchByIp(cameraIp);
-
-  // await printReceipt(number, tariffType, insertedData.startTime);
 
   if (checkInternetConnection()) {
     insertedData.event = "input";
@@ -132,7 +131,7 @@ const outputSession = async (req, res) => {
 
     // await openFetchByIp(cameraIp);
 
-    // await printReceipt(number, tariffType, insertedData.startTime);
+    await setInner(number, 0, "number");
 
     res.status(201).send(insertedData);
   } else {
@@ -192,8 +191,8 @@ const outputSession = async (req, res) => {
       }
 
       // await openFetchByIp(cameraIp);
+      await setInner(number, 0, "number");
 
-      // await printReceipt(number, tariffType, insertedData.startTime);
       res.status(201).send(insertedData);
     }
   }
@@ -262,7 +261,7 @@ const closeSnapshotSession = async (
 
     // await openFetchByIp(cameraIp);
 
-    // await printReceipt(number, tariffType, insertedData.startTime);
+    await setInner(id, 0, "id");
 
     return insertedData;
   } else {
@@ -321,7 +320,7 @@ const closeSnapshotSession = async (
 
       // await openFetchByIp(cameraIp);
 
-      // await printReceipt(number, tariffType, insertedData.startTime);
+      await setInner(id, 0, "id");
 
       return insertedData;
     }

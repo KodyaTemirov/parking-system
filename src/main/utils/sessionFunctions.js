@@ -200,8 +200,8 @@ const getSnapshotSession = async (eventName, tariffType, paymentMethod, cameraIp
 
   const stmt = db.prepare(`
     INSERT INTO sessions
-      (plateNumber, inputFullImage, startTime, tariffType, duration, inputCost, inputPaymentMethod,cameraIp)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      (plateNumber, inputFullImage, startTime, tariffType, duration, inputCost, inputPaymentMethod,cameraIp, lastActivity)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)
   `);
 
   const result = stmt.run(
@@ -212,7 +212,8 @@ const getSnapshotSession = async (eventName, tariffType, paymentMethod, cameraIp
     null,
     tarifs.find((item) => item.id == tariffType).price,
     paymentMethod,
-    cameraIp
+    cameraIp,
+    new Date().toISOString()
   );
 
   const insertedData = db

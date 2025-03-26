@@ -13,7 +13,13 @@ import {
   handleOutputSessionId,
   isPayedTodayId,
 } from "../../utils/sessionFunctions.js";
-import { calculatePrice, openFetch, openFetchByIp } from "../../utils/plateFunctions.js";
+import {
+  calculatePrice,
+  isEnoughTime,
+  openFetch,
+  openFetchByIp,
+  setInner,
+} from "../../utils/plateFunctions.js";
 import { getSnapshot } from "../../utils/getSnapshot.js";
 import {
   calculateParkingCost,
@@ -35,6 +41,10 @@ const inputCar = async (req, res) => {
 
     const { fullImage, plateImage, number } = parsePlateData(req.body);
 
+    const check = await isEnoughTime(number, "number");
+
+    console.log(check);
+
     const isPayedTodayValue = await isPayedToday(number);
 
     if (isPayedTodayValue) {
@@ -49,6 +59,8 @@ const inputCar = async (req, res) => {
         eventName: "input",
         session: lastSession,
       });
+
+      await setInner(number, 1, "number");
 
       const camera = await getCameraOperator(req.headers.host);
       // await openFetchByIp(req.headers.host);
@@ -96,6 +108,8 @@ const inputCarById = async (req, res) => {
       const lastSession = getLastSession(id, "id");
 
       // await openFetchByIp(cameraIp);
+
+      await setInner(id, 1, "id");
 
       res.status(200).send({
         number: null,
@@ -153,6 +167,8 @@ const outputCar = async (req, res) => {
         fullImageFile,
         outputCost: 0,
       });
+
+      await setInner(number, 0, "number");
 
       getIO().emit(`payedToday-${operator.operatorId}`, {
         number,
@@ -217,6 +233,8 @@ const outputCar = async (req, res) => {
           outputCost: 0,
         });
 
+        await setInner(number, 0, "number");
+
         // await openFetchByIp(cameraIp);
 
         getIO().emit(`payedToday-${operator.operatorId}`, {
@@ -267,6 +285,8 @@ const outputCarById = async (req, res) => {
         fullImageFile: snapUrl,
         outputCost: 0,
       });
+
+      await setInner(id, 0, "id");
 
       // await openFetchByIp(cameraIp);
 
@@ -330,6 +350,8 @@ const outputCarById = async (req, res) => {
         });
 
         // await openFetchByIp(cameraIp);
+
+        await setInner(id, 0, "id");
 
         return res.status(200).send({
           number: null,
