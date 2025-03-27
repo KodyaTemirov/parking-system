@@ -1,5 +1,4 @@
 import db from "@/db/database.js";
-import { getIO } from "../../utils/socket.js";
 
 const getCameras = async (req, res) => {
   try {

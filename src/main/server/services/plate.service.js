@@ -1,7 +1,6 @@
 import { parsePlateData } from "@/utils/parsePlateData.js";
 import { getIO } from "../../utils/socket";
 import { getCameraOperator } from "./camera.service.js";
-import db from "@/db/database.js";
 import { tariffs } from "@/config";
 import { saveBase64Image } from "../../utils/saveBase64Image.js";
 import { handleOutputSession, handleOutputSessionId } from "../../utils/sessionFunctions.js";
