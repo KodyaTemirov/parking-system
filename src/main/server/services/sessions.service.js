@@ -1,12 +1,12 @@
 import db from "@/db/database.js";
-import { getIO } from "../../utils/socket.js";
+import { getIO } from "@/utils/socket.js";
 import { getCameraOperator } from "./camera.service.js";
-import { saveBase64Image } from "../../utils/saveBase64Image.js";
+import { saveBase64Image } from "@/utils/saveBase64Image.js";
 import { tariffs } from "@/config";
-import { postInfo } from "../../utils/postInfo.js";
-import { checkInternetConnection } from "../../utils/checkInternet.js";
-import { getSnapshotSession, getParkStats, sendParkStats } from "../../utils/sessionFunctions.js";
-import { openFetchByIp, setInner } from "../../utils/plateFunctions.js";
+import { postInfo } from "@/utils/postInfo.js";
+import { checkInternetConnection } from "@/utils/checkInternet.js";
+import { getSnapshotSession, getParkStats, sendParkStats } from "@/utils/sessionFunctions.js";
+import { openFetchByIp, setInner } from "@/utils/plateFunctions.js";
 
 const registerSession = async (req, res) => {
   const { number, plateImage, fullImage, eventName, tariffType, paymentMethod, cameraIp } =

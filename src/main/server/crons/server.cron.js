@@ -1,12 +1,12 @@
 import axios from "axios";
 import cron from "node-cron";
 import db from "../../db/database.js";
-import { checkInternetConnection } from "../../utils/checkInternet.js";
-import { isPayedToday } from "../../utils/calculatePrice.js";
-import { deleteSession } from "../../utils/sessionFunctions.js";
-import { deleteImageFile } from "../../utils/saveBase64Image.js";
-import { getImageFile } from "../../utils/getImageFile.js";
-import { uploadImage } from "../../utils/postInfo.js";
+import { checkInternetConnection } from "@/utils/checkInternet.js";
+import { isPayedToday } from "@/utils/calculatePrice.js";
+import { deleteSession } from "@/utils/sessionFunctions.js";
+import { deleteImageFile } from "@/utils/saveBase64Image.js";
+import { getImageFile } from "@/utils/getImageFile.js";
+import { uploadImage } from "@/utils/postInfo.js";
 
 const startCronJob = () => {
   cron.schedule("*/10 * * * *", async () => {

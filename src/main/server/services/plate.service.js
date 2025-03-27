@@ -1,17 +1,17 @@
 import { parsePlateData } from "@/utils/parsePlateData.js";
-import { getIO } from "../../utils/socket";
+import { getIO } from "@/utils/socket";
 import { getCameraOperator } from "./camera.service.js";
 import { tariffs } from "@/config";
-import { saveBase64Image } from "../../utils/saveBase64Image.js";
-import { handleOutputSession, handleOutputSessionId } from "../../utils/sessionFunctions.js";
-import { isEnoughTime, isInner, setInner } from "../../utils/plateFunctions.js";
-import { getSnapshot } from "../../utils/getSnapshot.js";
+import { saveBase64Image } from "@/utils/saveBase64Image.js";
+import { handleOutputSession, handleOutputSessionId } from "@/utils/sessionFunctions.js";
+import { isEnoughTime, isInner, setInner } from "@/utils/plateFunctions.js";
+import { getSnapshot } from "@/utils/getSnapshot.js";
 import {
   calculateParkingCost,
   getLastSession,
   getLastSessionUniversal,
   isPayedToday,
-} from "../../utils/calculatePrice.js";
+} from "@/utils/calculatePrice.js";
 
 const inputCar = async (req, res) => {
   try {
