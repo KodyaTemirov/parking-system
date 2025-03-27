@@ -30,7 +30,7 @@ const inputCar = async (req, res) => {
     const check = await isEnoughTime(number, "number");
 
     if (!check) {
-      res.status(200).send("Not 30 sec yet");
+      return res.status(200).send("Not 30 sec yet");
     }
 
     const isInnerCheck = await isInner(number, "number");
@@ -158,7 +158,7 @@ const outputCar = async (req, res) => {
     const check = await isEnoughTime(number, "number");
 
     if (!check) {
-      res.status(200).send("Not 30 sec yet");
+      return res.status(200).send("Not 30 sec yet");
     }
 
     const operator = await getCameraOperator(req.headers.host);
