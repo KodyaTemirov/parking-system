@@ -68,7 +68,8 @@
   });
 
   const addSessionHandler = async () => {
-    const { number, plateImage, fullImage, paymentMethod, tariffType, price } = localNewCar.value;
+    const { number, plateImage, fullImage, paymentMethod, tariffType, price, id } =
+      localNewCar.value;
 
     if (!price) {
       showError("Ошибка", "Заполните все обязательные поля");
@@ -84,6 +85,7 @@
         tariffType: tariffType || 1,
         cameraIp: selectCam.value,
         outputCost: price,
+        id: id || null,
       });
 
       console.log("localNewCar.value", localNewCar.value);
