@@ -2,6 +2,9 @@ import axios from "axios";
 import cron from "node-cron";
 import db from "../../db/database.js";
 import { checkInternetConnection } from "../../utils/checkInternet.js";
+import { isPayedToday } from "../../utils/calculatePrice.js";
+import { deleteSession } from "../../utils/sessionFunctions.js";
+import { deleteImageFile } from "../../utils/saveBase64Image.js";
 
 const startCronJob = () => {
   cron.schedule("0 0,12 * * *", async () => {
@@ -41,8 +44,36 @@ const startCronJob = () => {
     );
   });
 
-  cron.schedule("0 0 1 * *", () => {
-    console.log("Крон запущен 1 числа каждого месяца");
+  cron.schedule("0 0 * * *", () => {
+    const stmt = db.prepare(
+      `SELECT * FROM sessions where isUpdated = 0 and isSync = 1 and endTime is not null and isInner = 0`
+    );
+
+    const sessions = stmt.all();
+
+    const filteredSessions = sessions.filter((session) => {
+      const startTime = new Date(session.startTime);
+      const endTime = new Date();
+      const diffTime = Math.abs(endTime - startTime);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays >= 30;
+    });
+
+    for (const session of filteredSessions) {
+      const isPayed = isPayedToday(
+        session.plateNumber || session.id,
+        session.plateNumber ? "number" : "id"
+      );
+
+      if (!isPayed) {
+        deleteImageFile(session.inputPlateImage);
+        deleteImageFile(session.inputFullImage);
+        deleteImageFile(session.outputPlateImage);
+        deleteImageFile(session.outputFullImage);
+
+        deleteSession(session.id);
+      }
+    }
   });
 };
 

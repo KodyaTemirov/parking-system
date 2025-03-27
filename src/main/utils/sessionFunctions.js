@@ -349,6 +349,11 @@ const sendParkStats = async () => {
   }
 };
 
+const deleteSession = (id) => {
+  const stmt = db.prepare(`DELETE FROM sessions WHERE id = ?`);
+  stmt.run(id);
+};
+
 export {
   getSessionByNumber,
   handleOutputSession,
@@ -361,4 +366,5 @@ export {
   getSnapshotSession,
   getParkStats,
   sendParkStats,
+  deleteSession,
 };
