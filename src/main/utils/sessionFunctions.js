@@ -57,7 +57,7 @@ const handleOutputSession = async ({
     const camera = await getCameraOperator(cameraIp);
 
     insertedData.operatorId = camera.operatorId;
-    await getIO().emit("newSession", insertedData);
+    await getIO().emit("newUpdate", insertedData);
   } catch (error) {
     throw error;
   }
@@ -100,7 +100,7 @@ const handleOutputSessionId = async ({
     const camera = await getCameraOperator(cameraIp);
     insertedData.operatorId = camera.operatorId;
 
-    await getIO().emit("newSession", insertedData);
+    await getIO().emit("newUpdate", insertedData);
   } catch (error) {
     console.log(error);
   }

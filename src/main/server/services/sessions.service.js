@@ -118,7 +118,7 @@ const outputSession = async (req, res) => {
     const camera = await getCameraOperator(cameraIp);
     insertedData.operatorId = camera.operatorId;
 
-    await getIO().emit("newSession", insertedData);
+    await getIO().emit("newUpdate", insertedData);
     await sendParkStats();
 
     if (checkInternetConnection()) {
@@ -179,7 +179,7 @@ const outputSession = async (req, res) => {
       const camera = await getCameraOperator(cameraIp);
       insertedData.operatorId = camera.operatorId;
 
-      await getIO().emit("newSession", insertedData);
+      await getIO().emit("newUpdate", insertedData);
       await sendParkStats();
 
       if (checkInternetConnection()) {
@@ -248,7 +248,7 @@ const closeSnapshotSession = async (
     const camera = await getCameraOperator(cameraIp);
     insertedData.operatorId = camera.operatorId;
 
-    await getIO().emit("newSession", insertedData);
+    await getIO().emit("newUpdate", insertedData);
     await sendParkStats();
 
     if (checkInternetConnection()) {
@@ -307,7 +307,7 @@ const closeSnapshotSession = async (
       const camera = await getCameraOperator(cameraIp);
       insertedData.operatorId = camera.operatorId;
 
-      await getIO().emit("newSession", insertedData);
+      await getIO().emit("newUpdate", insertedData);
       await sendParkStats();
 
       if (checkInternetConnection()) {

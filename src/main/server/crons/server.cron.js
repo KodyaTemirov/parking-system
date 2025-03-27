@@ -5,51 +5,57 @@ import { checkInternetConnection } from "../../utils/checkInternet.js";
 import { isPayedToday } from "../../utils/calculatePrice.js";
 import { deleteSession } from "../../utils/sessionFunctions.js";
 import { deleteImageFile } from "../../utils/saveBase64Image.js";
+import { getImageFile } from "../../utils/getImageFile.js";
+import { uploadImage } from "../../utils/postInfo.js";
 
 const startCronJob = () => {
-  cron.schedule("*/10 * * * *", async () => {
-    if (!checkInternetConnection()) return;
+  cron.schedule("*/12 * * * *", async () => {
+    try {
+      if (!checkInternetConnection()) return;
 
-    const stmt = db.prepare("SELECT * FROM sessions where isUpdated = 1 or isSync = 0");
-    const sessions = stmt.all();
-    for (const item of sessions) {
-      if (item.inputPlateImage != null && item.inputFullImage != null) {
-        const image = getImageFile(item.inputPlateImage);
-        const imageFull = getImageFile(item.inputFullImage);
+      const stmt = db.prepare("SELECT * FROM sessions where isUpdated = 1 or isSync = 0");
+      const sessions = stmt.all();
+      for (const item of sessions) {
+        if (item.inputPlateImage != null && item.inputFullImage != null) {
+          const image = getImageFile(item.inputPlateImage);
+          const imageFull = getImageFile(item.inputFullImage);
 
-        const plateImageId = await uploadImage(image);
-        const fullImageId = await uploadImage(imageFull);
+          const plateImageId = await uploadImage(image);
+          const fullImageId = await uploadImage(imageFull);
 
-        item.inputPlateImage = plateImageId;
-        item.inputFullImage = fullImageId;
+          item.inputPlateImage = plateImageId;
+          item.inputFullImage = fullImageId;
+        }
+        if (item.outputPlateImage != null && item.outputFullImage != null) {
+          const image = getImageFile(item.outputPlateImage);
+          const imageFull = getImageFile(item.outputFullImage);
+
+          const plateImageId = await uploadImage(image);
+          const fullImageId = await uploadImage(imageFull);
+
+          item.outputPlateImage = plateImageId;
+          item.outputFullImage = fullImageId;
+        }
       }
-      if (item.outputPlateImage != null && item.outputFullImage != null) {
-        const image = getImageFile(item.outputPlateImage);
-        const imageFull = getImageFile(item.outputFullImage);
 
-        const plateImageId = await uploadImage(image);
-        const fullImageId = await uploadImage(imageFull);
-
-        item.outputPlateImage = plateImageId;
-        item.outputFullImage = fullImageId;
-      }
-    }
-
-    axios.post(
-      `https://raqamli-bozor.uz/services/platon-core/api/v2/desktop/market/vehicles`,
-      {
-        data: sessions,
-      },
-      {
-        headers: {
-          token: "68fa03a7-ff2f-cfdf-bbe7-c4e42e93a13e",
+      axios.post(
+        `https://raqamli-bozor.uz/services/platon-core/api/v2/desktop/market/vehicles`,
+        {
+          data: sessions,
         },
-      }
-    );
+        {
+          headers: {
+            token: "68fa03a7-ff2f-cfdf-bbe7-c4e42e93a13e",
+          },
+        }
+      );
 
-    db.prepare("UPDATE sessions SET isSync = 1, isUpdated = 0 WHERE id IN (?)").run(
-      sessions.map((session) => session.id)
-    );
+      db.prepare("UPDATE sessions SET isSync = 1, isUpdated = 0 WHERE id IN (?)").run(
+        sessions.map((session) => session.id)
+      );
+    } catch (error) {
+      console.log(error);
+    }
   });
 
   cron.schedule("0 0 * * *", () => {
