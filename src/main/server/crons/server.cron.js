@@ -40,6 +40,10 @@ const startCronJob = () => {
       sessions.map((session) => session.id)
     );
   });
+
+  cron.schedule("0 0 1 * *", () => {
+    console.log("Крон запущен 1 числа каждого месяца");
+  });
 };
 
 export default startCronJob;

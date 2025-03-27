@@ -337,8 +337,8 @@ const getSessions = (req, res) => {
   let params = [];
 
   if (search) {
-    query += " WHERE plateNumber LIKE ?";
-    countQuery += " WHERE plateNumber LIKE ?";
+    query += " WHERE LOWER(plateNumber) LIKE LOWER(?) ?";
+    countQuery += " WHERE LOWER(plateNumber) LIKE LOWER(?) ?";
     params.push(`%${search}%`);
   }
 
