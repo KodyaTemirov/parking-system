@@ -5,7 +5,7 @@ import { getSnapshot } from "./getSnapshot.js";
 import { openFetch, openFetchByIp } from "./plateFunctions.js";
 import { postInfo } from "./postInfo.js";
 import { tariffs } from "@/config";
-import { saveBase64Image } from "./saveBase64Image.js";
+import { deleteImageFile, saveBase64Image } from "./saveBase64Image.js";
 import { getIO } from "./socket.js";
 
 const getSessionByNumber = (number) => {
@@ -26,8 +26,17 @@ const handleOutputSession = async ({
 }) => {
   try {
     const session = db
-      .prepare(`SELECT MAX(id) as id FROM sessions WHERE plateNumber = ?`)
+      .prepare(`SELECT * FROM sessions WHERE plateNumber = ? order by id desc limit 1`)
       .get(number);
+
+    if (session.outputPlateImage) {
+      deleteImageFile(session.outputPlateImage);
+    }
+
+    if (session.outputFullImage) {
+      deleteImageFile(session.outputFullImage);
+    }
+
     const stmt = db.prepare(`
     UPDATE sessions
     SET outputPlateImage = ?,
@@ -72,6 +81,16 @@ const handleOutputSessionId = async ({
   cameraIp,
 }) => {
   try {
+    const session = db.prepare(`SELECT * FROM sessions WHERE id = ?`).get(id);
+
+    if (session.outputPlateImage) {
+      deleteImageFile(session.outputPlateImage);
+    }
+
+    if (session.outputFullImage) {
+      deleteImageFile(session.outputFullImage);
+    }
+
     const stmt = db.prepare(`
     UPDATE sessions
     SET outputPlateImage = ?,
