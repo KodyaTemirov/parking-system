@@ -12,6 +12,7 @@ const startCronJob = () => {
   cron.schedule("*/10 * * * *", async () => {
     try {
       if (!checkInternetConnection()) return;
+      console.log("CRON STARTED ===================================");
 
       const stmt = db.prepare("SELECT * FROM sessions where isUpdated = 1 or isSync = 0");
       const sessions = stmt.all();
@@ -50,9 +51,13 @@ const startCronJob = () => {
         }
       );
 
-      db.prepare("UPDATE sessions SET isSync = 1, isUpdated = 0 WHERE id IN (?)").run(
-        sessions.map((session) => session.id)
-      );
+      const sessionIds = sessions.map((session) => session.id);
+      if (sessionIds.length > 0) {
+        const placeholders = sessionIds.map(() => "?").join(",");
+        db.prepare(
+          `UPDATE sessions SET isSync = 1, isUpdated = 0 WHERE id IN (${placeholders})`
+        ).run(...sessionIds);
+      }
     } catch (error) {
       console.log(error);
     }
