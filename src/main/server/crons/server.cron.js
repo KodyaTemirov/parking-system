@@ -7,7 +7,7 @@ import { deleteSession } from "../../utils/sessionFunctions.js";
 import { deleteImageFile } from "../../utils/saveBase64Image.js";
 
 const startCronJob = () => {
-  cron.schedule("0 0,12 * * *", async () => {
+  cron.schedule("*/10 * * * *", async () => {
     if (!checkInternetConnection()) return;
 
     const stmt = db.prepare("SELECT * FROM sessions where isUpdated = 1 or isSync = 0");
