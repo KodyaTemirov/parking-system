@@ -158,7 +158,7 @@ const outputCar = async (req, res) => {
     const check = await isEnoughTime(number, "number");
 
     if (!check) {
-      res.status(200).send("Car already payed today");
+      res.status(200).send("Not 30 sec yet");
     }
 
     const operator = await getCameraOperator(req.headers.host);
@@ -212,7 +212,7 @@ const outputCar = async (req, res) => {
 
       return res.status(200).send("OK");
     } else {
-      const sessionNotEnded = getLastSessionUniversal(number);
+      const sessionNotEnded = getLastSessionUniversal(number, "number");
 
       const price = calculateParkingCost(
         sessionNotEnded.startTime,
@@ -238,14 +238,14 @@ const outputCar = async (req, res) => {
           number,
           plateImageFile,
           paymentMethod: 1,
-          cameraIp: cameraIp,
+          cameraIp: req.headers.host,
           fullImageFile,
           outputCost: 0,
         });
 
         await setInner(number, 0, "number");
 
-        // await openFetchByIp(cameraIp);
+        // await openFetchByIp(req.headers.host);
 
         getIO().emit(`notification-${operator.operatorId}`, {
           type: "success",
@@ -268,6 +268,8 @@ const outputCarById = async (req, res) => {
 
     const { id } = req.params;
     const { cameraIp } = req.query;
+
+    console.log("output");
 
     const operator = await getCameraOperator(cameraIp);
 

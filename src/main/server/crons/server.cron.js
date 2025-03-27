@@ -35,9 +35,17 @@ const startCronJob = () => {
       }
     }
 
-    axios.post(`https://raqamli-bozor.uz/services/platon-core/api/v2/desktop/market/vehicles`, {
-      data: sessions,
-    });
+    axios.post(
+      `https://raqamli-bozor.uz/services/platon-core/api/v2/desktop/market/vehicles`,
+      {
+        data: sessions,
+      },
+      {
+        headers: {
+          token: "68fa03a7-ff2f-cfdf-bbe7-c4e42e93a13e",
+        },
+      }
+    );
 
     db.prepare("UPDATE sessions SET isSync = 1, isUpdated = 0 WHERE id IN (?)").run(
       sessions.map((session) => session.id)

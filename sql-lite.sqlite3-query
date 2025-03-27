@@ -3,4 +3,4 @@
 SELECT * FROM sessions
 WHERE plateNumber = '10X369JB';
 
-DELETE FROM sessions WHERE id in (8,7,6)
+DELETE FROM sessions WHERE id is not null

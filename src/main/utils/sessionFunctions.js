@@ -24,11 +24,11 @@ const handleOutputSession = async ({
   outputCost,
   cameraIp,
 }) => {
-  const session = db
-    .prepare(`SELECT MAX(id) as id FROM sessions WHERE plateNumber = ?`)
-    .get(number);
-
-  const stmt = db.prepare(`
+  try {
+    const session = db
+      .prepare(`SELECT MAX(id) as id FROM sessions WHERE plateNumber = ?`)
+      .get(number);
+    const stmt = db.prepare(`
     UPDATE sessions
     SET outputPlateImage = ?,
         outputFullImage = ?,
@@ -41,24 +41,26 @@ const handleOutputSession = async ({
     WHERE id = ?
   `);
 
-  const result = stmt.run(
-    plateImage || null,
-    fullImage || null,
-    new Date().toISOString(),
-    null,
-    outputCost,
-    paymentMethod,
-    cameraIp,
-    session.id
-  );
+    const result = stmt.run(
+      plateImage || null,
+      fullImage || null,
+      new Date().toISOString(),
+      null,
+      outputCost,
+      paymentMethod,
+      cameraIp,
+      session.id
+    );
 
-  const insertedData = db.prepare("SELECT * FROM sessions WHERE id = ?").get(session.id);
+    const insertedData = db.prepare("SELECT * FROM sessions WHERE id = ?").get(session.id);
 
-  const camera = await getCameraOperator(cameraIp);
+    const camera = await getCameraOperator(cameraIp);
 
-  insertedData.operatorId = camera.operatorId;
-
-  await getIO().emit("newSession", insertedData);
+    insertedData.operatorId = camera.operatorId;
+    await getIO().emit("newSession", insertedData);
+  } catch (error) {
+    throw error;
+  }
 };
 
 const handleOutputSessionId = async ({

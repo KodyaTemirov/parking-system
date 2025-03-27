@@ -62,7 +62,9 @@ const openFetchByIp = async (ip) => {
 
 const setInner = async (item, value, type = "number") => {
   try {
-    const stmt = db.prepare(`UPDATE sessions set isInner = ?, lastActivity = ? WHERE ${type} = ?`);
+    const stmt = db.prepare(
+      `UPDATE sessions set isInner = ?, lastActivity = ? WHERE ${type == "number" ? "plateNumber" : "id"} = ?`
+    );
 
     stmt.run(value, new Date().toISOString(), item);
   } catch (error) {
