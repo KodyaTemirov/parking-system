@@ -22,7 +22,7 @@ const registerSession = async (req, res) => {
   const stmt = db.prepare(`
     INSERT INTO sessions
       (plateNumber, inputPlateImage, inputFullImage, startTime, tariffType, duration, inputCost, inputPaymentMethod,cameraIp,lastActivity)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   const result = stmt.run(
