@@ -3,7 +3,7 @@ import { getIO } from "../../utils/socket.js";
 import { getCameraOperator } from "./camera.service.js";
 import { saveBase64Image } from "../../utils/saveBase64Image.js";
 import { getSnapshot } from "../../utils/getSnapshot.js";
-import { tarifs } from "../../utils/prices.js";
+import { tariffs } from "@/config";
 import { postInfo } from "../../utils/postInfo.js";
 import { checkInternetConnection } from "../../utils/checkInternet.js";
 import { getSnapshotSession, getParkStats, sendParkStats } from "../../utils/sessionFunctions.js";
@@ -33,7 +33,7 @@ const registerSession = async (req, res) => {
     new Date().toISOString(),
     tariffType,
     null,
-    tarifs.find((item) => item.id == tariffType).price,
+    tariffs.find((item) => item.id == tariffType).price,
     paymentMethod,
     cameraIp,
     new Date().toISOString()

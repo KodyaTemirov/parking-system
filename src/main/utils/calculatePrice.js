@@ -1,4 +1,4 @@
-import { tarifs } from "./prices.js";
+import { tariffs } from "@/config";
 import db from "../db/database.js";
 
 const calculateParkingCost = (entryTime, dailyCost) => {
@@ -53,7 +53,7 @@ const isPayedToday = (item, type = "number") => {
 
   if (!session) return false;
 
-  const currentTarif = tarifs.find((tarif) => tarif.id === session.tariffType).pricePerDay;
+  const currentTarif = tariffs.find((tarif) => tarif.id === session.tariffType).pricePerDay;
 
   const payedDays = session.outputCost / currentTarif || 0;
 

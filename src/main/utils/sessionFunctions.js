@@ -4,7 +4,7 @@ import { checkInternetConnection } from "./checkInternet.js";
 import { getSnapshot } from "./getSnapshot.js";
 import { openFetch, openFetchByIp } from "./plateFunctions.js";
 import { postInfo } from "./postInfo.js";
-import { tarifs } from "./prices.js";
+import { tariffs } from "@/config";
 import { saveBase64Image } from "./saveBase64Image.js";
 import { getIO } from "./socket.js";
 
@@ -213,7 +213,7 @@ const getSnapshotSession = async (eventName, tariffType, paymentMethod, cameraIp
     new Date().toISOString(),
     tariffType,
     null,
-    tarifs.find((item) => item.id == tariffType).price,
+    tariffs.find((item) => item.id == tariffType).price,
     paymentMethod,
     cameraIp,
     new Date().toISOString()

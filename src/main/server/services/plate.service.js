@@ -2,7 +2,7 @@ import { parsePlateData } from "@/utils/parsePlateData.js";
 import { getIO } from "../../utils/socket";
 import { getCameraOperator } from "./camera.service.js";
 import db from "@/db/database.js";
-import { tarifs } from "@/utils/prices.js";
+import { tariffs } from "@/config";
 import { saveBase64Image } from "../../utils/saveBase64Image.js";
 import { handleOutputSession, handleOutputSessionId } from "../../utils/sessionFunctions.js";
 import { isEnoughTime, isInner, setInner } from "../../utils/plateFunctions.js";
@@ -196,7 +196,7 @@ const outputCar = async (req, res) => {
     } else if (session) {
       const price = calculateParkingCost(
         session.startTime,
-        tarifs.find((item) => item.id == session.tariffType).pricePerDay
+        tariffs.find((item) => item.id == session.tariffType).pricePerDay
       );
 
       getIO().emit(`outputCar-${operator.operatorId}`, {
@@ -216,7 +216,7 @@ const outputCar = async (req, res) => {
 
       const price = calculateParkingCost(
         sessionNotEnded.startTime,
-        tarifs.find((item) => item.id == sessionNotEnded.tariffType).pricePerDay
+        tariffs.find((item) => item.id == sessionNotEnded.tariffType).pricePerDay
       );
 
       if (price > 0) {
@@ -312,7 +312,7 @@ const outputCarById = async (req, res) => {
     } else if (session) {
       const price = calculateParkingCost(
         session.startTime,
-        tarifs.find((item) => item.id == session.tariffType).pricePerDay
+        tariffs.find((item) => item.id == session.tariffType).pricePerDay
       );
 
       const snapImage = await getSnapshot(cameraIp, operator.login, operator.password);
@@ -332,7 +332,7 @@ const outputCarById = async (req, res) => {
       const snapImage = await getSnapshot(cameraIp, operator.login, operator.password);
       const price = calculateParkingCost(
         sessionNotEnded.startTime,
-        tarifs.find((item) => item.id == sessionNotEnded.tariffType).pricePerDay
+        tariffs.find((item) => item.id == sessionNotEnded.tariffType).pricePerDay
       );
 
       if (price > 0) {

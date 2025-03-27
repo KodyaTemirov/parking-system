@@ -1,12 +1,12 @@
 import axios from "axios";
-import { tarifs } from "./prices";
+import { tariffs } from "@/config";
 import { getCameraOperator } from "../server/services/camera.service";
 import db from "../db/database.js";
 
 const calculatePrice = (startTime, endTime, tariffType) => {
   const start = new Date(startTime);
   const end = endTime ? new Date(endTime) : new Date();
-  const tarifCost = tarifs.find((tarif) => tarif.id === tariffType).pricePerDay;
+  const tarifCost = tariffs.find((tarif) => tarif.id === tariffType).pricePerDay;
 
   if (end < start) return 0;
 
