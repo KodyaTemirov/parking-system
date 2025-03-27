@@ -9,7 +9,7 @@ import { getImageFile } from "../../utils/getImageFile.js";
 import { uploadImage } from "../../utils/postInfo.js";
 
 const startCronJob = () => {
-  cron.schedule("*/12 * * * *", async () => {
+  cron.schedule("*/10 * * * *", async () => {
     try {
       if (!checkInternetConnection()) return;
 
