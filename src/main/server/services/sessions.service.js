@@ -66,7 +66,7 @@ const outputSession = async (req, res) => {
   const { number, plateImage, fullImage, paymentMethod, outputCost, cameraIp, id } = req.body;
 
   if (!number) {
-    return await closeSnapshotSession(
+    const info = await closeSnapshotSession(
       id,
       plateImage,
       fullImage,
@@ -74,6 +74,7 @@ const outputSession = async (req, res) => {
       outputCost,
       cameraIp
     );
+    res.status(201).send(info);
   }
 
   const lastSession = db
