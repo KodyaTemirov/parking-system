@@ -56,6 +56,7 @@ const inputCar = async (req, res) => {
       await setInner(number, 1, "number");
 
       const camera = await getCameraOperator(req.headers.host);
+
       // await openFetchByIp(req.headers.host);
 
       res.status(200).send("Car already payed today");
@@ -267,8 +268,6 @@ const outputCarById = async (req, res) => {
 
     const { id } = req.params;
     const { cameraIp } = req.query;
-
-    console.log("output");
 
     const operator = await getCameraOperator(cameraIp);
 
