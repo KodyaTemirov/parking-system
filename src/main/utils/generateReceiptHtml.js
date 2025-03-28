@@ -1,3 +1,5 @@
+import { tariffs } from "@/config";
+
 // generateReceiptHtml.js
 export function generateReceiptHtml(info) {
   return `
@@ -10,7 +12,7 @@ export function generateReceiptHtml(info) {
           body { margin: 0; padding: 0; }
           .page-break { page-break-before: always; }
         }
-					
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
           font-family: Arial, sans-serif;
@@ -36,7 +38,7 @@ export function generateReceiptHtml(info) {
         <h2>ЧЕК</h2>
         <p><strong class="receipt-id">ID: ${info.id}</strong></p>
         <p><strong>Госномер:</strong> ${info.plateNumber}</p>
-        <p><strong>Тариф:</strong> ${info.tariffType}</p>
+        <p><strong>Тариф:</strong> ${tariffs.find((item) => item.id == info.tariffType).value}</p>
         <p><strong>Время начала:</strong> ${new Date(info.startTime).toLocaleString()}</p>
         <hr>
         <canvas id="qr-code" class="qr-code"></canvas>
