@@ -158,7 +158,7 @@
         <td class="px-4 py-2">{{ calculateDuration(session.startTime, session.endTime) }}</td>
         <td class="px-4 py-2">{{ session.cost }} сум</td>
         <td class="px-4 py-2">{{ session.paymentMethod === 1 ? "Наличные" : "Карта" }}</td>
-        <td class="px-4 py-2">{{ !session.endTime ? "Внутри" : "Выехал" }}</td>
+        <td class="px-4 py-2">{{ session.isInner ? "Внутри" : "Выехал" }}</td>
       </tr>
     </tbody>
   </table>
