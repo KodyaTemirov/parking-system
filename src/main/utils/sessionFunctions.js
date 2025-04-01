@@ -328,6 +328,17 @@ const sendParkStats = async () => {
       )
       .get();
 
+    const innerCars = db
+      .prepare(
+        `
+    SELECT
+      COUNT(*) as count
+    FROM sessions
+    WHERE isInner = 1
+  `
+      )
+      .get();
+
     const outputData = db
       .prepare(
         `
@@ -363,7 +374,7 @@ const sendParkStats = async () => {
       inputData,
       outputData,
       totalCostToday: totalCostToday.totalInputCost + totalCostToday.totalOutputCost,
-      totalCarInPark: inputData - outputData,
+      totalCarInPark: innerCars,
     });
   } catch (error) {
     throw error;
