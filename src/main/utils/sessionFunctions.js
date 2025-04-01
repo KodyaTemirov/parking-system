@@ -311,7 +311,7 @@ const getParkStats = async () => {
     const totalCostToday = db
       .prepare(
         `
-  SELECT SUM(inputCost) as totalInputCost, SUM(outputCost) as totalOutputCost FROM sessions WHERE date(startTime) = date('now')
+  SELECT SUM(inputCost) as totalInputCost, SUM(outputCost) as totalOutputCost FROM sessions
 `
       )
       .get();
@@ -376,7 +376,7 @@ const sendParkStats = async () => {
     const totalCostToday = db
       .prepare(
         `
-    SELECT SUM(inputCost) as totalInputCost, SUM(outputCost) as totalOutputCost FROM sessions WHERE date(startTime) = date('now')
+    SELECT SUM(inputCost) as totalInputCost, SUM(outputCost) as totalOutputCost FROM sessions
   `
       )
       .get();
