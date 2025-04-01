@@ -141,7 +141,6 @@
         {{ isSocketConnected ? "Connected" : "Disconnected" }}
       </div>
     </SubTitle>
-    <div>{{ stats }}</div>
     <div class="flex gap-4">
       <Button @click="openDrawer" class="flex w-full flex-col items-center gap-2">
         <Icon icon="material-symbols:input-circle" class="text-7xl" />
@@ -157,6 +156,35 @@
       </Button>
     </div>
 
+    <SubTitle class="flex justify-between">Bugungi statistika</SubTitle>
+
+    <div class="stats">
+      <div class="statCard">
+        Sessiyalar soni
+        <div class="statCount">
+          {{ stats.allData }}
+        </div>
+      </div>
+      <div class="statCard">
+        Umumiy to'lov
+        <div class="statCount">
+          {{ stats.totalCostToday }}
+        </div>
+      </div>
+      <div class="statCard">
+        Chiqishlar soni
+        <div class="statCount">
+          {{ stats.outputData }}
+        </div>
+      </div>
+      <div class="statCard">
+        Ichkaridagilar soni
+        <div class="statCount">
+          {{ stats.totalCarInPark }}
+        </div>
+      </div>
+    </div>
+
     <InputDrawer v-model="isOpenInput" v-model:newCar="inputCar" />
     <OutputDrawer v-model="isOpenOutput" v-model:newCar="outputCar" />
 
@@ -169,6 +197,16 @@
 </template>
 <style scoped>
   @reference "@/assets/main.css";
+  .stats {
+    @apply mt-4 grid grid-cols-4 gap-4;
+  }
+  .statCard {
+    @apply w-full rounded-lg bg-white p-4 text-sm text-gray-400 shadow-md;
+  }
+
+  .statCount {
+    @apply text-2xl font-semibold text-gray-600;
+  }
 
   .wrapper {
     @apply overflow-hidden p-4;

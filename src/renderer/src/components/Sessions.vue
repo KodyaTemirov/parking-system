@@ -126,7 +126,7 @@
       v-model="searchQuery"
       @input="searchSessions"
       placeholder="Davlat raqamini qidirish..."
-      class="mb-4 rounded border border-gray-300 p-2"
+      class="mb-2 rounded-lg border border-gray-300 px-4 py-2"
     />
   </SubTitle>
   <table
@@ -160,7 +160,7 @@
         <td class="px-4 py-2">{{ session.cost }} so'm</td>
         <td class="px-4 py-2">{{ session.paymentMethod === 1 ? "Naqd" : "Karta" }}</td>
         <td class="px-4 py-2">{{ session.isInner ? "Ichkarida" : "Chiqdi" }}</td>
-        <td class="px-4 py-2">{{ session.isSync ? "Ha" : "Yo'q" }}</td>
+        <td class="px-4 py-2">{{ session.isSync && !session.isUpdated ? "Ha" : "Yo'q" }}</td>
       </tr>
     </tbody>
   </table>
