@@ -256,6 +256,7 @@ const getSnapshotSession = async (eventName, tariffType, paymentMethod, cameraIp
   }
 
   await getIO().emit("newSession", insertedData);
+  await sendParkStats();
 
   // await openFetchByIp(cameraIp);
 
@@ -267,49 +268,60 @@ const getParkStats = async () => {
     const allData = db
       .prepare(
         `
-    SELECT
-      COUNT(*) as count
-    FROM sessions
-  `
+  SELECT
+    COUNT(*) as count
+  FROM sessions
+`
+      )
+      .get();
+
+    const innerCars = db
+      .prepare(
+        `
+  SELECT
+    COUNT(*) as count
+  FROM sessions
+  WHERE isInner = 1
+`
       )
       .get();
 
     const outputData = db
       .prepare(
         `
-    SELECT
-      COUNT(*) as count
-    FROM sessions
-    WHERE endTime is not null
-  `
+  SELECT
+    COUNT(*) as count
+  FROM sessions
+  WHERE isInner = 0
+`
       )
-      .all();
+      .get();
 
     const inputData = db
       .prepare(
         `
-    SELECT
-      COUNT(*) as count
-    FROM sessions
-    WHERE endTime is null
-  `
+  SELECT
+    COUNT(*) as count
+  FROM sessions
+  WHERE endTime is null
+`
       )
-      .all();
+      .get();
 
     const totalCostToday = db
       .prepare(
         `
-    SELECT SUM(inputCost) as totalInputCost, SUM(outputCost) as totalOutputCost FROM sessions WHERE date(startTime) = date('now')
-  `
+  SELECT SUM(inputCost) as totalInputCost, SUM(outputCost) as totalOutputCost FROM sessions WHERE date(startTime) = date('now')
+`
       )
       .get();
 
     return {
-      allData,
-      inputData,
-      outputData,
+      allData: allData.count,
+      inputData: inputData.count,
+      outputData: outputData.count,
       totalCostToday: totalCostToday.totalInputCost + totalCostToday.totalOutputCost,
-      totalCarInPark: inputData - outputData,
+      totalCarInPark: innerCars.count,
     };
   } catch (error) {
     throw error;
@@ -345,10 +357,10 @@ const sendParkStats = async () => {
     SELECT
       COUNT(*) as count
     FROM sessions
-    WHERE endTime is not null
+    WHERE isInner = 0
   `
       )
-      .all();
+      .get();
 
     const inputData = db
       .prepare(
@@ -359,7 +371,7 @@ const sendParkStats = async () => {
     WHERE endTime is null
   `
       )
-      .all();
+      .get();
 
     const totalCostToday = db
       .prepare(
@@ -370,11 +382,11 @@ const sendParkStats = async () => {
       .get();
 
     getIO().emit("parkStats", {
-      allData,
-      inputData,
-      outputData,
+      allData: allData.count,
+      inputData: inputData.count,
+      outputData: outputData.count,
       totalCostToday: totalCostToday.totalInputCost + totalCostToday.totalOutputCost,
-      totalCarInPark: innerCars,
+      totalCarInPark: innerCars.count,
     });
   } catch (error) {
     throw error;

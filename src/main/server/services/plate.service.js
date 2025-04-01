@@ -12,6 +12,7 @@ import {
   getLastSessionUniversal,
   isPayedToday,
 } from "@/utils/calculatePrice.js";
+import { sendParkStats } from "../../utils/sessionFunctions.js";
 
 const inputCar = async (req, res) => {
   try {
@@ -54,6 +55,7 @@ const inputCar = async (req, res) => {
       });
 
       await setInner(number, 1, "number");
+      await sendParkStats();
 
       const camera = await getCameraOperator(req.headers.host);
 
@@ -114,6 +116,7 @@ const inputCarById = async (req, res) => {
       // await openFetchByIp(cameraIp);
 
       await setInner(id, 1, "id");
+      await sendParkStats();
 
       getIO().emit(`notification-${operator.operatorId}`, {
         type: "success",
@@ -183,6 +186,7 @@ const outputCar = async (req, res) => {
         outputCost: 0,
       });
 
+      await sendParkStats();
       await setInner(number, 0, "number");
 
       getIO().emit(`notification-${operator.operatorId}`, {
@@ -244,6 +248,7 @@ const outputCar = async (req, res) => {
         });
 
         await setInner(number, 0, "number");
+        await sendParkStats();
 
         // await openFetchByIp(req.headers.host);
 
@@ -292,6 +297,7 @@ const outputCarById = async (req, res) => {
       });
 
       await setInner(id, 0, "id");
+      await sendParkStats();
 
       // await openFetchByIp(cameraIp);
 
@@ -361,6 +367,7 @@ const outputCarById = async (req, res) => {
         // await openFetchByIp(cameraIp);
 
         await setInner(id, 0, "id");
+        await sendParkStats();
 
         getIO().emit(`notification-${operator.operatorId}`, {
           type: "success",
