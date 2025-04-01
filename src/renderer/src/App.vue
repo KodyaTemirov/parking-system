@@ -14,6 +14,7 @@
   const initialCar = { paymentMethod: 1, tariffType: 1, eventName: "output" };
   const inputCar = ref({ ...initialCar });
   const outputCar = ref({ ...initialCar });
+  const stats = ref({});
   const isOpenInput = ref(false);
   const isOpenOutput = ref(false);
 
@@ -97,10 +98,25 @@
     }
   );
 
+  const getAllInfo = async () => {
+    try {
+      const { data } = await axios.get(`${ipServer}/api/session/info`);
+
+      stats.value = data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   onMounted(async () => {
     socket.connect();
     isSocketConnected.value = true;
 
+    getAllInfo();
+
+    socket.on("parkStats", (data) => {
+      stats.value = data;
+    });
     socket.on("connect", () => {
       isSocketConnected.value = true;
     });
@@ -125,6 +141,7 @@
         {{ isSocketConnected ? "Connected" : "Disconnected" }}
       </div>
     </SubTitle>
+    <div>{{ stats }}</div>
     <div class="flex gap-4">
       <Button @click="openDrawer" class="flex w-full flex-col items-center gap-2">
         <Icon icon="material-symbols:input-circle" class="text-7xl" />
