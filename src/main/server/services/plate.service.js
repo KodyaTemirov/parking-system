@@ -176,10 +176,10 @@ const outputCar = async (req, res) => {
 
       handleOutputSession({
         number,
-        plateImageFile,
+        plateImage: plateImageFile,
         paymentMethod: 1,
         cameraIp: req.headers.host,
-        fullImageFile,
+        fullImage: fullImageFile,
         outputCost: 0,
       });
 
@@ -236,10 +236,10 @@ const outputCar = async (req, res) => {
 
         handleOutputSession({
           number,
-          plateImageFile,
+          plateImage: plateImageFile,
           paymentMethod: 1,
           cameraIp: req.headers.host,
-          fullImageFile,
+          fullImage: fullImageFile,
           outputCost: 0,
         });
 
@@ -284,10 +284,10 @@ const outputCarById = async (req, res) => {
 
       handleOutputSessionId({
         id: id,
-        plateImageFile: null,
+        plateImage: null,
         paymentMethod: 1,
         cameraIp: cameraIp,
-        fullImageFile: snapUrl,
+        fullImage: snapUrl,
         outputCost: 0,
       });
 
@@ -351,10 +351,10 @@ const outputCarById = async (req, res) => {
 
         handleOutputSessionId({
           id: id,
-          plateImageFile: null,
+          plateImage: null,
           paymentMethod: 1,
           cameraIp: cameraIp,
-          fullImageFile: snapUrl,
+          fullImage: snapUrl,
           outputCost: 0,
         });
 
