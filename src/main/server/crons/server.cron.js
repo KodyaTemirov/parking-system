@@ -9,7 +9,7 @@ import { getImageFile } from "@/utils/getImageFile.js";
 import { uploadImage } from "@/utils/postInfo.js";
 
 const startCronJob = () => {
-  cron.schedule("*/12 * * * *", async () => {
+  cron.schedule("*/10 * * * *", async () => {
     try {
       if (!checkInternetConnection()) return;
       console.log("CRON STARTED ===================================");
@@ -38,8 +38,6 @@ const startCronJob = () => {
           item.outputFullImage = fullImageId;
         }
       }
-
-      console.log(sessions);
 
       axios.post(
         `https://raqamli-bozor.uz/services/platon-core/api/v2/desktop/market/vehicles`,
