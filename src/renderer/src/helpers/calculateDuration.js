@@ -9,5 +9,5 @@ export const calculateDuration = (startTime, endTime) => {
   const hours = Math.floor((durationMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
 
-  return `${days > 0 ? `${days}д ` : ""}${hours > 0 ? `${hours}ч ` : ""}${minutes > 0 ? `${minutes}м` : "Только что"}`;
+  return `${days > 0 ? `${days}kun ` : ""}${hours > 0 ? `${hours} soat ` : ""}${minutes > 0 ? `${minutes}m` : "Hozirgina"}`;
 };

@@ -26,7 +26,7 @@
   const emit = defineEmits(["update:modelValue", "update:newCar"]);
   const isOpen = ref(props.modelValue);
 
-  // Создаем локальную копию newCar
+  // newCar uchun lokal nusxa yaratamiz
   const localNewCar = ref({ ...props.newCar });
 
   watch(
@@ -44,7 +44,7 @@
       selectCam.value = data.length > 0 ? data[0].ip : null;
     } catch (err) {
       console.error(err);
-      showError("Ошибка", "Не удалось загрузить камеры");
+      showError("Xato", "Kameralarni yuklab bo'lmadi");
     }
   };
 
@@ -72,7 +72,7 @@
       localNewCar.value;
 
     if (!price) {
-      showError("Ошибка", "Заполните все обязательные поля");
+      showError("Xato", "Barcha majburiy maydonlarni to'ldiring");
       return;
     }
 
@@ -90,17 +90,17 @@
 
       console.log("localNewCar.value", localNewCar.value);
 
-      success("Успех!", "Операция выполнена успешно");
+      success("Muvaffaqiyatli!", "Amal muvaffaqiyatli bajarildi");
       isOpen.value = false;
     } catch (err) {
       console.error(err);
-      showError("Ошибка", "Не удалось завершить операцию");
+      showError("Xato", "Amalni yakunlab bo'lmadi");
     }
   };
 
   const getCheckData = async () => {
     if (!checkId.value) {
-      showError("Ошибка", "Введите номер чека");
+      showError("Xato", "Chek raqamini kiriting");
       return;
     }
 
@@ -118,12 +118,12 @@
           price: data.price,
         };
       }
-      // Обновляем локальную копию и отправляем изменения в родительский компонент
+      // Lokal nusxani yangilaymiz va o'zgarishlarni ota komponentga yuboramiz
 
       emit("update:newCar", localNewCar.value);
     } catch (err) {
       console.error(err);
-      showError("Ошибка", "Не удалось найти данные по чеку");
+      showError("Xato", "Chek bo'yicha ma'lumot topilmadi");
     }
   };
 
@@ -137,24 +137,24 @@
 </script>
 
 <template>
-  <Drawer title="Новый выезд" v-model="isOpen" position="right">
+  <Drawer title="Yangi chiqish" v-model="isOpen" position="right">
     <div class="rows">
       <div class="row" v-if="localNewCar.number">
-        <span>Гос-номер:</span>
+        <span>Davlat raqami:</span>
         <span class="flex items-center">
           <CarPlate :plateNumber="localNewCar.number" />
         </span>
       </div>
       <div v-else>
         <form @submit.prevent="getCheckData" class="flex gap-2">
-          <Input placeholder="Введите номер чека" v-model="checkId" />
-          <Button type="submit">Найти</Button>
+          <Input placeholder="Chek raqamini kiriting" v-model="checkId" />
+          <Button type="submit">Qidirish</Button>
         </form>
       </div>
     </div>
 
     <div v-if="!localNewCar.number">
-      <SubTitle>Выберите камеру</SubTitle>
+      <SubTitle>Kamerani tanlang</SubTitle>
       <div class="camera-selector">
         <div
           v-for="camera in cameras"
@@ -169,17 +169,17 @@
     </div>
 
     <SubTitle>
-      Выбранный тариф:
+      Tanlangan tarif:
       {{ localNewCar.session && tariffs[localNewCar.session.tariffType - 1]?.value }}
     </SubTitle>
-    <SubTitle>Выберите метод оплаты</SubTitle>
+    <SubTitle>To'lov usulini tanlang</SubTitle>
     <PaymentSelector v-model="localNewCar.paymentMethod" />
 
     <div class="fixed-button">
-      <SubTitle>Чек: {{ localNewCar.id }}</SubTitle>
+      <SubTitle>Chek: {{ localNewCar.id }}</SubTitle>
       <SubTitle class="flex justify-between">
-        Итого к оплате:
-        <span class="text-2xl font-bold text-black">{{ localNewCar.price }} сум</span>
+        Umumiy to'lov:
+        <span class="text-2xl font-bold text-black">{{ localNewCar.price }} so'm</span>
       </SubTitle>
       <Button
         @click="addSessionHandler"
@@ -188,7 +188,7 @@
       >
         <Icon icon="material-symbols:output-circle" />
 
-        Открыть ворота
+        Darvozani ochish
       </Button>
     </div>
   </Drawer>

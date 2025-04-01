@@ -5,13 +5,13 @@
   const props = defineProps(["modelValue"]);
   const emit = defineEmits(["update:modelValue"]);
 
-  // Типы оплаты с иконками
+  // To'lov turlari va ularning ikonkalari
   const paymentMethods = ref([
-    { id: 1, name: "Наличные", icon: "mdi:cash", state: props.modelValue === 1 },
-    { id: 2, name: "Карта", icon: "mdi:credit-card", state: props.modelValue === 2 },
+    { id: 1, name: "Naqd", icon: "mdi:cash", state: props.modelValue === 1 },
+    { id: 2, name: "Karta", icon: "mdi:credit-card", state: props.modelValue === 2 },
   ]);
 
-  // Функция выбора типа оплаты
+  // To'lov turini tanlash funksiyasi
   const selectPayment = (id) => {
     emit("update:modelValue", id);
     paymentMethods.value = paymentMethods.value.map((method) => ({

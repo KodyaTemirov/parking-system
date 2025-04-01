@@ -7,7 +7,7 @@
       <div class="country">UZ</div>
     </div>
   </div>
-  <div v-else class="plate not-specified px-6">Не указано</div>
+  <div v-else class="plate not-specified px-6">Kiritilmagan</div>
 </template>
 
 <script setup>

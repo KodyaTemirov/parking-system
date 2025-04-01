@@ -4,7 +4,7 @@
   const props = defineProps({
     value: {
       type: String,
-      default: "Не указано",
+      default: "Ko'rsatilmagan",
     },
     price: {
       type: Number,
@@ -38,8 +38,8 @@
       <div class="price-title">
         {{ props.value }}
       </div>
-      <div class="price">Цена: {{ props.price }} сум</div>
-      <div class="price">За дополнительные дни: {{ props.pricePerDay }} сум</div>
+      <div class="price">Narxi: {{ props.price }} so'm</div>
+      <div class="price">Qo'shimcha kunlar uchun: {{ props.pricePerDay }} so'm</div>
     </div>
   </button>
 </template>

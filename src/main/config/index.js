@@ -1,7 +1,7 @@
 export const ipServer = "http://10.20.10.136:9061";
 export const tariffs = [
   {
-    value: "Легковые автомобили и микроавтобусы",
+    value: "Yengil avtomobillar va mikroavtobuslar",
     price: 30000,
     pricePerDay: 10000,
     id: 1,
@@ -9,7 +9,7 @@ export const tariffs = [
     icon: "mdi:car",
   },
   {
-    value: "Грузовики, автобусы, тракторы",
+    value: "Yuk mashinalari, avtobuslar, traktorlari",
     price: 35000,
     pricePerDay: 10000,
     id: 2,
@@ -17,7 +17,7 @@ export const tariffs = [
     icon: "mdi:dump-truck",
   },
   {
-    value: "Мотоциклы, мотороллеры и мопеды",
+    value: "Mototsikllar, motorollerlar va mopedlar",
     price: 11000,
     pricePerDay: 10000,
     id: 3,
@@ -25,7 +25,7 @@ export const tariffs = [
     icon: "mdi:motorbike",
   },
   {
-    value: "Велосипеды",
+    value: "Velosipedlar",
     price: 9000,
     pricePerDay: 10000,
     id: 4,

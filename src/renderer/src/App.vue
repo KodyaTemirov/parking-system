@@ -116,19 +116,19 @@
 <template>
   <div class="wrapper">
     <SubTitle class="flex justify-between">
-      Оператор {{ appStore.selectedOperator }}
+      Operator {{ appStore.selectedOperator }}
       <div class="socket-wrapper">
         <div
           class="socket-status"
           :class="{ connected: isSocketConnected, disconnected: !isSocketConnected }"
         ></div>
-        {{ isSocketConnected ? "Подключен" : "Отключен" }}
+        {{ isSocketConnected ? "Connected" : "Disconnected" }}
       </div>
     </SubTitle>
     <div class="flex gap-4">
       <Button @click="openDrawer" class="flex w-full flex-col items-center gap-2">
         <Icon icon="material-symbols:input-circle" class="text-7xl" />
-        Новый въезд
+        Kirish
       </Button>
       <Button
         variant="success"
@@ -136,7 +136,7 @@
         class="flex w-full flex-col items-center gap-2"
       >
         <Icon icon="material-symbols:output-circle" class="text-7xl" />
-        Новый выезд
+        Chiqish
       </Button>
     </div>
 

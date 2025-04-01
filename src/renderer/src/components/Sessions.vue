@@ -34,7 +34,7 @@
       sessionStore.totalPages = data.totalPages;
       page.value++;
     } catch (error) {
-      console.log(error, "ERROR");
+      console.log(error, "XATO");
     }
   };
 
@@ -53,21 +53,21 @@
       sessionStore.setSessions([...sessionStore.sessions, ...newSessions]);
       searchPage.value++;
     } catch (error) {
-      console.log(error, "ERROR");
+      console.log(error, "XATO");
     }
   };
 
   const searchSessions = async () => {
-    searchPage.value = 1; // Сбрасываем страницу поиска при новом запросе
+    searchPage.value = 1; // Yangi qidiruv so'rovi uchun sahifani qayta o'rnatamiz
 
     if (!searchQuery.value) {
       page.value = 1;
-      setupObserver(); // Включаем основной Observer после очистки поиска
+      setupObserver(); // Qidiruv tozalangandan keyin asosiy Observerni yoqamiz
       return;
     }
 
     try {
-      observer.value?.disconnect(); // Отключаем обычный Observer
+      observer.value?.disconnect(); // Oddiy Observerni o'chiramiz
 
       const { data } = await axios.get(`${ipServer}/api/session`, {
         params: { search: searchQuery.value, page: searchPage.value, size: size.value },
@@ -76,9 +76,9 @@
       sessionStore.total = data.total;
       sessionStore.totalPages = data.totalPages;
       searchPage.value++;
-      setupSearchObserver(); // Включаем Observer для поиска
+      setupSearchObserver(); // Qidiruv uchun Observerni yoqamiz
     } catch (error) {
-      console.log(error, "ERROR");
+      console.log(error, "XATO");
     }
   };
 
@@ -113,19 +113,19 @@
 
   watch(searchQuery, (newVal) => {
     if (!newVal) {
-      setupObserver(); // Если поисковый запрос очистился — включаем обычный Observer
+      setupObserver(); // Agar qidiruv so'rovi tozalansa, oddiy Observerni yoqamiz
     }
   });
 </script>
 
 <template>
   <SubTitle class="flex items-center justify-between">
-    Парковочные сессии {{ sessionStore.sessions.length }}
+    Avtoturargoh sessiyalari {{ sessionStore.sessions.length }}
 
     <input
       v-model="searchQuery"
       @input="searchSessions"
-      placeholder="Поиск по гос-номеру..."
+      placeholder="Davlat raqamini qidirish..."
       class="mb-4 rounded border border-gray-300 p-2"
     />
   </SubTitle>
@@ -136,13 +136,14 @@
     <thead>
       <tr class="bg-gray-200 text-left">
         <th class="px-4 py-2">#</th>
-        <th class="px-4 py-2">Гос-номер</th>
-        <th class="px-4 py-2">Начало</th>
-        <th class="px-4 py-2">Тип тарифа</th>
-        <th class="px-4 py-2">Продолжительность</th>
-        <th class="px-4 py-2">Стоимость</th>
-        <th class="px-4 py-2">Метод оплаты</th>
-        <th class="px-4 py-2">Статус</th>
+        <th class="px-4 py-2">Davlat raqami</th>
+        <th class="px-4 py-2">Boshlanish vaqti</th>
+        <th class="px-4 py-2">Tarif turi</th>
+        <th class="px-4 py-2">Davomiyligi</th>
+        <th class="px-4 py-2">Narxi</th>
+        <th class="px-4 py-2">To'lov usuli</th>
+        <th class="px-4 py-2">Holati</th>
+        <th class="px-4 py-2">Sinxronlash</th>
       </tr>
     </thead>
     <tbody>
@@ -156,13 +157,14 @@
         <td class="px-4 py-2">{{ new Date(session.startTime).toLocaleString() }}</td>
         <td class="px-4 py-2">{{ tariffs[session.tariffType - 1]?.value }}</td>
         <td class="px-4 py-2">{{ calculateDuration(session.startTime, session.endTime) }}</td>
-        <td class="px-4 py-2">{{ session.cost }} сум</td>
-        <td class="px-4 py-2">{{ session.paymentMethod === 1 ? "Наличные" : "Карта" }}</td>
-        <td class="px-4 py-2">{{ session.isInner ? "Внутри" : "Выехал" }}</td>
+        <td class="px-4 py-2">{{ session.cost }} so'm</td>
+        <td class="px-4 py-2">{{ session.paymentMethod === 1 ? "Naqd" : "Karta" }}</td>
+        <td class="px-4 py-2">{{ session.isInner ? "Ichkarida" : "Chiqdi" }}</td>
+        <td class="px-4 py-2">{{ session.isSync ? "Ha" : "Yo'q" }}</td>
       </tr>
     </tbody>
   </table>
-  <div v-else>Сессий нет</div>
+  <div v-else>Sessiyalar mavjud emas</div>
   <div id="load-more" class="h-10"></div>
 </template>
 

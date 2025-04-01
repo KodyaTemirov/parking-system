@@ -53,7 +53,7 @@
 
   const getCheckData = async () => {
     if (!checkId.value) {
-      showError("Ошибка", "Введите номер чека");
+      showError("Xato", "Chek raqamini kiriting");
       return;
     }
 
@@ -63,11 +63,11 @@
       );
 
       if (data.eventName === "input") {
-        showError("Ошибка", "Чек просрочен");
+        showError("Xato", "Chek muddati o'tgan");
         return;
       } else if (data.eventName === "payedToday") isOpen.value = false;
 
-      // Обновляем локальную копию и отправляем изменения в родительский компонент
+      // Mahalliy nusxani yangilaymiz va o'zgarishlarni ota komponentga yuboramiz
       localNewCar.value = {
         ...data.session,
         price: data.price,
@@ -75,7 +75,7 @@
       emit("update:newCar", localNewCar.value);
     } catch (err) {
       console.error(err);
-      showError("Ошибка", "Не удалось найти данные по чеку");
+      showError("Xato", "Chek bo'yicha ma'lumot topilmadi");
     }
   };
 
@@ -123,11 +123,11 @@
 </script>
 
 <template>
-  <Drawer title="Новый въезд" v-model="isOpen" position="left">
+  <Drawer title="Yangi kirish" v-model="isOpen" position="left">
     <div class="drawer-content">
       <div class="rows">
         <div class="row" v-if="newCar.number">
-          <span>Гос-номер:</span>
+          <span>Davlat raqami:</span>
           <span class="flex items-center">
             <CarPlate :plateNumber="newCar.number" />
           </span>
@@ -135,16 +135,16 @@
       </div>
 
       <form v-if="!newCar.number" @submit.prevent="getCheckData" class="flex gap-2">
-        <Input placeholder="Введите номер чека" v-model="checkId" />
-        <Button type="submit">Найти</Button>
+        <Input placeholder="Chek raqamini kiriting" v-model="checkId" />
+        <Button type="submit">Qidirish</Button>
       </form>
 
-      <SubTitle>Выберите тип тарифа</SubTitle>
+      <SubTitle>Tarif turini tanlang</SubTitle>
       <Plans v-model="newCar.tariffType" />
-      <SubTitle>Выберите метод оплаты</SubTitle>
+      <SubTitle>To'lov usulini tanlang</SubTitle>
       <PaymentSelector v-model="newCar.paymentMethod" />
       <div v-if="!newCar.number">
-        <SubTitle>Выберите камеру</SubTitle>
+        <SubTitle>Kamerani tanlang</SubTitle>
         <div class="camera-selector">
           <div
             v-for="camera in cameras"
@@ -158,25 +158,25 @@
         </div>
       </div>
 
-      <Accordion class="mt-4" title="Дополнительная информация">
+      <Accordion class="mt-4" title="Qo'shimcha ma'lumot">
         <div class="flex flex-col gap-4">
           <img :src="newCar.fullImage" alt="" class="w-full rounded-lg" />
           <img :src="newCar.plateImage" alt="" class="w-full rounded-lg" />
         </div>
 
         <SubTitle>
-          IP камеры:
+          Kamera IP manzili:
           <span class="text-sm font-medium text-black">{{ newCar.cameraIp }}</span>
         </SubTitle>
         <SubTitle>
-          Событие:
+          Hodisa:
 
           <span class="text-sm font-medium text-black">
-            {{ newCar.eventName ? "Въезд" : "Выезд" }}
+            {{ newCar.eventName ? "Kirish" : "Chiqish" }}
           </span>
         </SubTitle>
         <SubTitle>
-          Оператор:
+          Operator:
 
           <span class="text-sm font-medium text-black">
             {{ newCar.operatorId }}
@@ -187,14 +187,14 @@
 
     <div class="fixed-button">
       <SubTitle class="flex justify-between">
-        Итого к оплате:
+        Umumiy to'lov:
         <span class="text-2xl font-bold text-black">
-          {{ tariffs[newCar.tariffType - 1].price }} сум
+          {{ tariffs[newCar.tariffType - 1].price }} so'm
         </span>
       </SubTitle>
       <Button @click="addSessionHandler" class="flex w-full items-center justify-center gap-2">
         <Icon icon="material-symbols:input-circle" />
-        Открыть ворота
+        Darvozani ochish
       </Button>
     </div>
   </Drawer>
