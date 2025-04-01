@@ -62,7 +62,10 @@
         `${ipServer}/api/input/${checkId.value}?cameraIp=${selectCam.value}`
       );
 
-      if (data.eventName === "payedToday") isOpen.value = false;
+      if (data.eventName === "input") {
+        showError("Ошибка", "Чек просрочен");
+        return;
+      } else if (data.eventName === "payedToday") isOpen.value = false;
 
       // Обновляем локальную копию и отправляем изменения в родительский компонент
       localNewCar.value = {
