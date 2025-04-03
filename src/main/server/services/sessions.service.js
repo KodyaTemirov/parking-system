@@ -121,15 +121,6 @@ const outputSession = async (req, res) => {
     await getIO().emit("newUpdate", insertedData);
     await sendParkStats();
 
-    if (await checkInternetConnection()) {
-      insertedData.event = "output";
-      await postInfo({
-        type: "insert",
-        data: insertedData,
-        event: "output",
-      });
-    }
-
     // await openFetchByIp(cameraIp);
 
     await setInner(number, 0, "number");
@@ -250,15 +241,6 @@ const closeSnapshotSession = async (
 
     await getIO().emit("newUpdate", insertedData);
     await sendParkStats();
-
-    if (await checkInternetConnection()) {
-      insertedData.event = "output";
-      await postInfo({
-        type: "insert",
-        data: insertedData,
-        event: "output",
-      });
-    }
 
     // await openFetchByIp(cameraIp);
 
