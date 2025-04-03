@@ -78,6 +78,7 @@
 
     socket.on(`outputCar-${operator}`, async (data) => {
       outputCar.value = data;
+      console.log(data);
       isOpenOutput.value = true;
     });
   };

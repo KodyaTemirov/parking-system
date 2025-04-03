@@ -32,7 +32,8 @@
   watch(
     () => props.newCar,
     (newValue) => {
-      localNewCar.value = { ...newValue };
+      console.log("test", newValue);
+      localNewCar.value = { ...newValue, ...newValue.session };
     },
     { immediate: true }
   );
