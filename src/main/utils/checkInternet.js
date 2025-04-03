@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const checkInternetConnection = async () => {
   try {
-    await axios.get("https://www.google.com", { timeout: 3000 });
+    await axios.get("https://www.google.com", { timeout: 500 });
     return true;
   } catch (error) {
     return false;
@@ -18,7 +18,7 @@ export const checkInternetConnectionWithFallback = async () => {
 
   for (const url of urls) {
     try {
-      await axios.get(url, { timeout: 3000 });
+      await axios.get(url, { timeout: 1000 });
       return true;
     } catch (error) {
       continue;
