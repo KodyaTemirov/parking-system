@@ -11,6 +11,7 @@ import { openFetchByIp, setInner } from "@/utils/plateFunctions.js";
 const registerSession = async (req, res) => {
   const { number, plateImage, fullImage, eventName, tariffType, paymentMethod, cameraIp } =
     req.body;
+  console.log("🔹 Регистрация:", cameraIp);
 
   if (!number) {
     return await getSnapshotSession(eventName, tariffType, paymentMethod, cameraIp, res);
@@ -49,7 +50,7 @@ const registerSession = async (req, res) => {
 
   // await openFetchByIp(cameraIp);
 
-  if (checkInternetConnection()) {
+  if (await checkInternetConnection()) {
     insertedData.event = "input";
     await postInfo({
       type: "insert",
@@ -120,7 +121,7 @@ const outputSession = async (req, res) => {
     await getIO().emit("newUpdate", insertedData);
     await sendParkStats();
 
-    if (checkInternetConnection()) {
+    if (await checkInternetConnection()) {
       insertedData.event = "output";
       await postInfo({
         type: "insert",
@@ -181,7 +182,7 @@ const outputSession = async (req, res) => {
       await getIO().emit("newUpdate", insertedData);
       await sendParkStats();
 
-      if (checkInternetConnection()) {
+      if (await checkInternetConnection()) {
         insertedData.event = "output";
         await postInfo({
           type: "insert",
@@ -250,7 +251,7 @@ const closeSnapshotSession = async (
     await getIO().emit("newUpdate", insertedData);
     await sendParkStats();
 
-    if (checkInternetConnection()) {
+    if (await checkInternetConnection()) {
       insertedData.event = "output";
       await postInfo({
         type: "insert",
@@ -309,7 +310,7 @@ const closeSnapshotSession = async (
       await getIO().emit("newUpdate", insertedData);
       await sendParkStats();
 
-      if (checkInternetConnection()) {
+      if (await checkInternetConnection()) {
         insertedData.event = "output";
         await postInfo({
           type: "insert",

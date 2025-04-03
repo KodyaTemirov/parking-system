@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const checkInternetConnection = async () => {
   try {
-    await axios.get("https://www.google.com", { timeout: 5000 });
+    await axios.get("https://www.google.com", { timeout: 3000 });
     return true;
   } catch (error) {
     return false;

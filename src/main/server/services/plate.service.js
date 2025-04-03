@@ -15,6 +15,7 @@ import {
 import { sendParkStats } from "../../utils/sessionFunctions.js";
 
 const inputCar = async (req, res) => {
+  console.log("Input CAR:", req.headers.host);
   try {
     if (!req.body) {
       res.status(400).send("No body in request");

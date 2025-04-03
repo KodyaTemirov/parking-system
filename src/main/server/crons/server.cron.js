@@ -11,7 +11,7 @@ import { uploadImage } from "@/utils/postInfo.js";
 const startCronJob = () => {
   cron.schedule("*/10 * * * *", async () => {
     try {
-      if (!checkInternetConnection()) return;
+      if (!(await checkInternetConnection())) return;
       console.log("CRON STARTED ===================================");
 
       const stmt = db.prepare("SELECT * FROM sessions where isUpdated = 1 or isSync = 0");

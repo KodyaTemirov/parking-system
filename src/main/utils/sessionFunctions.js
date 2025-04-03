@@ -246,7 +246,7 @@ const getSnapshotSession = async (eventName, tariffType, paymentMethod, cameraIp
 
   insertedData.operatorId = camera.operatorId;
 
-  if (checkInternetConnection()) {
+  if (await checkInternetConnection()) {
     insertedData.event = "input";
     await postInfo({
       type: "insert",
@@ -400,7 +400,7 @@ const deleteSession = (id) => {
 
 const sendSessions = async () => {
   try {
-    if (!checkInternetConnection()) return;
+    if (!(await checkInternetConnection())) return;
     console.log("CRON STARTED ===================================");
 
     const stmt = db.prepare("SELECT * FROM sessions where isUpdated = 1 or isSync = 0");
