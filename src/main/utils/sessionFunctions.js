@@ -398,6 +398,60 @@ const deleteSession = (id) => {
   stmt.run(id);
 };
 
+const sendSessions = async () => {
+  try {
+    if (!checkInternetConnection()) return;
+    console.log("CRON STARTED ===================================");
+
+    const stmt = db.prepare("SELECT * FROM sessions where isUpdated = 1 or isSync = 0");
+    const sessions = stmt.all();
+    for (const item of sessions) {
+      if (item.inputPlateImage != null && item.inputFullImage != null) {
+        const image = getImageFile(item.inputPlateImage);
+        const imageFull = getImageFile(item.inputFullImage);
+
+        const plateImageId = await uploadImage(image);
+        const fullImageId = await uploadImage(imageFull);
+
+        item.inputPlateImage = plateImageId;
+        item.inputFullImage = fullImageId;
+      }
+      if (item.outputPlateImage != null && item.outputFullImage != null) {
+        const image = getImageFile(item.outputPlateImage);
+        const imageFull = getImageFile(item.outputFullImage);
+
+        const plateImageId = await uploadImage(image);
+        const fullImageId = await uploadImage(imageFull);
+
+        item.outputPlateImage = plateImageId;
+        item.outputFullImage = fullImageId;
+      }
+    }
+
+    axios.post(
+      `https://raqamli-bozor.uz/services/platon-core/api/v2/desktop/market/vehicles`,
+      {
+        data: sessions,
+      },
+      {
+        headers: {
+          token: "68fa03a7-ff2f-cfdf-bbe7-c4e42e93a13e",
+        },
+      }
+    );
+
+    const sessionIds = sessions.map((session) => session.id);
+    if (sessionIds.length > 0) {
+      const placeholders = sessionIds.map(() => "?").join(",");
+      db.prepare(`UPDATE sessions SET isSync = 1, isUpdated = 0 WHERE id IN (${placeholders})`).run(
+        ...sessionIds
+      );
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export {
   getSessionByNumber,
   handleOutputSession,
@@ -411,4 +465,5 @@ export {
   getParkStats,
   sendParkStats,
   deleteSession,
+  sendSessions,
 };

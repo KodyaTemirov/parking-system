@@ -38,7 +38,7 @@ const inputCar = async (req, res) => {
     if (isInnerCheck) {
       getIO().emit(`notification-${operator.operatorId}`, {
         type: "error",
-        message: `${isInnerCheck.id} уже внутри!`,
+        message: `${isInnerCheck.id} allaqachon ichkarida!`,
       });
       res.status(200).send("Car already inner");
       return;
@@ -51,7 +51,7 @@ const inputCar = async (req, res) => {
 
       getIO().emit(`notification-${operator.operatorId}`, {
         type: "success",
-        message: `${lastSession.id} не имеет долгов!`,
+        message: `${lastSession.id} qarzi mavjud emas!`,
       });
 
       await setInner(number, 1, "number");
@@ -100,7 +100,7 @@ const inputCarById = async (req, res) => {
     if (isInnerCheck) {
       getIO().emit(`notification-${operator.operatorId}`, {
         type: "error",
-        message: `${isInnerCheck.id} уже внутри!`,
+        message: `${isInnerCheck.id} allaqachon ichkarida!`,
       });
       res.status(200).send("Car already inner");
       return;
@@ -120,7 +120,7 @@ const inputCarById = async (req, res) => {
 
       getIO().emit(`notification-${operator.operatorId}`, {
         type: "success",
-        message: `${lastSession.id} не имеет долгов!`,
+        message: `${lastSession.id} qarzi mavjud emas!`,
       });
 
       res.status(200).send({
@@ -191,7 +191,7 @@ const outputCar = async (req, res) => {
 
       getIO().emit(`notification-${operator.operatorId}`, {
         type: "success",
-        message: `${lastSession.id} не имеет долгов!`,
+        message: `${lastSession.id} qarzi mavjud emas!`,
       });
 
       // await openFetchByIp(req.headers.host);
@@ -254,7 +254,7 @@ const outputCar = async (req, res) => {
 
         getIO().emit(`notification-${operator.operatorId}`, {
           type: "success",
-          message: `${sessionNotEnded.id} не имеет долгов!`,
+          message: `${sessionNotEnded.id} qarzi mavjud emas!`,
         });
       }
       return res.status(200).send("OK");
@@ -303,7 +303,7 @@ const outputCarById = async (req, res) => {
 
       getIO().emit(`notification-${operator.operatorId}`, {
         type: "success",
-        message: `${lastSession.id} не имеет долгов!`,
+        message: `${lastSession.id} qarzi mavjud emas!`,
       });
 
       return res.status(200).send({
@@ -371,7 +371,7 @@ const outputCarById = async (req, res) => {
 
         getIO().emit(`notification-${operator.operatorId}`, {
           type: "success",
-          message: `${sessionNotEnded.id} не имеет долгов!`,
+          message: `${sessionNotEnded.id} qarzi mavjud emas!`,
         });
 
         return res.status(200).send({
