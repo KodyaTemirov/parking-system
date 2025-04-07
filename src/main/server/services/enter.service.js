@@ -26,7 +26,7 @@ const postEnter = async (req, res) => {
    openedAt) VALUES (?,?,?);
   `);
 
-    const result = stmt.run(cameraId, operatorId, openedAt);
+    const result = stmt.run(cameraId, operatorId, new Date().toISOString());
 
     const insertedData = db
       .prepare("SELECT * FROM operators WHERE id = ?")
