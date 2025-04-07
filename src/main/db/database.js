@@ -61,6 +61,17 @@ db.prepare(
 `
 ).run();
 
+db.prepare(
+  `
+  CREATE TABLE IF NOT EXISTS enters (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    cameraId INTEGER,
+    operatorId INTEGER,
+    openedAt TEXT
+  );
+`
+).run();
+
 console.log(`✅ База данных подключена: ${dbPath}`);
 
 export default db;
