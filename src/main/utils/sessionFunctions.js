@@ -7,6 +7,7 @@ import { postInfo } from "./postInfo.js";
 import { tariffs } from "@/config";
 import { deleteImageFile, saveBase64Image } from "./saveBase64Image.js";
 import { getIO } from "./socket.js";
+import generateOfd from "./generateOfd.js";
 
 const getSessionByNumber = (number) => {
   const data = db
@@ -239,6 +240,21 @@ const getSnapshotSession = async (eventName, tariffType, paymentMethod, cameraIp
     cameraIp,
     new Date().toISOString()
   );
+
+  if (await checkInternetConnection()) {
+    const url = await generateOfd(
+      result.lastInsertRowid,
+      tariffs.find((item) => item.id == tariffType).price
+    );
+
+    db.prepare(
+      `
+      UPDATE sessions
+      SET ofd = ?
+      WHERE id = ?
+    `
+    ).run(url, result.lastInsertRowid);
+  }
 
   const insertedData = db
     .prepare("SELECT * FROM sessions WHERE id = ?")
