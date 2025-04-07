@@ -56,7 +56,8 @@ db.prepare(
     cameraIp TEXT,
     isUpdated INTEGER DEFAULT 0,
     isInner INTEGER DEFAULT 1,
-    lastActivity TEXT
+    lastActivity TEXT,
+    ofd TEXT
   );
 `
 ).run();

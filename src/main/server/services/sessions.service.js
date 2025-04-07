@@ -7,6 +7,7 @@ import { postInfo } from "@/utils/postInfo.js";
 import { checkInternetConnection } from "@/utils/checkInternet.js";
 import { getSnapshotSession, getParkStats, sendParkStats } from "@/utils/sessionFunctions.js";
 import { openFetchByIp, setInner } from "@/utils/plateFunctions.js";
+import generateOfd from "../../utils/generateOfd.js";
 
 const registerSession = async (req, res) => {
   const { number, plateImage, fullImage, eventName, tariffType, paymentMethod, cameraIp } =
@@ -38,6 +39,21 @@ const registerSession = async (req, res) => {
     cameraIp,
     new Date().toISOString()
   );
+
+  if (await checkInternetConnection()) {
+    const url = await generateOfd(
+      result.lastInsertRowid,
+      tariffs.find((item) => item.id == tariffType).price
+    );
+
+    db.prepare(
+      `
+      UPDATE sessions
+      SET ofd = ?
+      WHERE id = ?
+    `
+    ).run(url, result.lastInsertRowid);
+  }
 
   const insertedData = db
     .prepare("SELECT * FROM sessions WHERE id = ?")
