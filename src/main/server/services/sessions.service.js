@@ -64,7 +64,7 @@ const registerSession = async (req, res) => {
   await getIO().emit("newSession", insertedData);
   await sendParkStats();
 
-  // await openFetchByIp(cameraIp);
+  await openFetchByIp(cameraIp);
 
   if (await checkInternetConnection()) {
     insertedData.event = "input";
@@ -137,7 +137,7 @@ const outputSession = async (req, res) => {
     await getIO().emit("newUpdate", insertedData);
     await sendParkStats();
 
-    // await openFetchByIp(cameraIp);
+    await openFetchByIp(cameraIp);
 
     await setInner(number, 0, "number");
 
@@ -189,7 +189,7 @@ const outputSession = async (req, res) => {
       await getIO().emit("newUpdate", insertedData);
       await sendParkStats();
 
-      // await openFetchByIp(cameraIp);
+      await openFetchByIp(cameraIp);
       await setInner(number, 0, "number");
 
       res.status(201).send(insertedData);
@@ -249,7 +249,7 @@ const closeSnapshotSession = async (
     await getIO().emit("newUpdate", insertedData);
     await sendParkStats();
 
-    // await openFetchByIp(cameraIp);
+    await openFetchByIp(cameraIp);
 
     await setInner(id, 0, "id");
 
@@ -299,7 +299,7 @@ const closeSnapshotSession = async (
       await getIO().emit("newUpdate", insertedData);
       await sendParkStats();
 
-      // await openFetchByIp(cameraIp);
+      await openFetchByIp(cameraIp);
 
       await setInner(id, 0, "id");
 

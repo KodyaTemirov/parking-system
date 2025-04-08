@@ -274,7 +274,7 @@ const getSnapshotSession = async (eventName, tariffType, paymentMethod, cameraIp
   await getIO().emit("newSession", insertedData);
   await sendParkStats();
 
-  // await openFetchByIp(cameraIp);
+  await openFetchByIp(cameraIp);
 
   res.status(201).send(insertedData);
 };

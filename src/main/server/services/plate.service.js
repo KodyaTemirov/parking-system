@@ -114,7 +114,7 @@ const inputCarById = async (req, res) => {
     if (isPayedTodayValue) {
       const lastSession = getLastSession(id, "id");
 
-      // await openFetchByIp(cameraIp);
+      await openFetchByIp(cameraIp);
 
       await setInner(id, 1, "id");
       await sendParkStats();
@@ -300,7 +300,7 @@ const outputCarById = async (req, res) => {
       await setInner(id, 0, "id");
       await sendParkStats();
 
-      // await openFetchByIp(cameraIp);
+      await openFetchByIp(cameraIp);
 
       getIO().emit(`notification-${operator.operatorId}`, {
         type: "success",
@@ -365,7 +365,7 @@ const outputCarById = async (req, res) => {
           outputCost: 0,
         });
 
-        // await openFetchByIp(cameraIp);
+        await openFetchByIp(cameraIp);
 
         await setInner(id, 0, "id");
         await sendParkStats();

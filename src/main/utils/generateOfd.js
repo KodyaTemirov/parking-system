@@ -2,10 +2,18 @@ import axios from "axios";
 
 const generateOfd = async (id, sum) => {
   try {
-    const data = await axios.post(`https://raqamli-bozor.uz/services/platon-core/api/v1/pms/ofd`, {
-      id,
-      sum,
-    });
+    const data = await axios.post(
+      `https://raqamli-bozor.uz/services/platon-core/api/v1/pms/ofd`,
+      {
+        id,
+        sum,
+      },
+      {
+        headers: {
+          Authorization: "Basic " + btoa(`pms_306576853:a3f1c8d92b7e4f65`),
+        },
+      }
+    );
 
     return data.data.url;
   } catch (error) {
