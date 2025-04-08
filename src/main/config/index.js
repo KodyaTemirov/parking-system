@@ -1,4 +1,4 @@
-export const ipServer = "http://192.168.0.101:9061";
+export const ipServer = "http://192.168.1.60:9061";
 export const tariffs = [
   {
     value: "Yengil avtomobillar va mikroavtobuslar",
