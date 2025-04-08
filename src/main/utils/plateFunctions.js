@@ -39,7 +39,7 @@ const openFetch = async (status, ip, login, password) => {
   </action>
 </config>`;
 
-    const response = await axios.post(`https://${ip}/ManualAlarmOut/1`, raw, config);
+    const response = await axios.post(`http://${ip}/ManualAlarmOut/1`, raw, config);
     console.log(response.data);
   } catch (error) {
     console.error("Ошибка запроса:", error.message);
@@ -82,7 +82,7 @@ const isEnoughTime = async (item, type) => {
       const lastActivity = new Date(session.lastActivity);
       const now = new Date();
       const timeDiff = now - lastActivity;
-      if (timeDiff > 30000) {
+      if (timeDiff > 5000) {
         return true;
       } else {
         return false;

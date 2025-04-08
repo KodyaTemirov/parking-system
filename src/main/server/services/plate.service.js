@@ -6,6 +6,7 @@ import { saveBase64Image } from "@/utils/saveBase64Image.js";
 import { handleOutputSession, handleOutputSessionId } from "@/utils/sessionFunctions.js";
 import { isEnoughTime, isInner, setInner } from "@/utils/plateFunctions.js";
 import { getSnapshot } from "@/utils/getSnapshot.js";
+import { openFetchByIp } from "@/utils/plateFunctions";
 import {
   calculateParkingCost,
   getLastSession,
@@ -21,6 +22,7 @@ const inputCar = async (req, res) => {
       res.status(400).send("No body in request");
       throw new Error("No body in request");
     }
+    console.log("input");
 
     const operator = await getCameraOperator(req.headers.host);
 
@@ -60,7 +62,7 @@ const inputCar = async (req, res) => {
 
       const camera = await getCameraOperator(req.headers.host);
 
-      // await openFetchByIp(req.headers.host);
+      await openFetchByIp(req.headers.host);
 
       res.status(200).send("Car already payed today");
 
@@ -157,6 +159,7 @@ const outputCar = async (req, res) => {
       throw new Error("No body in request");
     }
 
+    console.log("output");
     const { fullImage, plateImage, number } = parsePlateData(req.body);
 
     const check = await isEnoughTime(number, "number");
@@ -173,6 +176,7 @@ const outputCar = async (req, res) => {
     const session = getLastSession(number);
 
     if (isPayedTodayValue) {
+      console.log("payed");
       const lastSession = getLastSession(number);
 
       const plateImageFile = saveBase64Image(plateImage);
@@ -195,7 +199,7 @@ const outputCar = async (req, res) => {
         message: `${lastSession.id} qarzi mavjud emas!`,
       });
 
-      // await openFetchByIp(req.headers.host);
+      await openFetchByIp(req.headers.host);
 
       return res.status(200).send("OK");
     } else if (session) {
@@ -236,6 +240,8 @@ const outputCar = async (req, res) => {
           eventName: "output",
         });
       } else {
+        console.log("payed-2");
+
         const plateImageFile = saveBase64Image(plateImage);
         const fullImageFile = saveBase64Image(fullImage);
 
@@ -251,7 +257,7 @@ const outputCar = async (req, res) => {
         await setInner(number, 0, "number");
         await sendParkStats();
 
-        // await openFetchByIp(req.headers.host);
+        await openFetchByIp(req.headers.host);
 
         getIO().emit(`notification-${operator.operatorId}`, {
           type: "success",

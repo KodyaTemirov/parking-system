@@ -14,6 +14,8 @@ const generateOfd = async (id, sum) => {
         },
       }
     );
+    console.log(data, 'ofd info');
+    console.log(data.data, 'ofd info');
 
     return data.data.url;
   } catch (error) {
