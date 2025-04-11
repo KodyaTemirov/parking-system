@@ -14,10 +14,8 @@ const generateOfd = async (id, sum) => {
         },
       }
     );
-    console.log(data, 'ofd info');
-    console.log(data.data, 'ofd info');
 
-    return data.data.url;
+    return data.data.data.url;
   } catch (error) {
     console.error("Error generating OFD:", error);
     throw new Error("Failed to generate OFD");

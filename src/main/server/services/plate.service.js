@@ -16,19 +16,21 @@ import {
 import { sendParkStats } from "../../utils/sessionFunctions.js";
 
 const inputCar = async (req, res) => {
-  console.log("Input CAR:", req.headers.host);
+  // console.log(req.headers, 'headers');
+  // res.status(200).send(req.body)
   try {
     if (!req.body) {
       res.status(400).send("No body in request");
       throw new Error("No body in request");
     }
-    console.log("input");
+    console.log("input", new Date().toLocaleString())
+
 
     const operator = await getCameraOperator(req.headers.host);
 
     if (!operator) return res.status(200).send("Operator not found");
 
-    const { fullImage, plateImage, number } = parsePlateData(req.body);
+    const { fullImage, plateImage, number } = req.body;
 
     const check = await isEnoughTime(number, "number");
 
@@ -80,6 +82,7 @@ const inputCar = async (req, res) => {
 
     res.status(200).send("OK");
   } catch (error) {
+    console.log(error);
     res.status(400).send(error);
   }
 };
@@ -159,8 +162,8 @@ const outputCar = async (req, res) => {
       throw new Error("No body in request");
     }
 
-    console.log("output");
-    const { fullImage, plateImage, number } = parsePlateData(req.body);
+    const { fullImage, plateImage, number } = req.body;
+    console.log("output", new Date().toLocaleString())
 
     const check = await isEnoughTime(number, "number");
 
@@ -176,7 +179,7 @@ const outputCar = async (req, res) => {
     const session = getLastSession(number);
 
     if (isPayedTodayValue) {
-      console.log("payed");
+      console.log('payed');
       const lastSession = getLastSession(number);
 
       const plateImageFile = saveBase64Image(plateImage);
@@ -240,7 +243,7 @@ const outputCar = async (req, res) => {
           eventName: "output",
         });
       } else {
-        console.log("payed-2");
+      console.log('payed-2');
 
         const plateImageFile = saveBase64Image(plateImage);
         const fullImageFile = saveBase64Image(fullImage);

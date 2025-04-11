@@ -4,6 +4,7 @@ import { getImageFile } from "./getImageFile.js";
 import fs from "fs";
 import axios from "axios";
 import FormData from "form-data";
+import { checkInternetConnection } from "@/utils/checkInternet.js";
 
 const postInfo = async (data) => {
   try {
@@ -32,11 +33,19 @@ const postInfo = async (data) => {
       }
     }
 
+    if(data.type == "insert" && !data.data.plateNumber){
+      data.data.plateNumber = data.data.id
+    }
+
+    console.log(data);
+
     const response = await axios.post(`${url}/v1/desktop/market/vehicles`, data, {
       headers: {
         token: "41b197f7-27b1-4b33-8a91-a8232b664e26",
       },
     });
+
+    console.log(response.data);
 
     if (data.type == "insert") {
       db.prepare("UPDATE sessions SET isSync = 1, isUpdated = 0 WHERE id = ?").run(data.data.id);
@@ -50,12 +59,16 @@ const postInfo = async (data) => {
 
     return response.data;
   } catch (error) {
+    console.log(error)
     throw error;
   }
 };
 
 const uploadImage = async (filePath) => {
   try {
+    if(!filePath){
+      throw new Error(`Пустой путь`);
+    }
     const formDataOriginal = new FormData();
     const fileStream = fs.createReadStream(filePath);
 
@@ -89,4 +102,63 @@ const uploadMedia = async (config) => {
   }
 };
 
-export { postInfo, uploadImage };
+
+const uploadOldInfos = async () => {
+  try {
+    if (!(await checkInternetConnection())) return;
+    console.log("CRON STARTED ===================================");
+  
+    const stmt = db.prepare("SELECT * FROM sessions where isUpdated = 1 or isSync = 0");
+    const sessions = stmt.all();
+    for (const item of sessions) {
+      if(!item.plateNumber){
+        item.plateNumber = item.id
+      }
+      if (item.inputPlateImage != null && item.inputFullImage != null) {
+        const image = getImageFile(item.inputPlateImage);
+        const imageFull = getImageFile(item.inputFullImage);
+  
+        const plateImageId = await uploadImage(image);
+        const fullImageId = await uploadImage(imageFull);
+  
+        item.inputPlateImage = plateImageId;
+        item.inputFullImage = fullImageId;
+      }
+      if (item.outputPlateImage != null && item.outputFullImage != null) {
+        const image = getImageFile(item.outputPlateImage);
+        const imageFull = getImageFile(item.outputFullImage);
+  
+        const plateImageId = await uploadImage(image);
+        const fullImageId = await uploadImage(imageFull);
+  
+        item.outputPlateImage = plateImageId;
+        item.outputFullImage = fullImageId;
+      }
+    }
+  
+    axios.post(
+      `https://raqamli-bozor.uz/services/platon-core/api/v2/desktop/market/vehicles`,
+      {
+        data: sessions,
+      },
+      {
+        headers: {
+          token: "68fa03a7-ff2f-cfdf-bbe7-c4e42e93a13e",
+        },
+      }
+    );
+  
+    const sessionIds = sessions.map((session) => session.id);
+    if (sessionIds.length > 0) {
+      const placeholders = sessionIds.map(() => "?").join(",");
+      db.prepare(
+        `UPDATE sessions SET isSync = 1, isUpdated = 0 WHERE id IN (${placeholders})`
+      ).run(...sessionIds);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+export { postInfo, uploadImage,uploadOldInfos };

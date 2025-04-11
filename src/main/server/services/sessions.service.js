@@ -8,6 +8,7 @@ import { checkInternetConnection } from "@/utils/checkInternet.js";
 import { getSnapshotSession, getParkStats, sendParkStats } from "@/utils/sessionFunctions.js";
 import { openFetchByIp, setInner } from "@/utils/plateFunctions.js";
 import generateOfd from "../../utils/generateOfd.js";
+import { uploadOldInfos } from "../../utils/postInfo.js";
 
 const registerSession = async (req, res) => {
   const { number, plateImage, fullImage, eventName, tariffType, paymentMethod, cameraIp } =
@@ -90,6 +91,9 @@ const outputSession = async (req, res) => {
       outputCost,
       cameraIp
     );
+
+    await uploadOldInfos()
+
     res.status(201).send(info);
   }
 
@@ -141,6 +145,8 @@ const outputSession = async (req, res) => {
 
     await setInner(number, 0, "number");
 
+    await uploadOldInfos()
+
     res.status(201).send(insertedData);
   } else {
     const lastPaidSession = db
@@ -191,6 +197,9 @@ const outputSession = async (req, res) => {
 
       await openFetchByIp(cameraIp);
       await setInner(number, 0, "number");
+
+      await uploadOldInfos()
+
 
       res.status(201).send(insertedData);
     }
@@ -252,6 +261,7 @@ const closeSnapshotSession = async (
     await openFetchByIp(cameraIp);
 
     await setInner(id, 0, "id");
+    
 
     return insertedData;
   } else {

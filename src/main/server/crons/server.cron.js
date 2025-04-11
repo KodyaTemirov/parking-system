@@ -17,6 +17,9 @@ const startCronJob = () => {
       const stmt = db.prepare("SELECT * FROM sessions where isUpdated = 1 or isSync = 0");
       const sessions = stmt.all();
       for (const item of sessions) {
+        if(!item.plateNumber){
+          item.plateNumber = item.id
+        }
         if (item.inputPlateImage != null && item.inputFullImage != null) {
           const image = getImageFile(item.inputPlateImage);
           const imageFull = getImageFile(item.inputFullImage);

@@ -30,9 +30,13 @@ const isPeriodPaid = (entryTime, paidDays) => {
       return true;
     }
 
+    console.log(paidDays,currentDate <= paidUntilDate)
+
     // Для времени больше 24 часов проверяем оплаченные дни
     const extraDays = Math.ceil((diffInMinutes - 24 * 60) / (24 * 60));
     const paidUntilDate = entryDate + (paidDays + extraDays) * 24 * 60 * 60 * 1000;
+    console.log(paidDays,currentDate <= paidUntilDate , 'paids')
+
     return currentDate <= paidUntilDate;
   } catch (error) {
     console.error("Ошибка при проверке оплаченного периода:", error);
